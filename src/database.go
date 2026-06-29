@@ -10,27 +10,31 @@ import (
 	"database/sql"
 )
 
-/** This file contains:
+/**
+This file contains:
+
 --- Users ---
-- create user (u User) (id int64, error error)
-- get user (uid uint64) returns a *User, error
-- update user (u User) error
-- delete user (uid uint64) error
-- get servers by user (uid uint64) returns []Server, error
-- check if user exists (id uint64) returns bool, error
-- get user id by username (username string) returns uint64, error
+- CreateUser(u User) (int64, error)
+- GetUser(id uint64) (*User, error)
+- UpdateUserProfile(u User) error
+- UpdateUser(u User) error
+- DeleteUser(id uint64) error
+- GetServersByUser(userID uint64) ([]Server, error)
+- UserExists(id uint64) (bool, error)
+- GetUserIDByUsername(username string) (uint64, error)
 
 --- Passwords ---
-- hash password (password string) returns string, error
-- check password (hash, password string) bool
-- check password with db (uint64, password) returns bool, error
+- HashPassword(password string) (string, error)
+- CheckPassword(hash, password string) (bool, error)
+- CheckPasswordDB(userID uint64, password string) (bool, error)
 
 --- Session Tokens ---
-- generate session token () returns string, error
-- set session token (uid uint64, token string, expires time.Time) error
-- check session token (uid uint64, token string) returns bool, error
-- get username from session token (token string) returns string, error
+- GenerateSessionToken() (string, error)
+- SetSessionToken(userID uint64, token string, expires time.Time) error
+- CheckSessionToken(userID uint64, token string) (bool, error)
+- GetUIDFromToken(sessionToken string) (uint64, error)
 **/
+
 
 /** USERS **/
 
@@ -191,9 +195,9 @@ func (a *App) CheckPasswordDB(userID uint64, password string) (bool, error) {
 		return false, err
 	}
 
-	ok, e := a.CheckPassword(hash, password)
+	ok, err := a.CheckPassword(hash, password)
 	if err != nil {
-		return false, e
+		return false, err
 	}
 
 	if !ok {
