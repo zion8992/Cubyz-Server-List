@@ -32,7 +32,26 @@
 
 		<div class="tab-panel" id="tab-servers">
 			<h2>Servers</h2>
-			<p>Coming soon...</p>
+			<a href="/servers/create" class="button">Create Server</a>
+
+			{{ if .Servers }}
+			<ul class="server-list">
+				{{ range .Servers }}
+				<li class="server-list-item">
+					<img src="/static/img/default_server.png" alt="Server icon" class="server-list-icon">
+					<a href="/servers/{{ .ID }}" class="server-list-name">{{ .Name }}</a>
+					<div class="server-list-actions">
+						<a href="/servers/edit/{{ .ID }}" class="button">Edit</a>
+						<form method="POST" action="/servers/delete/{{ .ID }}" onsubmit="return confirm('Delete this server?');">
+							<button type="submit" class="button danger">Delete</button>
+						</form>
+					</div>
+				</li>
+				{{ end }}
+			</ul>
+			{{ else }}
+			<p class="empty">You don't have any servers yet.</p>
+			{{ end }}
 		</div>
 	</section>
 </div>

@@ -4,21 +4,12 @@ import (
 	"database/sql"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/justinas/alice"
-	"html/template"
 	"log/slog"
 	"net/http"
 	"os"
 	"fmt"
 	"time"
 )
-
-type App struct {
-	Log *slog.Logger
-	DB  *sql.DB
-	BlockedWords string
-	DefaultExpiry time.Duration
-	TemplateCache map[string]*template.Template
-}
 
 func main() {
 	app := NewApp()
@@ -41,6 +32,14 @@ func main() {
 
 	// semi-static pages
 	mux.HandleFunc("/", app.SlashHandler)
+
+	// servers
+	mux.HandleFunc("GET /servers/create", app.ServerCreateGET)
+	mux.HandleFunc("POST /servers/create", app.ServerCreatePOST)
+	mux.HandleFunc("GET /servers/{id}", app.ServerInfo)
+	mux.HandleFunc("GET /servers/edit/{id}", app.ServerEditGET)
+	mux.HandleFunc("POST /servers/edit/{id}", app.ServerEditPOST)
+	mux.HandleFunc("POST /servers/delete/{id}", app.ServerDeletePOST)
 
 	app.Log.Info("Listening on :8000...")
 	err := http.ListenAndServe(":8000", handler)

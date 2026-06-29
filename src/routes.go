@@ -6,6 +6,8 @@ import (
 	"strings"
 	"database/sql"
 	"time"
+	"fmt"
+	"strconv"
 )
 
 
@@ -163,16 +165,25 @@ func (a *App) AccountGET(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	servers, err := a.GetServersByUser(uid)
+	if err != nil {
+		a.Error(w, r, "Failed to load servers: "+err.Error())
+		return
+	}
+
 	data := struct {
 		Page
 		User
+		Servers []Server
 	}{
-		Page: Page{IsLoggedIn: true},
-		User: *user,
+		Page:    Page{IsLoggedIn: true},
+		User:    *user,
+		Servers: servers,
 	}
 
 	a.render(w, r, http.StatusOK, "account.html", data)
 }
+
 
 func (a *App) AccountPOST(w http.ResponseWriter, r *http.Request) {
 	ok, err := a.CheckReqSessionTok(r)
@@ -226,4 +237,250 @@ func getSessionCookie(r *http.Request) string {
 		return ""
 	}
 	return cookie.Value
+}
+
+/** SERVERS **/
+
+func (a *App) ServerCreateGET(w http.ResponseWriter, r *http.Request) {
+	ok, err := a.CheckReqSessionTok(r)
+	if err != nil || !ok {
+		http.Redirect(w, r, "/login", http.StatusSeeOther)
+		return
+	}
+
+	data := Page{
+		IsLoggedIn: true,
+	}
+
+	a.render(w, r, http.StatusOK, "server_create.html", data)
+}
+
+func (a *App) ServerCreatePOST(w http.ResponseWriter, r *http.Request) {
+	ok, err := a.CheckReqSessionTok(r)
+	if err != nil || !ok {
+		http.Redirect(w, r, "/login", http.StatusSeeOther)
+		return
+	}
+
+	uid, err := a.GetUIDFromToken(getSessionCookie(r))
+	if err != nil {
+		a.Error(w, r, "Failed to identify user: "+err.Error())
+		return
+	}
+
+	r.ParseForm()
+
+	name := strings.TrimSpace(r.FormValue("name"))
+	if name == "" {
+		a.Error(w, r, "Server name is required")
+		return
+	}
+
+	ip := strings.TrimSpace(r.FormValue("ip"))
+	if ip == "" {
+		a.Error(w, r, "Server IP is required")
+		return
+	}
+
+
+	s := Server{
+		Name:         name,
+		Description:  strings.TrimSpace(r.FormValue("description")),
+		XMLFeedLink:  strings.TrimSpace(r.FormValue("xml_feed_link")),
+		PlayerCount:  0,
+		OwnerID:      uid,
+		Gamemodes:    strings.TrimSpace(r.FormValue("gamemodes")),
+		Version:      strings.TrimSpace(r.FormValue("version")),
+		Languages:    strings.TrimSpace(r.FormValue("languages")),
+		RequiresMods: r.FormValue("requires_mods") == "on",
+		WebsiteURL:   strings.TrimSpace(r.FormValue("website_url")),
+		ChatURL:      strings.TrimSpace(r.FormValue("chat_url")),
+	}
+
+	id, err := a.CreateServer(s)
+	if err != nil {
+		a.Error(w, r, "Failed to create server: "+err.Error())
+		return
+	}
+
+	http.Redirect(w, r, fmt.Sprintf("/servers/%d", id), http.StatusSeeOther)
+}
+
+func (a *App) ServerInfo(w http.ResponseWriter, r *http.Request) {
+	idStr := r.PathValue("id")
+	id, err := strconv.ParseUint(idStr, 10, 64)
+	if err != nil {
+		a.Return404(w, r)
+		return
+	}
+
+	server, err := a.GetServer(id)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			a.Return404(w, r)
+			return
+		}
+		a.Error(w, r, "Failed to load server: "+err.Error())
+		return
+	}
+
+	isOwner := false
+	if ok, _ := a.CheckReqSessionTok(r); ok {
+		uid, err := a.GetUIDFromToken(getSessionCookie(r))
+		if err == nil && uid == server.OwnerID {
+			isOwner = true
+		}
+	}
+
+	data := struct {
+		Page
+		Server
+		IsOwner bool
+	}{
+		Page:    Page{IsLoggedIn: a.HasSessionToken(r)},
+		Server:  *server,
+		IsOwner: isOwner,
+	}
+
+	a.render(w, r, http.StatusOK, "server_info.html", data)
+}
+
+func (a *App) ServerEditGET(w http.ResponseWriter, r *http.Request) {
+	ok, err := a.CheckReqSessionTok(r)
+	if err != nil || !ok {
+		http.Redirect(w, r, "/login", http.StatusSeeOther)
+		return
+	}
+
+	uid, err := a.GetUIDFromToken(getSessionCookie(r))
+	if err != nil {
+		a.Error(w, r, "Failed to identify user: "+err.Error())
+		return
+	}
+
+	idStr := r.PathValue("id")
+	id, err := strconv.ParseUint(idStr, 10, 64)
+	if err != nil {
+		a.Return404(w, r)
+		return
+	}
+
+	server, err := a.GetServer(id)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			a.Return404(w, r)
+			return
+		}
+		a.Error(w, r, "Failed to load server: "+err.Error())
+		return
+	}
+
+	if server.OwnerID != uid {
+		a.Return404(w, r)
+		return
+	}
+
+	data := struct {
+		Page
+		Server
+	}{
+		Page:   Page{IsLoggedIn: true},
+		Server: *server,
+	}
+
+	a.render(w, r, http.StatusOK, "server_edit.html", data)
+}
+
+func (a *App) ServerEditPOST(w http.ResponseWriter, r *http.Request) {
+	ok, err := a.CheckReqSessionTok(r)
+	if err != nil || !ok {
+		http.Redirect(w, r, "/login", http.StatusSeeOther)
+		return
+	}
+
+	uid, err := a.GetUIDFromToken(getSessionCookie(r))
+	if err != nil {
+		a.Error(w, r, "Failed to identify user: "+err.Error())
+		return
+	}
+
+	idStr := r.PathValue("id")
+	id, err := strconv.ParseUint(idStr, 10, 64)
+	if err != nil {
+		a.Return404(w, r)
+		return
+	}
+
+	server, err := a.GetServer(id)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			a.Return404(w, r)
+			return
+		}
+		a.Error(w, r, "Failed to load server: "+err.Error())
+		return
+	}
+
+	if server.OwnerID != uid {
+		a.Return404(w, r)
+		return
+	}
+
+	r.ParseForm()
+
+	name := strings.TrimSpace(r.FormValue("name"))
+	if name == "" {
+		a.Error(w, r, "Server name is required")
+		return
+	}
+
+	s := Server{
+		ID:           id,
+		Name:         name,
+		Description:  strings.TrimSpace(r.FormValue("description")),
+		XMLFeedLink:  strings.TrimSpace(r.FormValue("xml_feed_link")),
+		IP:           strings.TrimSpace(r.FormValue("ip")),
+		Gamemodes:    strings.TrimSpace(r.FormValue("gamemodes")),
+		Version:      strings.TrimSpace(r.FormValue("version")),
+		Languages:    strings.TrimSpace(r.FormValue("languages")),
+		RequiresMods: r.FormValue("requires_mods") == "on",
+		WebsiteURL:   strings.TrimSpace(r.FormValue("website_url")),
+		ChatURL:      strings.TrimSpace(r.FormValue("chat_url")),
+		OwnerID:      uid,
+	}
+
+	if err := a.UpdateServer(s); err != nil {
+		a.Error(w, r, "Failed to update server: "+err.Error())
+		return
+	}
+
+	http.Redirect(w, r, fmt.Sprintf("/servers/%d", id), http.StatusSeeOther)
+}
+
+func (a *App) ServerDeletePOST(w http.ResponseWriter, r *http.Request) {
+	ok, err := a.CheckReqSessionTok(r)
+	if err != nil || !ok {
+		http.Redirect(w, r, "/login", http.StatusSeeOther)
+		return
+	}
+
+	uid, err := a.GetUIDFromToken(getSessionCookie(r))
+	if err != nil {
+		a.Error(w, r, "Failed to identify user: "+err.Error())
+		return
+	}
+
+	idStr := r.PathValue("id")
+	id, err := strconv.ParseUint(idStr, 10, 64)
+	if err != nil {
+		a.Return404(w, r)
+		return
+	}
+
+	if err := a.DeleteServer(id, uid); err != nil {
+		a.Error(w, r, "Failed to delete server: "+err.Error())
+		return
+	}
+
+	http.Redirect(w, r, "/account", http.StatusSeeOther)
 }

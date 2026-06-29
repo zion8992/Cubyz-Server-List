@@ -33,6 +33,13 @@ CREATE TABLE servers (
   xml_feed_link TEXT,
   playercount BIGINT UNSIGNED NOT NULL DEFAULT 0,
   owner_id BIGINT UNSIGNED NOT NULL,
+  gamemodes VARCHAR(255),
+  version VARCHAR(255),
+  languages VARCHAR(255),
+  requires_mods BOOLEAN NOT NULL DEFAULT FALSE,
+  website_url TEXT,
+  chat_url TEXT,
+  ip VARCHAR(255) NOT NULL DEFAULT '',
   FOREIGN KEY (owner_id) REFERENCES users(id) ON DELETE CASCADE
 );
 ```

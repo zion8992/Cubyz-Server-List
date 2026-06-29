@@ -108,35 +108,6 @@ func (a *App) DeleteUser(id uint64) error {
 	return err
 }
 
-func (a *App) GetServersByUser(userID uint64) ([]Server, error) {
-	rows, err := a.DB.Query(
-		"SELECT id,name,description,xml_feed_link,playercount,owner_id FROM servers WHERE owner_id=?",
-		userID,
-	)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-
-	var servers []Server
-	for rows.Next() {
-		var s Server
-		if err := rows.Scan(
-			&s.ID,
-			&s.Name,
-			&s.Description,
-			&s.XMLFeedLink,
-			&s.PlayerCount,
-			&s.OwnerID,
-		); err != nil {
-			return nil, err
-		}
-		servers = append(servers, s)
-	}
-
-	return servers, nil
-}
-
 func (a *App) UserExists(id uint64) (bool, error) {
 	var exists bool
 
@@ -267,4 +238,153 @@ func (a *App) GetUIDFromToken(sessionToken string) (uint64, error) {
 
 	// conversions #2
 	return uint64(converted), nil
+}
+
+/** SERVERS **/
+
+func (a *App) CreateServer(s Server) (int64, error) {
+	res, err := a.DB.Exec(
+		`INSERT INTO servers (
+			name, description, xml_feed_link, ip, playercount, owner_id,
+			gamemodes, version, languages, requires_mods, website_url, chat_url
+		) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+		s.Name,
+		s.Description,
+		s.XMLFeedLink,
+		s.IP,
+		s.PlayerCount,
+		s.OwnerID,
+		s.Gamemodes,
+		s.Version,
+		s.Languages,
+		s.RequiresMods,
+		s.WebsiteURL,
+		s.ChatURL,
+	)
+	if err != nil {
+		return 0, err
+	}
+	return res.LastInsertId()
+}
+
+func (a *App) GetServer(id uint64) (*Server, error) {
+	var s Server
+	var description, xmlFeedLink, ip, gamemodes, version, languages, websiteURL, chatURL sql.NullString
+
+	err := a.DB.QueryRow(
+		`SELECT id, name, description, xml_feed_link, ip, playercount, owner_id,
+			gamemodes, version, languages, requires_mods, website_url, chat_url
+		 FROM servers WHERE id=?`,
+		id,
+	).Scan(
+		&s.ID,
+		&s.Name,
+		&description,
+		&xmlFeedLink,
+		&ip,
+		&s.PlayerCount,
+		&s.OwnerID,
+		&gamemodes,
+		&version,
+		&languages,
+		&s.RequiresMods,
+		&websiteURL,
+		&chatURL,
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	s.Description = description.String
+	s.XMLFeedLink = xmlFeedLink.String
+	s.IP = ip.String
+	s.Gamemodes = gamemodes.String
+	s.Version = version.String
+	s.Languages = languages.String
+	s.WebsiteURL = websiteURL.String
+	s.ChatURL = chatURL.String
+
+	return &s, nil
+}
+
+func (a *App) GetServersByUser(userID uint64) ([]Server, error) {
+	rows, err := a.DB.Query(
+		`SELECT id, name, description, xml_feed_link, ip, playercount, owner_id,
+			gamemodes, version, languages, requires_mods, website_url, chat_url
+		 FROM servers WHERE owner_id=?`,
+		userID,
+	)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var servers []Server
+	for rows.Next() {
+		var s Server
+		var description, xmlFeedLink, ip, gamemodes, version, languages, websiteURL, chatURL sql.NullString
+		if err := rows.Scan(
+			&s.ID,
+			&s.Name,
+			&description,
+			&xmlFeedLink,
+			&ip,
+			&s.PlayerCount,
+			&s.OwnerID,
+			&gamemodes,
+			&version,
+			&languages,
+			&s.RequiresMods,
+			&websiteURL,
+			&chatURL,
+		); err != nil {
+			return nil, err
+		}
+		s.Description = description.String
+		s.XMLFeedLink = xmlFeedLink.String
+		s.IP = ip.String
+		s.Gamemodes = gamemodes.String
+		s.Version = version.String
+		s.Languages = languages.String
+		s.WebsiteURL = websiteURL.String
+		s.ChatURL = chatURL.String
+		servers = append(servers, s)
+	}
+
+	return servers, nil
+}
+
+func (a *App) UpdateServer(s Server) error {
+	_, err := a.DB.Exec(
+		`UPDATE servers SET
+			name = ?,
+			description = ?,
+			xml_feed_link = ?,
+			ip = ?,
+			gamemodes = ?,
+			version = ?,
+			languages = ?,
+			requires_mods = ?,
+			website_url = ?,
+			chat_url = ?
+		 WHERE id = ? AND owner_id = ?`,
+		s.Name,
+		s.Description,
+		s.XMLFeedLink,
+		s.IP,
+		s.Gamemodes,
+		s.Version,
+		s.Languages,
+		s.RequiresMods,
+		s.WebsiteURL,
+		s.ChatURL,
+		s.ID,
+		s.OwnerID,
+	)
+	return err
+}
+
+func (a *App) DeleteServer(id, ownerID uint64) error {
+	_, err := a.DB.Exec(`DELETE FROM servers WHERE id = ? AND owner_id = ?`, id, ownerID)
+	return err
 }
