@@ -1,7 +1,12 @@
 # Setup Database
+```
+create database ironite;
+```
+
 
 ```sql
-DROP TABLE IF EXISTS servers;
+/** USERS **/
+
 DROP TABLE IF EXISTS users;
 
 CREATE TABLE users (
@@ -12,7 +17,14 @@ CREATE TABLE users (
   date_created TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   session_token VARCHAR(255) NULL,
   session_token_expires TIMESTAMP NULL
+  profile_picture_url VARCHAR(500) NULL,
+  description TEXT NULL,
+  pronouns VARCHAR(50) NULL;
 );
+
+/** SERVERS **/
+
+DROP TABLE IF EXISTS servers;
 
 CREATE TABLE servers (
   id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,

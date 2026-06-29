@@ -10,6 +10,7 @@ import (
 	"time"
 )
 
+
 // Struct that stores all data that needs to be shown in a page
 type Page struct {
 	// Sessions
@@ -182,4 +183,99 @@ func (a *App) LoginPOST(w http.ResponseWriter, r *http.Request) {
 
 	http.Redirect(w, r, "/", http.StatusSeeOther)
 	return
+}
+
+func (a *App) AccountGET(w http.ResponseWriter, r *http.Request) {
+	ok, err := a.CheckReqSessionTok(r)
+	if err != nil || !ok {
+		http.Redirect(w, r, "/login", http.StatusSeeOther)
+		return
+	}
+
+	uid, err := a.GetUIDFromToken(getSessionCookie(r))
+	if err != nil {
+		a.Error(w, r, "Failed to identify user: "+err.Error())
+		return
+	}
+
+	user, err := a.GetUser(uid)
+	if err != nil {
+		a.Error(w, r, "Failed to load user: "+err.Error())
+		return
+	}
+
+	tmpl, err := template.ParseFiles(
+		"./templates/base.html",
+		"./templates/account.html",
+	)
+	if err != nil {
+		a.Error(w, r, fmt.Sprintf("failed to load template: %v (templates/account.html)", err))
+		return
+	}
+
+	data := struct {
+		Page
+		User
+	}{
+		Page: Page{IsLoggedIn: true},
+		User: *user,
+	}
+
+	if err := tmpl.Execute(w, data); err != nil {
+		a.Error(w, r, "template execution failed: ", err.Error())
+	}
+}
+
+func (a *App) AccountPOST(w http.ResponseWriter, r *http.Request) {
+	ok, err := a.CheckReqSessionTok(r)
+	if err != nil || !ok {
+		http.Redirect(w, r, "/login", http.StatusSeeOther)
+		return
+	}
+
+	uid, err := a.GetUIDFromToken(getSessionCookie(r))
+	if err != nil {
+		a.Error(w, r, "Failed to identify user: "+err.Error())
+		return
+	}
+
+	r.ParseForm()
+
+	user, err := a.GetUser(uid)
+	if err != nil {
+		a.Error(w, r, "Failed to load user: "+err.Error())
+		return
+	}
+
+	user.Username = strings.TrimSpace(r.FormValue("username"))
+	user.Email = strings.TrimSpace(r.FormValue("email"))
+	user.ProfilePictureURL = strings.TrimSpace(r.FormValue("profile_picture_url"))
+	user.Description = strings.TrimSpace(r.FormValue("description"))
+	user.Pronouns = strings.TrimSpace(r.FormValue("pronouns"))
+
+	if user.Username == "" || user.Email == "" {
+		a.Error(w, r, "Username and email are required")
+		return
+	}
+
+	ok, err = a.ValidateFormFields(user.Username, user.Password, user.Email)
+	if !ok {
+		a.Error(w, r, "Form field validation failed: "+err.Error())
+		return
+	}
+
+	if err := a.UpdateUserProfile(*user); err != nil {
+		a.Error(w, r, "Failed to update account: "+err.Error())
+		return
+	}
+
+	http.Redirect(w, r, "/account", http.StatusSeeOther)
+}
+
+func getSessionCookie(r *http.Request) string {
+	cookie, err := r.Cookie("session_token")
+	if err != nil {
+		return ""
+	}
+	return cookie.Value
 }

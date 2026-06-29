@@ -7,6 +7,7 @@ import (
 	"time"
 	"strconv"
 	"errors"
+	"database/sql"
 )
 
 /** This file contains:
@@ -52,9 +53,11 @@ func (a *App) CreateUser(u User) (int64, error) {
 
 func (a *App) GetUser(id uint64) (*User, error) {
 	var u User
+	var profilePictureURL, description, pronouns sql.NullString
 
 	err := a.DB.QueryRow(
-		`SELECT id,username,email,password,date_created,session_token,session_token_expires 
+		`SELECT id,username,email,password,date_created,session_token,session_token_expires,
+		        profile_picture_url, description, pronouns
 		 FROM users WHERE id=?`,
 		id,
 	).Scan(
@@ -65,10 +68,28 @@ func (a *App) GetUser(id uint64) (*User, error) {
 		&u.DateCreated,
 		&u.SessionToken,
 		&u.SessionTokenExpires,
+		&profilePictureURL,
+		&description,
+		&pronouns,
 	)
+
+	u.ProfilePictureURL = profilePictureURL.String
+	u.Description = description.String
+	u.Pronouns = pronouns.String
 
 	return &u, err
 }
+
+
+func (a *App) UpdateUserProfile(u User) error {
+	_, err := a.DB.Exec(
+		`UPDATE users SET username=?, email=?, profile_picture_url=?, description=?, pronouns=? WHERE id=?`,
+		u.Username, u.Email, u.ProfilePictureURL, u.Description, u.Pronouns, u.ID,
+	)
+	return err
+}
+
+
 
 func (a *App) UpdateUser(u User) error {
 	_, err := a.DB.Exec(

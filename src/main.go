@@ -7,7 +7,7 @@ import (
 	"log/slog"
 	"net/http"
 	"os"
-	//"fmt"
+	"fmt"
 	"time"
 )
 
@@ -33,6 +33,9 @@ func main() {
 	mux.HandleFunc("GET /login", app.LoginGET)
 	mux.HandleFunc("POST /login", app.LoginPOST)
 
+	// account page
+	mux.HandleFunc("GET /account", app.AccountGET)
+	mux.HandleFunc("POST /account", app.AccountPOST)
 
 	// semi-static pages
 	mux.HandleFunc("/", app.SlashHandler)
@@ -46,7 +49,7 @@ func main() {
 }
 
 func NewApp() *App {
-	/*
+	
 	db, err := sql.Open("mysql", "root:H0EeLfLnO,xDEVELOPERSx4c!#%@tcp(127.0.0.1:3306)/ironite?parseTime=true")
 	if err != nil {
 		fmt.Printf("%s\n", "Failed to connect to database!")
@@ -57,10 +60,10 @@ func NewApp() *App {
 		fmt.Printf("%s\n", "Failed to ping to database!")
 		panic(err)
 	}
-*/
+
 	a := &App{
 		Log: slog.New(slog.NewTextHandler(os.Stderr, nil)),
-		//DB:  db,
+		DB:  db,
 		DefaultExpiry: 4 * time.Hour,
 	}
 

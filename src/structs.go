@@ -13,7 +13,11 @@ type User struct {
 	ServersOwned        []Server
 	SessionToken        string
 	SessionTokenExpires time.Time
+	ProfilePictureURL string
+	Description       string
+	Pronouns          string
 }
+
 
 type Server struct {
 	ID          uint64

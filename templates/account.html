@@ -1,0 +1,41 @@
+{{ define "content" }}
+<div class="account-layout">
+	<aside class="account-sidebar">
+		<nav>
+			<button class="sidebar-tab active" data-tab="account">Account</button>
+			<button class="sidebar-tab" data-tab="servers">Servers</button>
+		</nav>
+	</aside>
+
+	<section class="account-content">
+		<div class="tab-panel active" id="tab-account">
+			<h2>Account Settings</h2>
+			<form method="POST" action="/account">
+				<label for="username">Username</label>
+				<input type="text" id="username" name="username" value="{{ .Username }}" required>
+
+				<label for="email">Email</label>
+				<input type="email" id="email" name="email" value="{{ .Email }}" required>
+
+				<label for="profile_picture_url">Profile Picture URL</label>
+				<input type="url" id="profile_picture_url" name="profile_picture_url" value="{{ .ProfilePictureURL }}" placeholder="https://example.com/avatar.png">
+
+				<label for="pronouns">Pronouns</label>
+				<input type="text" id="pronouns" name="pronouns" value="{{ .Pronouns }}" placeholder="e.g. they/them">
+
+				<label for="description">Bio / Description</label>
+				<textarea id="description" name="description" placeholder="Tell us about yourself...">{{ .Description }}</textarea>
+
+				<button type="submit">Save Changes</button>
+			</form>
+		</div>
+
+		<div class="tab-panel" id="tab-servers">
+			<h2>Servers</h2>
+			<p>Coming soon...</p>
+		</div>
+	</section>
+</div>
+
+<script src="/static/js/sidebar.js"></script>
+{{ end }}

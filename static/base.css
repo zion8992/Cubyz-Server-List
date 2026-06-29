@@ -383,3 +383,70 @@ form p a {
     margin-bottom: 15px;
     text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
 }
+
+.account-layout {
+	display: flex;
+	gap: 30px;
+	align-items: flex-start;
+	max-width: 900px;
+	margin: 0 auto;
+	text-align: left;
+}
+
+.account-sidebar {
+	flex: 0 0 200px;
+	background-color: var(--card-bg);
+	border: 3px solid var(--card-border);
+	padding: 20px;
+}
+
+.account-sidebar nav {
+	display: flex;
+	flex-direction: column;
+	gap: 10px;
+}
+
+.sidebar-tab {
+	width: 100%;
+	text-align: left;
+	background-color: var(--bg-secondary);
+	border: 2px solid var(--border-color);
+	color: var(--color);
+	box-shadow: none;
+	text-transform: none;
+	padding: 12px 16px;
+}
+
+.sidebar-tab:hover {
+	background-color: var(--bg);
+	transform: none;
+	box-shadow: none;
+}
+
+.sidebar-tab.active {
+	background-color: var(--button-bg);
+	color: var(--button-text);
+	border-color: var(--button-border);
+}
+
+.account-content {
+	flex: 1;
+	background-color: var(--card-bg);
+	border: 3px solid var(--card-border);
+	padding: 30px;
+	min-width: 0;
+}
+
+.account-content form {
+	margin: 0;
+	border: none;
+	padding: 0;
+}
+
+.tab-panel {
+	display: none;
+}
+
+.tab-panel.active {
+	display: block;
+}
