@@ -1,8 +1,26 @@
 {{ define "content" }}
 
-<div class="center-me-pls">
-    <h2>Info</h2>
-    <p>Ironite is an open-source server list for Cubyz. Source code can be found out at <a href="github.com/zion8992/ironite">Ironite</a></p>
+<div class="account-layout">
+	<aside class="account-sidebar">
+		<nav>
+			<button class="sidebar-tab active" data-tab="info">Info</button>
+			<button class="sidebar-tab" data-tab="votify">Votify</button>
+		</nav>
+	</aside>
+
+	<section class="account-content">
+		<div class="tab-panel active" id="tab-info">
+			<h2>Info</h2>
+			<p>Opensource server list for Cubyz. Source is available <a href="github.com/zion8992/ironite">here</a>.</p>
+		</div>
+
+		<div class="tab-panel" id="tab-votify">
+			<h2>Votify</h2>
+            <p>WIP. Simple python client that allows you to get a list of the latest voters on your server. Useful for rewarding players for voting.</p>
+		</div>
+	</section>
 </div>
 
+
+<script src="/static/js/sidebar.js"></script>
 {{ end }}

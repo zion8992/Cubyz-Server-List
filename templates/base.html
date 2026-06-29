@@ -6,6 +6,7 @@
     <title>Cubyz Server List</title>
     <link rel="stylesheet" href="/static/base.css">
     <link rel="stylesheet" href="/static/light.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
 </head>
 <body>
     <header>
@@ -13,13 +14,13 @@
             <a href="/" style="text-decoration: none;"><h1 class="special-font">Ironite</h1></a>
         </div>
         <nav>
-            <a href="/list" class="nav-btn">List</a>
+            <a href="/list" class="nav-btn"><b>List</b></a>
             {{ if .IsLoggedIn }}
-            <a href="/account" class="nav-btn">Account</a>
+            <a href="/account" class="nav-btn"><b>Account</b></a>
             {{ else }}
-            <a href="/login" class="nav-btn">Log in</a>
-            {{ end}}
-            <a href="/info" class="nav-btn">Information</a>
+            <a href="/login" class="nav-btn"><b>Log in</b></a>
+            {{ end }}
+            <a href="/info" class="nav-btn"><b>Information</b></a>
         </nav>
     </header>
     

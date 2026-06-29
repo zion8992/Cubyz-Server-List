@@ -1,11 +1,10 @@
-@import url('https://fonts.googleapis.com/css2?family=Google+Sans+Code:ital,wght,MONO@0,300..800,1;1,300..800,1&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Source%20Code%20Pro:wght@100;200;300;400;500;600;700;800;900&display=swap');
 
 /** LIGHT/DARK MODE IMPORTS **/
 @import url('/static/dark.css') (prefers-color-scheme: dark);
 @import url('/static/light.css') (prefers-color-scheme: light);
 
-/** RESET THE FUCKING BROWSER CSS **/
+/** RESET THE BROWSER CSS **/
 * {
     margin: 0;
     padding: 0;
@@ -32,7 +31,7 @@
 
 /* Available fonts are "Google Sans Code" and "Unscii 16 Full" (cubyz) */
 body {
-    font-family: "Unscii 16 Full", monospace;
+    font-family: "Source Code Pro", monospace;
     background-color: var(--bg);
     color: var(--color);
     text-align: center;
@@ -449,4 +448,123 @@ form p a {
 
 .tab-panel.active {
 	display: block;
+}
+
+/* Hero section */
+
+.hero {
+	background-color: var(--card-bg);
+	border: 3px solid var(--card-border);
+	padding: 50px 30px;
+	margin-bottom: 40px;
+}
+
+.hero-image {
+	max-width: 400px;
+	margin-bottom: 25px;
+    width: 352px;
+}
+
+.hero h1 {
+	font-size: 36px;
+	margin-bottom: 15px;
+}
+
+.hero-subtitle {
+	font-size: 18px;
+	color: var(--color-secondary);
+	max-width: 600px;
+	margin: 0 auto 25px;
+}
+
+.hero-buttons {
+	display: flex;
+	gap: 15px;
+	justify-content: center;
+	flex-wrap: wrap;
+}
+
+/* Button link style */
+
+a.button {
+	display: inline-block;
+	padding: 12px 24px;
+	background-color: var(--button-bg);
+	color: var(--button-text);
+	border: 2px solid var(--button-border);
+	font-family: "Unscii 16 Full", monospace;
+	font-size: 16px;
+	text-decoration: none;
+	text-transform: uppercase;
+	letter-spacing: 1px;
+	box-shadow: var(--box-shadow-3d);
+	transition: all 0.15s ease;
+}
+
+a.button:hover {
+	background-color: var(--button-hover);
+	transform: translateY(-2px);
+	box-shadow: var(--box-shadow-3d-hover);
+}
+
+a.button.secondary {
+	background-color: var(--bg-secondary);
+	color: var(--color);
+	border-color: var(--border-color);
+	box-shadow: 0 4px 0 var(--border-color), 0 6px 8px rgba(0, 0, 0, 0.3);
+}
+
+a.button.secondary:hover {
+	background-color: var(--card-bg);
+}
+
+/* Features grid */
+
+.features {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+	gap: 30px;
+	margin-bottom: 40px;
+}
+
+.feature {
+	background-color: var(--card-bg);
+	border: 3px solid var(--card-border);
+	padding: 25px;
+	text-align: center;
+	transition: all 0.2s ease;
+}
+
+.feature:hover {
+	border-color: var(--accent);
+}
+
+.feature img {
+	width: 80px;
+	height: 80px;
+	margin-bottom: 15px;
+	border: 2px solid var(--border-color);
+	object-fit: cover;
+}
+
+.feature h2 {
+	font-size: 20px;
+	margin-bottom: 10px;
+}
+
+.feature p {
+	color: var(--color-secondary);
+	font-size: 14px;
+}
+
+/* Call to action */
+
+.cta {
+	background-color: var(--card-bg);
+	border: 3px solid var(--card-border);
+	padding: 40px 30px;
+}
+
+.cta h2 {
+	margin-bottom: 20px;
 }
