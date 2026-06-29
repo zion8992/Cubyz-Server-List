@@ -164,3 +164,17 @@ func (a *App) CheckReqSessionTok(r *http.Request) (bool, error) {
 
 	return false, nil
 }
+
+func (a *App) render(w http.ResponseWriter, r *http.Request, status int, page string, data any) {
+	ts, ok := a.TemplateCache[page]
+	if !ok {
+		a.Error(w, r, fmt.Sprintf("the template %s does not exist", page))
+		return
+	}
+
+	w.WriteHeader(status)
+
+	if err := ts.Execute(w, data); err != nil {
+		a.Error(w, r, "template execution failed: "+err.Error())
+	}
+}

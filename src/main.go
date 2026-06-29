@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/justinas/alice"
+	"html/template"
 	"log/slog"
 	"net/http"
 	"os"
@@ -16,6 +17,7 @@ type App struct {
 	DB  *sql.DB
 	BlockedWords string
 	DefaultExpiry time.Duration
+	TemplateCache map[string]*template.Template
 }
 
 func main() {
@@ -25,7 +27,7 @@ func main() {
 
 	staticFS := http.FileServer(http.Dir("./static"))
 	mux.Handle("/static/", http.StripPrefix("/static/", staticFS))
-	
+
 	// auth
 	mux.HandleFunc("GET /register", app.RegisterGET)
 	mux.HandleFunc("POST /register", app.RegisterPOST)
@@ -49,7 +51,7 @@ func main() {
 }
 
 func NewApp() *App {
-	
+
 	db, err := sql.Open("mysql", "root:H0EeLfLnO,xDEVELOPERSx4c!#%@tcp(127.0.0.1:3306)/ironite?parseTime=true")
 	if err != nil {
 		fmt.Printf("%s\n", "Failed to connect to database!")
@@ -61,10 +63,17 @@ func NewApp() *App {
 		panic(err)
 	}
 
+	templateCache, err := newTemplateCache()
+	if err != nil {
+		fmt.Printf("%s\n", "Failed to create template cache!")
+		panic(err)
+	}
+
 	a := &App{
 		Log: slog.New(slog.NewTextHandler(os.Stderr, nil)),
 		DB:  db,
 		DefaultExpiry: 4 * time.Hour,
+		TemplateCache: templateCache,
 	}
 
 	return a

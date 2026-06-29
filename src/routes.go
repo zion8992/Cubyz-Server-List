@@ -1,8 +1,6 @@
 package main
 
 import (
-	"fmt"
-	"html/template"
 	"net/http"
 	"os"
 	"strings"
@@ -32,44 +30,26 @@ func (a *App) SlashHandler(w http.ResponseWriter, r *http.Request) {
 	path := "./templates/" + page + ".html"
 
 	if _, err := os.Stat(path); os.IsNotExist(err) {
-		a.Return404(w, r,)
+		a.Return404(w, r)
 		return
 	}
 
-	tmpl, err := template.ParseFiles(
-		"./templates/base.html",
-		"./templates/"+page+".html",
-	)
-	if err != nil {
-		a.Error(w, r, fmt.Sprintf("failed to load template: %v (page=%s)", err, page))
-	}
-
 	data := Page{
 		IsLoggedIn: a.HasSessionToken(r),
 	}
 
-	if err := tmpl.Execute(w, data); err != nil {
-		a.Error(w, r, "template execution failed: ", err.Error())
-	}
+	a.render(w, r, http.StatusOK, page+".html", data)
 }
+
 
 func (a *App) RegisterGET(w http.ResponseWriter, r *http.Request) {
-	tmpl, err := template.ParseFiles(
-		"./templates/base.html",
-		"./templates/auth/register.html",
-	)
-	if err != nil {
-		a.Error(w, r, fmt.Sprintf("failed to load template: %v (templates/auth/login.html)", err))
-	}
-
 	data := Page{
 		IsLoggedIn: a.HasSessionToken(r),
 	}
 
-	if err := tmpl.Execute(w, data); err != nil {
-		a.Error(w, r, "template execution failed: ", err.Error())
-	}
+	a.render(w, r, http.StatusOK, "register.html", data)
 }
+
 
 func (a *App) RegisterPOST(w http.ResponseWriter, r *http.Request) {
 	r.ParseForm()
@@ -103,40 +83,19 @@ func (a *App) RegisterPOST(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	tmpl, err := template.ParseFiles(
-		"./templates/base.html",
-		"./templates/auth/register_ok.html",
-	)
-	if err != nil {
-		a.Error(w, r, fmt.Sprintf("failed to load template: %v (templates/auth/login.html)", err))
-		return
-	}
-
 	data := Page{
 		IsLoggedIn: a.HasSessionToken(r),
 	}
 
-	if err := tmpl.Execute(w, data); err != nil {
-		a.Error(w, r, "template execution failed: ", err.Error())
-	}
+	a.render(w, r, http.StatusOK, "register_ok.html", data)
 }
 
 func (a *App) LoginGET(w http.ResponseWriter, r *http.Request) {
-	tmpl, err := template.ParseFiles(
-		"./templates/base.html",
-		"./templates/auth/login.html",
-	)
-	if err != nil {
-		a.Error(w, r, fmt.Sprintf("failed to load template: %v (templates/auth/login.html)", err))
-	}
-
 	data := Page{
 		IsLoggedIn: a.HasSessionToken(r),
 	}
 
-	if err := tmpl.Execute(w, data); err != nil {
-		a.Error(w, r, "template execution failed: ", err.Error())
-	}
+	a.render(w, r, http.StatusOK, "login.html", data)
 }
 
 func (a *App) LoginPOST(w http.ResponseWriter, r *http.Request) {
@@ -204,15 +163,6 @@ func (a *App) AccountGET(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	tmpl, err := template.ParseFiles(
-		"./templates/base.html",
-		"./templates/account.html",
-	)
-	if err != nil {
-		a.Error(w, r, fmt.Sprintf("failed to load template: %v (templates/account.html)", err))
-		return
-	}
-
 	data := struct {
 		Page
 		User
@@ -221,9 +171,7 @@ func (a *App) AccountGET(w http.ResponseWriter, r *http.Request) {
 		User: *user,
 	}
 
-	if err := tmpl.Execute(w, data); err != nil {
-		a.Error(w, r, "template execution failed: ", err.Error())
-	}
+	a.render(w, r, http.StatusOK, "account.html", data)
 }
 
 func (a *App) AccountPOST(w http.ResponseWriter, r *http.Request) {
