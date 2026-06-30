@@ -1,0 +1,167 @@
+#!/usr/bin/env python3
+import configparser
+import os
+import queue
+import re
+import sys
+import threading
+import time
+from pathlib import Path
+from typing import Callable, Dict, List, Tuple
+
+CONFIG_PATH = Path("sparkConfig.ini")
+
+DEFAULTS: Dict[str, str] = {
+    "user_api_token": "",
+    "cubyz_log": "test-server/logs/latest.log",
+}
+
+# (event_name, compiled_regex, extractor(match) -> dict)
+PATTERNS: List[Tuple[str, re.Pattern, Callable[[re.Match], Dict]]] = [
+    (
+        "serverReady",
+        re.compile(r"\[info\]: Finished world assets"),
+        lambda m: {},
+    ),
+    (
+        "join",
+        re.compile(r"User (?P<user>.+?) joined using version (?P<version>.+)"),
+        lambda m: m.groupdict(),
+    ),
+    (
+        "leave",
+        re.compile(r"Chat: (?P<user>.+?) left"),
+        lambda m: m.groupdict(),
+    ),
+    (
+        "death",
+        re.compile(r"Chat: (?P<user>.+?) died of fall damage"),
+        lambda m: m.groupdict(),
+    ),
+]
+
+def ensure_config(path: Path) -> configparser.ConfigParser:
+    config = configparser.ConfigParser()
+    if not path.exists():
+        config["settings"] = DEFAULTS
+        with open(path, "w", encoding="utf-8") as f:
+            config.write(f)
+        print(f"Created default config: {path}", file=sys.stderr)
+    else:
+        config.read(path)
+    return config
+
+
+def classify(line: str) -> Tuple[str, Dict]:
+    for event, pattern, extractor in PATTERNS:
+        match = pattern.search(line)
+        if match:
+            return event, extractor(match)
+    return "default", {"raw": line}
+
+
+def reader(log_path: str, q: queue.Queue, stop: threading.Event) -> None:
+    path = Path(log_path)
+    f = None
+    try:
+        while not stop.is_set():
+            if not path.exists():
+                time.sleep(0.5)
+                continue
+
+            if f is None:
+                f = open(path, "r", encoding="utf-8", errors="ignore")
+                f.seek(0, os.SEEK_END)
+
+            line = f.readline()
+            if not line:
+                try:
+                    size = path.stat().st_size
+                    if f.tell() > size:
+                        f.seek(0, os.SEEK_END)
+                except OSError:
+                    f.close()
+                    f = None
+                time.sleep(0.1)
+                continue
+
+            line = line.rstrip("\n")
+            if line:
+                event, data = classify(line)
+                q.put({"event": event, "data": data})
+    finally:
+        if f:
+            f.close()
+
+
+def printer(q: queue.Queue, stop: threading.Event) -> None:
+    playercount = 0
+    server_version = "0.3.0" # latest cubyz version
+
+    while not stop.is_set() or not q.empty():
+        try:
+            item = q.get(timeout=0.1)
+        except queue.Empty:
+            continue
+
+        event = item["event"]
+        data = item["data"]
+
+        match event:
+            case "serverReady": # server just initialized
+                print(f"[{event}] {data}", flush=True)
+                print("Server is ready")
+                
+            case "join":
+                print(
+                    f"[{event}] {data['user']} joined using {data['version']}",
+                    flush=True,
+                )
+
+                playercount += 1
+                server_version = data['version']
+
+                print(f"Player count: {playercount}")
+                print(f"Set version: {server_version}")
+            case "leave":
+                print(f"[{event}] {data['user']} left", flush=True)
+                playercount -= 1
+                print(f"Player count: {playercount}")
+
+            case "death":
+                print(f"[{event}] {data['user']} died", flush=True)
+
+            case _:
+                print(f"[{event}] {data}", flush=True)
+
+
+def main() -> None:
+    config = ensure_config(CONFIG_PATH)
+
+    log_path = config.get("settings", "cubyz_log", fallback=DEFAULTS["cubyz_log"])
+    _ = config.get("settings", "user_api_token", fallback=DEFAULTS["user_api_token"])
+
+    if not Path(log_path).exists():
+        print(f"Cannot open file: {log_path}. Please ensure the path is correct in your {CONFIG_PATH}", file=sys.stderr)
+        sys.exit(1)
+
+    q: queue.Queue = queue.Queue()
+    stop = threading.Event()
+
+    t_reader = threading.Thread(target=reader, args=(log_path, q, stop), daemon=True)
+    t_printer = threading.Thread(target=printer, args=(q, stop), daemon=True)
+
+    t_reader.start()
+    t_printer.start()
+
+    try:
+        while True:
+            time.sleep(0.5)
+    except KeyboardInterrupt:
+        stop.set()
+        t_reader.join()
+        t_printer.join()
+
+
+if __name__ == "__main__":
+    main()
