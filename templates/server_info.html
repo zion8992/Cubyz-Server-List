@@ -46,7 +46,7 @@
 				{{ if .Server.WebsiteURL }}<li><strong>Website:</strong> <a href="{{ .Server.WebsiteURL }}" target="_blank" rel="noopener">Visit</a></li>{{ end }}
 				{{ if .Server.ChatURL }}<li><strong>Chat:</strong> <a href="{{ .Server.ChatURL }}" target="_blank" rel="noopener">Join</a></li>{{ end }}
 				<li><strong>Players:</strong> {{ .Server.PlayerCount }}</li>
-				<li><strong>Status:</strong> {{ if .Server.Status }}Online{{else}}Offline{{end}}</li>
+				<li><strong>Status:</strong> {{ if .ServerStatus }}Online{{else}}Offline{{end}}</li>
 			</ul>
 		</aside>
 	</div>

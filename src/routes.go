@@ -479,11 +479,13 @@ func (a *App) ServerInfo(w http.ResponseWriter, r *http.Request) {
 	data := struct {
 		Page
 		Server
-		IsOwner bool
+		IsOwner      bool
+		ServerStatus bool
 	}{
-		Page:    Page{IsLoggedIn: a.HasSessionToken(r)},
-		Server:  *server,
-		IsOwner: isOwner,
+		Page:         Page{IsLoggedIn: a.HasSessionToken(r)},
+		Server:       *server,
+		IsOwner:      isOwner,
+		ServerStatus: a.IsServerOnline(server.ID, server.LastSpark),
 	}
 
 	a.render(w, r, http.StatusOK, "server_info.html", data)

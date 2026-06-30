@@ -111,6 +111,16 @@ func (a *App) ApiServerOff(serverID uint64) error {
 	return err
 }
 
-func (a *App) IsServerOnline(lastSpark time.Time) bool {
-	return time.Since(lastSpark) < time.Hour
+func (a *App) IsServerOnline(serverID uint64, lastSpark time.Time) bool {
+	if time.Since(lastSpark) < time.Hour {
+		return true
+	}
+
+	var status bool
+	err := a.DB.QueryRow("SELECT status FROM servers WHERE id = ?", serverID).Scan(&status)
+	if err != nil {
+		return false
+	}
+
+	return status
 }

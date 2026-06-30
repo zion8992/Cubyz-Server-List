@@ -45,7 +45,7 @@ type Server struct {
 	ChatURL      string
 	IP           string
 	LastSpark    time.Time
-	Status   bool
+	Status       bool
 }
 
 type APIToken struct {
