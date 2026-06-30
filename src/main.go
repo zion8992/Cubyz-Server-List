@@ -32,6 +32,8 @@ func main() {
 	mux.HandleFunc("GET /account", app.AccountGET)
 	mux.HandleFunc("POST /account", app.AccountPOST)
 	mux.HandleFunc("POST /account-verify", app.AccountVerifyPOST)
+	mux.HandleFunc("GET /account-delete", app.DeleteAccountGET)
+	mux.HandleFunc("POST /account-delete-forever-and-ever", app.DeleteAccountPOST)
 
 	// semi-static pages
 	mux.HandleFunc("/", app.SlashHandler)

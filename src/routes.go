@@ -323,6 +323,67 @@ func (a *App) AccountVerifyPOST(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "/account?tab=verified", http.StatusSeeOther)
 }
 
+func (a *App) DeleteAccountGET(w http.ResponseWriter, r *http.Request) {
+	ok, err := a.CheckReqSessionTok(r)
+	if err != nil || !ok {
+		http.Redirect(w, r, "/login", http.StatusSeeOther)
+		return
+	}
+
+	uid, err := a.GetUIDFromToken(getSessionCookie(r))
+	if err != nil {
+		a.Error(w, r, "Failed to identify user: "+err.Error())
+		return
+	}
+
+	user, err := a.GetUser(uid)
+	if err != nil {
+		a.Error(w, r, "Failed to load user: "+err.Error())
+		return
+	}
+
+	servers, err := a.GetServersByUser(uid)
+	if err != nil {
+		a.Error(w, r, "Failed to load servers: "+err.Error())
+		return
+	}
+
+	data := struct {
+		Page
+		User
+		Servers []Server
+	}{
+		Page:    Page{IsLoggedIn: true},
+		User:    *user,
+		Servers: servers,
+	}
+
+	a.render(w, r, http.StatusOK, "delete-account.html", data)
+}
+
+
+func (a *App) DeleteAccountPOST(w http.ResponseWriter, r *http.Request) {
+	ok, err := a.CheckReqSessionTok(r)
+	if err != nil || !ok {
+		http.Redirect(w, r, "/login", http.StatusSeeOther)
+		return
+	}
+
+	uid, err := a.GetUIDFromToken(getSessionCookie(r))
+	if err != nil {
+		a.Error(w, r, "Failed to identify user: "+err.Error())
+		return
+	}
+
+	err = a.DeleteUser(uid)
+	if err != nil {
+		a.Error(w, r, "Failed to delete your account! "+err.Error())
+		return
+	}
+
+	http.Redirect(w, r, "/", http.StatusSeeOther)
+}
+
 func getSessionCookie(r *http.Request) string {
 	cookie, err := r.Cookie("session_token")
 	if err != nil {
