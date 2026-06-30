@@ -16,15 +16,17 @@ cubyz_log = logs/latest.log
 spark_server = https://servers.ashframe.net
 ```
 <br>
+
 **API Token**<br>
 You can generate an API token for Spark through Ironite.<br>
 **Account** -> **API Tokens** -> **Generate New Token**<br>
 For the `Type` select `Spark` and for the server, choose the server you want to set the status.<br>
 <br>
-**Cubyz Log**<br>
 
+**Cubyz Log**<br>
 Enter the location of Cubyz's Server `latest.log`. Make sure that when you run Cubyz, you see the log *live update*, if you don't, it is most likely the wrong file.<br>
 <br>
+
 **Spark Server**<br>
 Default is [https://servers.ashframe.net](https://servers.ashframe.net). Change this if you are using a different instance of Ironite.<br>
 <br>
