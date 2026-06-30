@@ -19,3 +19,6 @@ GOOS=darwin GOARCH=amd64 go build -o ironite ./src/ # for macOS
 <br>
 
 **NOTE**: Final executable requires the `templates` directory from the source code.
+
+### Spark
+Instructions to setup and run Spark can be found [here](https://github.com/zion8992/ironite/blob/main/Spark_Setup.md)
