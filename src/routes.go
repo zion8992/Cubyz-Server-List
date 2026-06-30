@@ -168,6 +168,7 @@ func (a *App) LoginPOST(w http.ResponseWriter, r *http.Request) {
 	ok, err = a.CheckPasswordDB(id, r.FormValue("password"))
 	if err != nil {
 		a.Error(w, r, "Failed to check if your password is correct: "+err.Error())
+		return
 	}
 
 	if !ok {
