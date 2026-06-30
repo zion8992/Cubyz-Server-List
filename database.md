@@ -41,8 +41,11 @@ CREATE TABLE servers (
   website_url TEXT,
   chat_url TEXT,
   ip VARCHAR(255) NOT NULL DEFAULT '',
+  last_spark TIMESTAMP NULL,
+  status BOOLEAN NOT NULL DEFAULT FALSE;
   FOREIGN KEY (owner_id) REFERENCES users(id) ON DELETE CASCADE
 );
+
 
 /** API TOKENS **/
 CREATE TABLE api_tokens (

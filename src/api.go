@@ -1,14 +1,76 @@
 package main
 
-import(
-	"net/http"
+import (
 	"fmt"
+	"net/http"
 )
 
 func (a *App) SparkUpdatePOST(w http.ResponseWriter, r *http.Request) {
-	r.ParseForm()
+	err := r.ParseForm()
+	if err != nil {
+		a.ApiError(w, r, "[0] Failed to parse form: "+err.Error())
+		return
+	}
 
 	token := r.FormValue("token")
-	
-	// check if token is valid
+	updateType := r.FormValue("update")
+
+	ok, err := a.IsValidApiToken(token)
+	if err != nil {
+		a.ApiError(w, r, "[1] Failed to check if your token is valid: "+err.Error())
+		return
+	}
+
+	if !ok {
+		a.ApiError(w, r, "[2] Invalid token")
+		return
+	}
+
+	sid, err := a.GetServerFromToken(token)
+	if err != nil {
+		a.ApiError(w, r, "[3] Failed to get the server that corresponds to your token: "+err.Error())
+		return
+	}
+
+	fmt.Printf("server id: %d\n", sid)
+
+	switch updateType {
+	case "playerJoin":
+		err := a.ApiIncServerPlayers(sid)
+		if err != nil {
+			a.ApiError(w, r, "[5] Failed to update your server! "+err.Error())
+			return
+		}
+
+	case "playerLeave":
+		err := a.ApiDecServerPlayers(sid)
+		if err != nil {
+			a.ApiError(w, r, "[5] Failed to update your server! "+err.Error())
+			return
+		}
+
+	case "playerDeath":
+		// pass
+
+	case "serverLag":
+		// pass
+
+	case "serverReady":
+		err := a.ApiServerOn(sid)
+		if err != nil {
+			a.ApiError(w, r, "[5] Failed to update your server! "+err.Error())
+			return
+		}
+
+	case "serverOff":
+		err := a.ApiServerOff(sid)
+		if err != nil {
+			a.ApiError(w, r, "[5] Failed to update your server! "+err.Error())
+			return
+		}
+
+	default:
+		a.ApiError(w, r, "[4] Invalid Update type! "+updateType)
+		return
+	}
 }

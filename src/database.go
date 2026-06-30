@@ -284,10 +284,11 @@ func (a *App) CreateServer(s Server) (int64, error) {
 func (a *App) GetServer(id uint64) (*Server, error) {
 	var s Server
 	var description, xmlFeedLink, ip, gamemodes, version, languages, websiteURL, chatURL sql.NullString
+	var lastSpark sql.NullTime
 
 	err := a.DB.QueryRow(
 		`SELECT id, name, description, xml_feed_link, ip, playercount, owner_id,
-			gamemodes, version, languages, requires_mods, website_url, chat_url
+			gamemodes, version, languages, requires_mods, website_url, chat_url, last_spark, status
 		 FROM servers WHERE id=?`,
 		id,
 	).Scan(
@@ -304,6 +305,8 @@ func (a *App) GetServer(id uint64) (*Server, error) {
 		&s.RequiresMods,
 		&websiteURL,
 		&chatURL,
+		&lastSpark,
+		&s.Status,
 	)
 	if err != nil {
 		return nil, err
@@ -317,15 +320,14 @@ func (a *App) GetServer(id uint64) (*Server, error) {
 	s.Languages = languages.String
 	s.WebsiteURL = websiteURL.String
 	s.ChatURL = chatURL.String
+	s.LastSpark = lastSpark.Time
 
 	return &s, nil
 }
 
 func (a *App) GetServersByUser(userID uint64) ([]Server, error) {
 	rows, err := a.DB.Query(
-		`SELECT id, name, description, xml_feed_link, ip, playercount, owner_id,
-			gamemodes, version, languages, requires_mods, website_url, chat_url
-		 FROM servers WHERE owner_id=?`,
+		"SELECT id FROM servers WHERE owner_id=?",
 		userID,
 	)
 	if err != nil {
@@ -335,34 +337,17 @@ func (a *App) GetServersByUser(userID uint64) ([]Server, error) {
 
 	var servers []Server
 	for rows.Next() {
-		var s Server
-		var description, xmlFeedLink, ip, gamemodes, version, languages, websiteURL, chatURL sql.NullString
-		if err := rows.Scan(
-			&s.ID,
-			&s.Name,
-			&description,
-			&xmlFeedLink,
-			&ip,
-			&s.PlayerCount,
-			&s.OwnerID,
-			&gamemodes,
-			&version,
-			&languages,
-			&s.RequiresMods,
-			&websiteURL,
-			&chatURL,
-		); err != nil {
+		var id uint64
+		if err := rows.Scan(&id); err != nil {
 			return nil, err
 		}
-		s.Description = description.String
-		s.XMLFeedLink = xmlFeedLink.String
-		s.IP = ip.String
-		s.Gamemodes = gamemodes.String
-		s.Version = version.String
-		s.Languages = languages.String
-		s.WebsiteURL = websiteURL.String
-		s.ChatURL = chatURL.String
-		servers = append(servers, s)
+
+		s, err := a.GetServer(id)
+		if err != nil {
+			return nil, err
+		}
+
+		servers = append(servers, *s)
 	}
 
 	return servers, nil

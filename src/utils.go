@@ -37,6 +37,17 @@ func (a *App) Error(w http.ResponseWriter, r *http.Request, errs ...string) {
 	}
 }
 
+func (a *App) ApiError(w http.ResponseWriter, r *http.Request, errs ...string) {
+	msg := strings.Join(errs, "")
+
+	a.Log.Error("request api error",
+		"path", r.URL.Path,
+		"errors", msg,
+	)
+
+	fmt.Fprint(w, msg)
+}
+
 func (a *App) ValidateFormFields(username, password, email string, validatePassword bool) (bool, error) {
 	// Username:
 	// - ASCII only

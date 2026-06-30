@@ -361,7 +361,6 @@ func (a *App) DeleteAccountGET(w http.ResponseWriter, r *http.Request) {
 	a.render(w, r, http.StatusOK, "delete-account.html", data)
 }
 
-
 func (a *App) DeleteAccountPOST(w http.ResponseWriter, r *http.Request) {
 	ok, err := a.CheckReqSessionTok(r)
 	if err != nil || !ok {

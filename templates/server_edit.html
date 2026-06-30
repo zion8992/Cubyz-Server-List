@@ -2,7 +2,7 @@
 <div class="server-info-page">
 	<form method="POST" action="/servers/edit/{{ .Server.ID }}">
 		<header class="server-header">
-			<img src="/static/img/default_server.png" alt="Server logo" class="server-logo">
+			<img src="/static/img/default_server.svg" alt="Server logo" class="server-logo">
 			<input type="text" name="name" value="{{ .Server.Name }}" required maxlength="255" class="server-title-input">
 			<div class="server-header-actions">
 				<button type="submit" class="button">Save</button>
