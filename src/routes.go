@@ -243,6 +243,17 @@ func (a *App) AccountPOST(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	_, err = a.GetUserIDByUsername(r.FormValue("username"))
+	if err != nil && err != sql.ErrNoRows {
+		a.Error(w, r, "Failed to check user: "+err.Error())
+		return
+	}
+
+	if err == nil {
+		a.Error(w, r, "Username is taken")
+		return
+	}
+
 	uid, err := a.GetUIDFromToken(getSessionCookie(r))
 	if err != nil {
 		a.Error(w, r, "Failed to identify user: "+err.Error())
@@ -309,7 +320,7 @@ func (a *App) AccountVerifyPOST(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	http.Redirect(w, r, "/account?tab=verify", http.StatusSeeOther)
+	http.Redirect(w, r, "/account?tab=verified", http.StatusSeeOther)
 }
 
 func getSessionCookie(r *http.Request) string {

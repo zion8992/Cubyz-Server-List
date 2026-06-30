@@ -5,6 +5,7 @@
 			<button class="sidebar-tab active" data-tab="account">Account</button>
 			<button class="sidebar-tab" data-tab="servers">Servers</button>
 			<button class="sidebar-tab" data-tab="verify">Verify Account</button>
+			<button class="sidebar-tab" data-tab="verified" style="display: none;">Verified Account</button>
 			<a href="/logout" class="button">Logout</a>
 		</nav>
 	</aside>
@@ -64,6 +65,13 @@
 				<textarea id="pubkey" name="pubkey" placeholder="ed25519:key" style="resize:both;">{{ .Pubkey }}</textarea>
 
 				<button type="submit">Verify</button>
+			</form>
+		</div>
+
+		<div class="tab-panel" id="tab-verified">
+			<h2>Account Verified</h2>
+			<form method="POST" action="/account-verify">
+				<p>Thank you for verifying your account.</p>
 			</form>
 		</div>
 	</section>
