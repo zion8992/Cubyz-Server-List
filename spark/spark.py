@@ -17,7 +17,7 @@ user_api_token = None
 
 def send_Spark_update(update: str) -> None:
     global Spark_server, user_api_token
-    url = f"{Spark_server}/api/v1/SparkUpdate"
+    url = f"{Spark_server}/api/v1/sparkUpdate"
     data = urllib.parse.urlencode(
         {"token": user_api_token, "update": update}
     ).encode("utf-8")
