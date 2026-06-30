@@ -42,6 +42,38 @@ func (a *App) SlashHandler(w http.ResponseWriter, r *http.Request) {
 	a.render(w, r, http.StatusOK, page+".html", data)
 }
 
+func (a *App) LogoutUser(w http.ResponseWriter, r *http.Request) {
+	// Expire every cookie the browser sent with this request
+	for _, c := range r.Cookies() {
+		http.SetCookie(w, &http.Cookie{
+			Name:     c.Name,
+			Value:    "",
+			Path:     "/",
+			MaxAge:   -1,
+			Expires:  time.Unix(0, 0),
+			HttpOnly: c.HttpOnly,
+			Secure:   c.Secure,
+			SameSite: c.SameSite,
+		})
+	}
+
+	// Also force-clear known app cookies in case they weren't sent
+	known := []string{"session_token", "csrf_token"}
+	for _, name := range known {
+		http.SetCookie(w, &http.Cookie{
+			Name:     name,
+			Value:    "",
+			Path:     "/",
+			MaxAge:   -1,
+			Expires:  time.Unix(0, 0),
+			HttpOnly: true,
+		})
+	}
+
+	data := Page{IsLoggedIn: false}
+	a.render(w, r, http.StatusOK, "loggedout.html", data)
+}
+
 func (a *App) RegisterGET(w http.ResponseWriter, r *http.Request) {
 	data := Page{
 		IsLoggedIn: a.HasSessionToken(r),
@@ -279,17 +311,10 @@ func (a *App) ServerCreatePOST(w http.ResponseWriter, r *http.Request) {
 	}
 
 	s := Server{
-		Name:         name,
-		Description:  strings.TrimSpace(r.FormValue("description")),
-		XMLFeedLink:  strings.TrimSpace(r.FormValue("xml_feed_link")),
-		PlayerCount:  0,
-		OwnerID:      uid,
-		Gamemodes:    strings.TrimSpace(r.FormValue("gamemodes")),
-		Version:      strings.TrimSpace(r.FormValue("version")),
-		Languages:    strings.TrimSpace(r.FormValue("languages")),
-		RequiresMods: r.FormValue("requires_mods") == "on",
-		WebsiteURL:   strings.TrimSpace(r.FormValue("website_url")),
-		ChatURL:      strings.TrimSpace(r.FormValue("chat_url")),
+		Name:        name,
+		Description: strings.TrimSpace(r.FormValue("description")),
+		IP:          ip,
+		OwnerID:     uid,
 	}
 
 	id, err := a.CreateServer(s)
