@@ -1,9 +1,18 @@
 # Setup Database
 
-This file will guide you through how to setup a MySQL database for ironite.
-If you have Docker installed you can easily create and run a database with the scripts in `scripts/`.
+This file will guide you through how to setup a MySQL database for ironite.<br>
+If you have Docker installed you can easily create and run a database with the scripts in `scripts/`.<br>
+```sh
+cd scripts
+./start_db.sh # starts or creates the database
 
-If you don't, install MySQL or download it from [https://www.mysql.com/downloads/](mysql.com/downloads).
+./stop_db.sh # stops database, does not delete the DB data
+
+./delete_db.sh # deletes database docker volume
+```
+<br>
+If you don't, install MySQL or download it from [https://www.mysql.com/downloads/](mysql.com/downloads).<br>
+<br>
 
 ### Database Tables
 
