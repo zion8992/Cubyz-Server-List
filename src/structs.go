@@ -27,6 +27,7 @@ type User struct {
 	ProfilePictureURL   string
 	Description         string
 	Pronouns            string
+	Pubkey              string
 }
 
 type Server struct {

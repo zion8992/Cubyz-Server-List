@@ -4,6 +4,7 @@
 		<nav>
 			<button class="sidebar-tab active" data-tab="account">Account</button>
 			<button class="sidebar-tab" data-tab="servers">Servers</button>
+			<button class="sidebar-tab" data-tab="verify">Verify Account</button>
 			<a href="/logout" class="button">Logout</a>
 		</nav>
 	</aside>
@@ -53,6 +54,17 @@
 			{{ else }}
 			<p class="empty">You don't have any servers yet.</p>
 			{{ end }}
+		</div>
+
+		<div class="tab-panel active" id="tab-verify">
+			<h2>Verify Account</h2>
+			<form method="POST" action="/account-verify">
+				<p>To verify your account, enter your Cubyz public key in the textarea below. <br> You can find your public key in <b>Settings</b> -> <b>Social</b> -> <b>Copy Public Key</b></p>
+				<label for="pubkey">Public Key</label>
+				<textarea id="pubkey" name="pubkey" placeholder="ed25519:key" style="resize:both;">{{ .Pubkey }}</textarea>
+
+				<button type="submit">Verify</button>
+			</form>
 		</div>
 	</section>
 </div>

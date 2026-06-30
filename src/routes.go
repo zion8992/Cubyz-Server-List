@@ -282,6 +282,36 @@ func (a *App) AccountPOST(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "/account", http.StatusSeeOther)
 }
 
+func (a *App) AccountVerifyPOST(w http.ResponseWriter, r *http.Request) {
+	ok, err := a.CheckReqSessionTok(r)
+	if err != nil || !ok {
+		http.Redirect(w, r, "/login", http.StatusSeeOther)
+		return
+	}
+
+	uid, err := a.GetUIDFromToken(getSessionCookie(r))
+	if err != nil {
+		a.Error(w, r, "Failed to identify user: "+err.Error())
+		return
+	}
+
+	r.ParseForm()
+
+	pubkey := strings.TrimSpace(r.FormValue("pubkey"))
+
+	if pubkey == "" {
+		a.Error(w, r, "Public Key is required.")
+		return
+	}
+
+	if err := a.UpdateUserPubkey(uid, pubkey); err != nil {
+		a.Error(w, r, "Failed to update account: "+err.Error())
+		return
+	}
+
+	http.Redirect(w, r, "/account?tab=verify", http.StatusSeeOther)
+}
+
 func getSessionCookie(r *http.Request) string {
 	cookie, err := r.Cookie("session_token")
 	if err != nil {

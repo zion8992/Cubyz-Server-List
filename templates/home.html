@@ -7,7 +7,11 @@
 	</p>
 	<div class="hero-buttons">
 		<a href="/list" class="button">Browse Servers</a>
+		{{ if .IsLoggedIn }}
+		<a href="/servers/create" class="button secondary">Create Server</a>
+		{{ else }}
 		<a href="/register" class="button secondary">Create Account</a>
+		{{ end }}
 	</div>
 </section>
 

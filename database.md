@@ -19,6 +19,7 @@ CREATE TABLE users (
   session_token_expires TIMESTAMP NULL
   profile_picture_url VARCHAR(500) NULL,
   description TEXT NULL,
+  pubkey TEXT NULL,
   pronouns VARCHAR(50) NULL;
 );
 
