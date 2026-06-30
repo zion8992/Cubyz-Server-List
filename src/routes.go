@@ -1,15 +1,14 @@
 package main
 
 import (
+	"database/sql"
+	"fmt"
 	"net/http"
 	"os"
-	"strings"
-	"database/sql"
-	"time"
-	"fmt"
 	"strconv"
+	"strings"
+	"time"
 )
-
 
 // Struct that stores all data that needs to be shown in a page
 type Page struct {
@@ -43,7 +42,6 @@ func (a *App) SlashHandler(w http.ResponseWriter, r *http.Request) {
 	a.render(w, r, http.StatusOK, page+".html", data)
 }
 
-
 func (a *App) RegisterGET(w http.ResponseWriter, r *http.Request) {
 	data := Page{
 		IsLoggedIn: a.HasSessionToken(r),
@@ -51,7 +49,6 @@ func (a *App) RegisterGET(w http.ResponseWriter, r *http.Request) {
 
 	a.render(w, r, http.StatusOK, "register.html", data)
 }
-
 
 func (a *App) RegisterPOST(w http.ResponseWriter, r *http.Request) {
 	r.ParseForm()
@@ -73,10 +70,10 @@ func (a *App) RegisterPOST(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	u := User {
+	u := User{
 		Username: r.FormValue("username"),
 		Password: r.FormValue("password"),
-		Email: r.FormValue("email"),
+		Email:    r.FormValue("email"),
 	}
 
 	_, err = a.CreateUser(u)
@@ -116,7 +113,7 @@ func (a *App) LoginPOST(w http.ResponseWriter, r *http.Request) {
 	var ok bool
 	ok, err = a.CheckPasswordDB(id, r.FormValue("password"))
 	if err != nil {
-		a.Error(w, r, "Failed to check if your password is correct: " + err.Error())
+		a.Error(w, r, "Failed to check if your password is correct: "+err.Error())
 	}
 
 	if !ok {
@@ -134,12 +131,12 @@ func (a *App) LoginPOST(w http.ResponseWriter, r *http.Request) {
 	expires := time.Now().Add(a.DefaultExpiry)
 	err = a.SetSessionToken(id, token, expires)
 
-	c := http.Cookie {
-		Name: "session_token",
-		Value: token,
+	c := http.Cookie{
+		Name:    "session_token",
+		Value:   token,
 		Expires: expires,
 	}
-	
+
 	http.SetCookie(w, &c)
 
 	http.Redirect(w, r, "/", http.StatusSeeOther)
@@ -183,7 +180,6 @@ func (a *App) AccountGET(w http.ResponseWriter, r *http.Request) {
 
 	a.render(w, r, http.StatusOK, "account.html", data)
 }
-
 
 func (a *App) AccountPOST(w http.ResponseWriter, r *http.Request) {
 	ok, err := a.CheckReqSessionTok(r)
@@ -281,7 +277,6 @@ func (a *App) ServerCreatePOST(w http.ResponseWriter, r *http.Request) {
 		a.Error(w, r, "Server IP is required")
 		return
 	}
-
 
 	s := Server{
 		Name:         name,

@@ -1,12 +1,12 @@
 package main
 
-import(
-	"fmt"
-	"net/http"
+import (
 	"errors"
+	"fmt"
+	"html/template"
+	"net/http"
 	"regexp"
 	"strings"
-	"html/template"
 )
 
 func (a *App) Error(w http.ResponseWriter, r *http.Request, errs ...string) {
@@ -145,7 +145,7 @@ func (a *App) CheckReqSessionTok(r *http.Request) (bool, error) {
 	var uid uint64
 	uid, err = a.GetUIDFromToken(cookie.Value)
 	if err != nil {
-		return false, errors.New("Failed to get the username from your session token: "+ err.Error())
+		return false, errors.New("Failed to get the username from your session token: " + err.Error())
 	}
 
 	if uid == 0 {
@@ -155,7 +155,7 @@ func (a *App) CheckReqSessionTok(r *http.Request) (bool, error) {
 	var ok bool
 	ok, err = a.CheckSessionToken(uid, cookie.Value)
 	if err != nil {
-		return false, errors.New("Failed to check if the session token in your HTTP request is valid: "+ err.Error())
+		return false, errors.New("Failed to check if the session token in your HTTP request is valid: " + err.Error())
 	}
 
 	if ok {

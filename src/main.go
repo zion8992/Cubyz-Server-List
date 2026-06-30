@@ -2,12 +2,12 @@ package main
 
 import (
 	"database/sql"
+	"fmt"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/justinas/alice"
 	"log/slog"
 	"net/http"
 	"os"
-	"fmt"
 	"time"
 )
 
@@ -69,8 +69,8 @@ func NewApp() *App {
 	}
 
 	a := &App{
-		Log: slog.New(slog.NewTextHandler(os.Stderr, nil)),
-		DB:  db,
+		Log:           slog.New(slog.NewTextHandler(os.Stderr, nil)),
+		DB:            db,
 		DefaultExpiry: 4 * time.Hour,
 		TemplateCache: templateCache,
 	}

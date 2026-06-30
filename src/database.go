@@ -2,12 +2,12 @@ package main
 
 import (
 	"crypto/rand"
-	"encoding/hex"
-	"golang.org/x/crypto/bcrypt"
-	"time"
-	"strconv"
-	"errors"
 	"database/sql"
+	"encoding/hex"
+	"errors"
+	"golang.org/x/crypto/bcrypt"
+	"strconv"
+	"time"
 )
 
 /**
@@ -34,7 +34,6 @@ This file contains:
 - CheckSessionToken(userID uint64, token string) (bool, error)
 - GetUIDFromToken(sessionToken string) (uint64, error)
 **/
-
 
 /** USERS **/
 
@@ -84,7 +83,6 @@ func (a *App) GetUser(id uint64) (*User, error) {
 	return &u, err
 }
 
-
 func (a *App) UpdateUserProfile(u User) error {
 	_, err := a.DB.Exec(
 		`UPDATE users SET username=?, email=?, profile_picture_url=?, description=?, pronouns=? WHERE id=?`,
@@ -92,8 +90,6 @@ func (a *App) UpdateUserProfile(u User) error {
 	)
 	return err
 }
-
-
 
 func (a *App) UpdateUser(u User) error {
 	_, err := a.DB.Exec(
@@ -233,7 +229,7 @@ func (a *App) GetUIDFromToken(sessionToken string) (uint64, error) {
 	var converted int
 	converted, err = strconv.Atoi(uid)
 	if err != nil {
-		return 0, errors.New("failed to convert uid to an int64: "+err.Error())
+		return 0, errors.New("failed to convert uid to an int64: " + err.Error())
 	}
 
 	// conversions #2

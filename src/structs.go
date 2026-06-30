@@ -1,16 +1,16 @@
 package main
 
 import (
-	"time"
-	"log/slog"
 	"database/sql"
 	"html/template"
+	"log/slog"
+	"time"
 )
 
 type App struct {
-	Log *slog.Logger
-	DB  *sql.DB
-	BlockedWords string
+	Log           *slog.Logger
+	DB            *sql.DB
+	BlockedWords  string
 	DefaultExpiry time.Duration
 	TemplateCache map[string]*template.Template
 }
@@ -24,24 +24,23 @@ type User struct {
 	ServersOwned        []Server
 	SessionToken        string
 	SessionTokenExpires time.Time
-	ProfilePictureURL string
-	Description       string
-	Pronouns          string
+	ProfilePictureURL   string
+	Description         string
+	Pronouns            string
 }
 
-
 type Server struct {
-	ID	uint64
-	Name	string
-	Description	string
-	XMLFeedLink	string
-	PlayerCount	uint64
-	OwnerID	uint64
-	Gamemodes	string
-	Version	string
-	Languages	string
-	RequiresMods	bool
-	WebsiteURL	string
-	ChatURL	string
-	IP	string
+	ID           uint64
+	Name         string
+	Description  string
+	XMLFeedLink  string
+	PlayerCount  uint64
+	OwnerID      uint64
+	Gamemodes    string
+	Version      string
+	Languages    string
+	RequiresMods bool
+	WebsiteURL   string
+	ChatURL      string
+	IP           string
 }

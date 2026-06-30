@@ -1,6 +1,6 @@
 package main
 
-import ( 
+import (
 	"log/slog"
 	"net/http"
 )
