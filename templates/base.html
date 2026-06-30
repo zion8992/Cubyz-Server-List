@@ -14,13 +14,14 @@
             <a href="/" style="text-decoration: none;"><h1 class="special-font">Ironite</h1></a>
         </div>
         <nav>
+            <a href="/servers/create" class="button secondary">Create Server</a>
             <a href="/list" class="nav-btn"><b>List</b></a>
             {{ if .IsLoggedIn }}
             <a href="/account" class="nav-btn"><b>Account</b></a>
             {{ else }}
             <a href="/login" class="nav-btn"><b>Log in</b></a>
             {{ end }}
-            <a href="/info" class="nav-btn"><b>Information</b></a>
+            <a href="/info" class="nav-btn"><b>Info</b></a>
         </nav>
     </header>
     
