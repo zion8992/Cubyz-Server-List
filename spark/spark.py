@@ -10,6 +10,7 @@ from pathlib import Path
 from typing import Callable, Dict, List, Tuple
 
 CONFIG_PATH = Path("sparkConfig.ini")
+CUBYZ_VERSION = "0.2.0"
 
 DEFAULTS: Dict[str, str] = {
     "user_api_token": "",
@@ -36,6 +37,11 @@ PATTERNS: List[Tuple[str, re.Pattern, Callable[[re.Match], Dict]]] = [
     (
         "death",
         re.compile(r"Chat: (?P<user>.+?) died of fall damage"),
+        lambda m: m.groupdict(),
+    ),
+    (
+        "lag",
+        re.compile(r"\[warning\]: The server is lagging behind by (?P<lagtime>.+)"),
         lambda m: m.groupdict(),
     ),
 ]
@@ -86,7 +92,7 @@ def reader(log_path: str, q: queue.Queue, stop: threading.Event) -> None:
                 continue
 
             line = line.rstrip("\n")
-            if line:
+            if line and not line.startswith("[debug]"):
                 event, data = classify(line)
                 q.put({"event": event, "data": data})
     finally:
@@ -97,6 +103,7 @@ def reader(log_path: str, q: queue.Queue, stop: threading.Event) -> None:
 def printer(q: queue.Queue, stop: threading.Event) -> None:
     playercount = 0
     server_version = "0.3.0" # latest cubyz version
+    latest_lag = ""
 
     while not stop.is_set() or not q.empty():
         try:
@@ -131,6 +138,10 @@ def printer(q: queue.Queue, stop: threading.Event) -> None:
             case "death":
                 print(f"[{event}] {data['user']} died", flush=True)
 
+            case "lag":
+                print(f"[{event}] The server is lagging behind by {data['lagtime']}")
+                latest_lag = data['lagtime']
+
             case _:
                 print(f"[{event}] {data}", flush=True)
 
@@ -161,6 +172,8 @@ def main() -> None:
         stop.set()
         t_reader.join()
         t_printer.join()
+
+    print(f"Started Spark for Cubyz {CUBYZ_VERSION}")
 
 
 if __name__ == "__main__":

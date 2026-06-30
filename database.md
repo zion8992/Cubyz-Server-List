@@ -43,4 +43,48 @@ CREATE TABLE servers (
   ip VARCHAR(255) NOT NULL DEFAULT '',
   FOREIGN KEY (owner_id) REFERENCES users(id) ON DELETE CASCADE
 );
+
+/** API TOKENS **/
+CREATE TABLE api_tokens (
+    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    owner_id BIGINT UNSIGNED NOT NULL,
+    server_id BIGINT UNSIGNED NOT NULL,
+    date_created TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    expiry TIMESTAMP NOT NULL,
+    type VARCHAR(50) NOT NULL,
+    token_hash VARCHAR(255) NOT NULL,
+
+    CONSTRAINT fk_api_tokens_owner
+        FOREIGN KEY (owner_id) REFERENCES users(id) ON DELETE CASCADE,
+    CONSTRAINT fk_api_tokens_server
+        FOREIGN KEY (server_id) REFERENCES servers(id) ON DELETE CASCADE,
+    CONSTRAINT chk_expiry_after_created
+        CHECK (expiry > date_created)
+);
+
+CREATE INDEX idx_api_tokens_owner_id ON api_tokens(owner_id);
+CREATE INDEX idx_api_tokens_server_id ON api_tokens(server_id);
+CREATE INDEX idx_api_tokens_expiry ON api_tokens(expiry);
+CREATE INDEX idx_api_tokens_token_hash ON api_tokens(token_hash);
+```
+
+**Create example token (testing only)**
+```
+INSERT INTO api_tokens (
+    id,
+    owner_id,
+    server_id,
+    date_created,
+    expiry,
+    type,
+    token_hash
+) VALUES (
+    1,
+    1,
+    3,
+    CURRENT_TIMESTAMP,
+    DATE_ADD(CURRENT_TIMESTAMP, INTERVAL 90 DAY),
+    'spark',
+    'snails'
+);
 ```

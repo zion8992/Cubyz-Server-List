@@ -46,6 +46,9 @@ func main() {
 	mux.HandleFunc("POST /servers/edit/{id}", app.ServerEditPOST)
 	mux.HandleFunc("POST /servers/delete/{id}", app.ServerDeletePOST)
 
+	// api
+	mux.HandleFunc("POST /api/v1/sparkUpdate", app.SparkUpdatePOST)
+
 	app.Log.Info("Listening on :8000...")
 	err := http.ListenAndServe(":8000", handler)
 	if err != nil {
