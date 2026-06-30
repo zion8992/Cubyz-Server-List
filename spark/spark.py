@@ -10,6 +10,7 @@ from pathlib import Path
 from typing import Callable, Dict, List, Tuple
 import urllib.parse
 import urllib.request
+import urllib.error
 
 Spark_server = None
 user_api_token = None
@@ -17,6 +18,9 @@ user_api_token = None
 
 def send_Spark_update(update: str) -> None:
     global Spark_server, user_api_token
+
+    error_pattern = re.compile(r"^\[(?P<code>[^]]+)\]")
+
     url = f"{Spark_server}/api/v1/sparkUpdate"
     data = urllib.parse.urlencode(
         {"token": user_api_token, "update": update}
@@ -24,8 +28,46 @@ def send_Spark_update(update: str) -> None:
     req = urllib.request.Request(url, data=data, method="POST")
     try:
         urllib.request.urlopen(req, timeout=10)
+    except urllib.error.HTTPError as e:
+        body = e.read().decode("utf-8", errors="replace")
+        print(f"HTTP error {e.code}: {body}", flush=True)
+
+        m = error_pattern.match(body)
+        code = m.group("code") if m else None
+
+        match code:
+            case "0":
+                print("Server failed to parse form sent from this Spark client. Please ensure Spark or Server list are up-to-date. If the issue persists, please contact the server list's support.")
+                sys.exit()
+            case "1":
+                print("Server couldn't check if your API token is valid. Try again, if the issue persists, please contact the server list's support.")
+                sys.exit()
+            case "2":
+                print("Invalid API token.")
+                sys.exit()
+            case "3":
+                print("Server couldn't get the server that corresponds to your API token. Try again, if the issue persists, please contact the server list's support.")
+                sys.exit()
+            case "4":
+                print("Invalid data sent to server (specifically the update type). Try updating Spark.")
+                sys.exit()
+            case "5":
+                print("Server couldn't update your server. Try again, if the issue persists, please contact the server list's support.")
+                sys.exit()
+            case _:
+                print(f"Unknown error code in response: {body}")
+        sys.exit()
+
     except Exception as e:
         print(f"Failed to send update: {e}", flush=True)
+        m = error_pattern.match(str(e))
+        code = m.group("code") if m else None
+        match code:
+            case "0" | "1" | "2" | "3" | "4" | "5":
+                print(f"Error code {code} detected in exception message.")
+            case _:
+                print("No recognized error code in exception message.")
+        
 
 
 CONFIG_PATH = Path("sparkConfig.ini")

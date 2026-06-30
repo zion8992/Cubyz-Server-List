@@ -10,6 +10,7 @@ import (
 )
 
 func (a *App) Error(w http.ResponseWriter, r *http.Request, errs ...string) {
+	w.WriteHeader(http.StatusInternalServerError)
 	msg := strings.Join(errs, "")
 
 	a.Log.Error("request error",
@@ -38,6 +39,7 @@ func (a *App) Error(w http.ResponseWriter, r *http.Request, errs ...string) {
 }
 
 func (a *App) ApiError(w http.ResponseWriter, r *http.Request, errs ...string) {
+	w.WriteHeader(http.StatusInternalServerError)
 	msg := strings.Join(errs, "")
 
 	a.Log.Error("request api error",
