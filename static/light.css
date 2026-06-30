@@ -1,37 +1,28 @@
+/* light.css */
 :root {
-    /* Primary Colors - Orange-reddish theme */
-    --primary-brown: #864d18;
-    --primary-red: #861818;
-    
-    /* Light Mode Colors */
-    --bg: #f5f5f5;
-    --bg-secondary: #e8e8e8;
-    --color: #2a2a2a;
-    --color-secondary: #555555;
-    --header-color: #d4b08a;
-    --accent: #a65d2a;
-    --border-color: #864d18;
-    
-    /* Button Colors */
-    --button-bg: #864d18;
-    --button-text: #ffffff;
-    --button-hover: #a65d2a;
-    --button-border: #6b3d14;
-    --button-shadow: #6b3d14;
-    
-    /* Card Colors */
+    --bg: #f5f6f5;
+    --bg-secondary: #ffffff;
+    --bg-hover: #e8eae8;
     --card-bg: #ffffff;
-    --card-border: #d4b08a;
-    
-    /* Players/Status Colors */
-    --players-color: #861818;
-    --online-color: #a62a2a;
-    
-    /* Link Colors */
-    --link-color: #864d18;
-    --link-hover: #a65d2a;
-    
-    /* Event Colors */
-    --event-bg: #861818;
+    --header-color: #e8eae8;
+    --header-gradient: #d8dad8;
+    --color: #2e3436;
+    --color-secondary: #7e8a82;
+    --border-color: #c9cec9;
+    --card-border: #c9cec9;
+    --primary-brown: #87b09a;
+    --accent: #6ba88e;
+    --accent-soft: rgba(107, 168, 142, 0.25);
+    --link-color: #3d9970;
+    --link-hover: #2e7a5c;
+    --button-bg: #6ba88e;
+    --button-gradient: #5a927a;
+    --button-gradient-hover: #4d7d68;
+    --button-hover: #7bb89e;
+    --button-text: #ffffff;
+    --button-border: #5a927a;
+    --button-shadow: #4d7d68;
+    --players-color: #3d9970;
+    --event-bg: #6ba88e;
     --event-text: #ffffff;
 }

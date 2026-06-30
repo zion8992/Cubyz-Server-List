@@ -87,8 +87,8 @@ func (a *App) GetUser(id uint64) (*User, error) {
 
 func (a *App) UpdateUserProfile(u User) error {
 	_, err := a.DB.Exec(
-		`UPDATE users SET username=?, email=?, profile_picture_url=?, description=?, pronouns=?, pubkey=? WHERE id=?`,
-		u.Username, u.Email, u.ProfilePictureURL, u.Description, u.Pronouns, u.Pubkey, u.ID,
+		`UPDATE users SET username=?, email=?, profile_picture_url=?, description=?, pronouns=? WHERE id=?`,
+		u.Username, u.Email, u.ProfilePictureURL, u.Description, u.Pronouns, u.ID,
 	)
 	return err
 }

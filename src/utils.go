@@ -37,7 +37,7 @@ func (a *App) Error(w http.ResponseWriter, r *http.Request, errs ...string) {
 	}
 }
 
-func (a *App) ValidateFormFields(username, password, email string) (bool, error) {
+func (a *App) ValidateFormFields(username, password, email string, validatePassword bool) (bool, error) {
 	// Username:
 	// - ASCII only
 	// - No spaces, quotes, slashes/backslashes
@@ -48,45 +48,47 @@ func (a *App) ValidateFormFields(username, password, email string) (bool, error)
 		return false, errors.New("invalid username format")
 	}
 
-	// Password:
-	// - min 11 chars
-	// - at least 2 uppercase
-	// - at least 4 digits
-	// - at least 1 lowercase
-	// - at least 1 symbol
-	// - no / or \
-	if len(password) < 11 {
-		return false, errors.New("invalid password format")
-	}
-
-	var upper, lower, digit, symbol int
-
-	for _, c := range password {
-		switch {
-		case c == '/' || c == '\\':
+	if validatePassword {
+		// Password:
+		// - min 11 chars
+		// - at least 2 uppercase
+		// - at least 4 digits
+		// - at least 1 lowercase
+		// - at least 1 symbol
+		// - no / or \
+		if len(password) < 11 {
 			return false, errors.New("invalid password format")
-		case 'A' <= c && c <= 'Z':
-			upper++
-		case 'a' <= c && c <= 'z':
-			lower++
-		case '0' <= c && c <= '9':
-			digit++
-		default:
-			symbol++
 		}
-	}
 
-	if upper < 2 || lower < 1 || digit < 4 || symbol < 1 {
-		return false, errors.New("invalid password format")
-	}
+		var upper, lower, digit, symbol int
 
-	// Email:
-	// - no spaces or backslashes before @
-	// - simple <abc>@<whatever>.<domain>
-	emailRegex := regexp.MustCompile(`^[^\\\s@]+@[^@\s]+\.[^@\s]+$`)
+		for _, c := range password {
+			switch {
+			case c == '/' || c == '\\':
+				return false, errors.New("invalid password format")
+			case 'A' <= c && c <= 'Z':
+				upper++
+			case 'a' <= c && c <= 'z':
+				lower++
+			case '0' <= c && c <= '9':
+				digit++
+			default:
+				symbol++
+			}
+		}
 
-	if !emailRegex.MatchString(email) {
-		return false, errors.New("invalid email format")
+		if upper < 2 || lower < 1 || digit < 4 || symbol < 1 {
+			return false, errors.New("invalid password format")
+		}
+
+		// Email:
+		// - no spaces or backslashes before @
+		// - simple <abc>@<whatever>.<domain>
+		emailRegex := regexp.MustCompile(`^[^\\\s@]+@[^@\s]+\.[^@\s]+$`)
+
+		if !emailRegex.MatchString(email) {
+			return false, errors.New("invalid email format")
+		}
 	}
 
 	return true, nil

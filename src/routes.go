@@ -106,7 +106,7 @@ func (a *App) RegisterGET(w http.ResponseWriter, r *http.Request) {
 
 func (a *App) RegisterPOST(w http.ResponseWriter, r *http.Request) {
 	r.ParseForm()
-	ok, err := a.ValidateFormFields(r.FormValue("username"), r.FormValue("password"), r.FormValue("email"))
+	ok, err := a.ValidateFormFields(r.FormValue("username"), r.FormValue("password"), r.FormValue("email"), true)
 
 	if !ok {
 		a.Error(w, r, "Form field validation failed: "+err.Error())
@@ -268,7 +268,7 @@ func (a *App) AccountPOST(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	ok, err = a.ValidateFormFields(user.Username, user.Password, user.Email)
+	ok, err = a.ValidateFormFields(user.Username, user.Email, "", false)
 	if !ok {
 		a.Error(w, r, "Form field validation failed: "+err.Error())
 		return
