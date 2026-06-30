@@ -99,6 +99,14 @@ func (a *App) UpdateUser(u User) error {
 	return err
 }
 
+func (a *App) LogoutUser(u User) error {
+	_, err := a.DB.Exec(
+		`UPDATE users SET session_token = NULL WHERE id = ?`,
+		u.ID,
+	)
+	return err
+}
+
 func (a *App) DeleteUser(id uint64) error {
 	_, err := a.DB.Exec("DELETE FROM users WHERE id=?", id)
 	return err

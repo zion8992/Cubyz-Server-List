@@ -26,7 +26,7 @@ func main() {
 	mux.HandleFunc("GET /login", app.LoginGET)
 	mux.HandleFunc("POST /login", app.LoginPOST)
 
-	mux.HandleFunc("GET /logout", app.LogoutUser)
+	mux.HandleFunc("GET /logout", app.LogoutHandler)
 
 	// account page
 	mux.HandleFunc("GET /account", app.AccountGET)

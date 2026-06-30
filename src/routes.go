@@ -42,7 +42,19 @@ func (a *App) SlashHandler(w http.ResponseWriter, r *http.Request) {
 	a.render(w, r, http.StatusOK, page+".html", data)
 }
 
-func (a *App) LogoutUser(w http.ResponseWriter, r *http.Request) {
+func (a *App) LogoutHandler(w http.ResponseWriter, r *http.Request) {
+	ok, err := a.CheckReqSessionTok(r)
+	if err != nil || !ok {
+		http.Redirect(w, r, "/login", http.StatusSeeOther)
+		return
+	}
+
+	uid, err := a.GetUIDFromToken(getSessionCookie(r))
+	if err != nil {
+		a.Error(w, r, "Failed to identify user: "+err.Error())
+		return
+	}
+
 	// Expire every cookie the browser sent with this request
 	for _, c := range r.Cookies() {
 		http.SetCookie(w, &http.Cookie{
@@ -68,6 +80,16 @@ func (a *App) LogoutUser(w http.ResponseWriter, r *http.Request) {
 			Expires:  time.Unix(0, 0),
 			HttpOnly: true,
 		})
+	}
+
+	u := User{
+		ID: uid,
+	}
+
+	err = a.LogoutUser(u)
+	if err != nil {
+		a.Error(w, r, "Failed to log you out: "+err.Error())
+		return
 	}
 
 	data := Page{IsLoggedIn: false}
