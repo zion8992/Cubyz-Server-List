@@ -147,7 +147,7 @@ func (a *App) CheckReqSessionTok(r *http.Request) (bool, error) {
 	var uid uint64
 	uid, err = a.GetUIDFromToken(cookie.Value)
 	if err != nil {
-		return false, errors.New("Failed to get the username from your session token: " + err.Error())
+		return false, errors.New("Failed to get the uid from your session token: " + err.Error())
 	}
 
 	if uid == 0 {
