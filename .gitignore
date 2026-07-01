@@ -2,8 +2,9 @@
 # https://github.com/github/gitignore/blob/main/community/Golang/Go.AllowList.gitignore
 #
 *test-server
-*sparkenv
+*venvee
 *enter-venv.sh
+*.ini
 
 # Binaries for programs and plugins
 *.exe

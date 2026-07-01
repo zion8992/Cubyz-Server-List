@@ -3,7 +3,7 @@ Spark is a simple script that allows you to set an automated player count and se
 <br><br>
 
 ### Downloading
-You can download `spark.md` from the [Ironite Github Releases Page](https://github.com/zion8992/ironite/releases).
+You can download `spark.py` from the [Ironite Github Releases Page](https://github.com/zion8992/ironite/releases).
 <br>
 
 ### Configuring

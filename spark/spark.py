@@ -215,7 +215,7 @@ def printer(q: queue.Queue, stop: threading.Event) -> None:
 
 
 def main() -> None:
-    global Spark_server, user_api_token
+    global Spark_server, user_api_token, CONFIG_PATH
 
     print(f"You are running Spark for Cubyz version {CUBYZ_VERSION}.")
     print(f"There may be compatibility issues if your server isn't running {CUBYZ_VERSION}.")
@@ -234,7 +234,7 @@ def main() -> None:
 
     print(f"Spark server: {Spark_server}")
     print(f"Spark cubyz log: {log_path}")
-    print(f"Spark config file: {config_path}")
+    print(f"Spark config file: {CONFIG_PATH}")
 
     if not Path(log_path).exists():
         print(
