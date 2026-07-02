@@ -1,1 +1,1 @@
-go run ./src/
+go run ./src/ "$@"

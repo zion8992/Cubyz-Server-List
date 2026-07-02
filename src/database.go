@@ -244,14 +244,13 @@ func (a *App) GetUIDFromToken(sessionToken string) (uint64, error) {
 	}
 
 	// conversions
-	var converted int
-	converted, err = strconv.Atoi(uid)
+	var converted uint64
+	converted, err = strconv.ParseUint(uid, 10, 64)
 	if err != nil {
-		return 0, errors.New("failed to convert uid to an int64: " + err.Error())
+		return 0, errors.New("failed to convert uid to an uint64: " + err.Error())
 	}
 
-	// conversions #2
-	return uint64(converted), nil
+	return converted, nil
 }
 
 /** SERVERS **/

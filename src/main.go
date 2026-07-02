@@ -9,9 +9,12 @@ import (
 	"net/http"
 	"os"
 	"time"
+	"flag"
 )
 
 func main() {
+	var port = flag.String("port", ":8000", "Port to host the HTTP server")
+
 	app := NewApp()
 	mux := http.NewServeMux()
 	handler := alice.New(app.RouteLogger).Then(mux)
@@ -52,8 +55,8 @@ func main() {
 	mux.HandleFunc("POST /api/v1/create-token", app.ApiCreateTokenHandler)
 	mux.HandleFunc("POST /api/v1/delete-token", app.ApiDeleteTokenHandler)
 
-	app.Log.Info("Listening on :8000...")
-	err := http.ListenAndServe(":8000", handler)
+	app.Log.Info(fmt.Sprintf("Listening on port %s", *port))
+	err := http.ListenAndServe(*port, handler)
 	if err != nil {
 		app.Log.Error("server failed", slog.String("error", err.Error()))
 		os.Exit(1)
@@ -61,8 +64,12 @@ func main() {
 }
 
 func NewApp() *App {
+	var DBPass = flag.String("dbpass", "H0EeLfLnO,xDEVELOPERSx4c!#%", "Root user's database password for MySQL")
+	flag.Parse()
 
-	db, err := sql.Open("mysql", "root:H0EeLfLnO,xDEVELOPERSx4c!#%@tcp(127.0.0.1:3306)/ironite?parseTime=true")
+	dsn := fmt.Sprintf("root:%s@tcp(127.0.0.1:3306)/ironite?parseTime=true", *DBPass)
+
+	db, err := sql.Open("mysql", dsn)
 	if err != nil {
 		fmt.Printf("%s\n", "Failed to connect to database!")
 		panic(err)

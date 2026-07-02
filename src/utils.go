@@ -19,7 +19,6 @@ func (a *App) Error(w http.ResponseWriter, r *http.Request, errs ...string) {
 	)
 
 	w.Header().Set("Content-Type", "text/html")
-	w.WriteHeader(http.StatusInternalServerError)
 
 	tmpl, err := template.ParseFiles(
 		"./templates/base.html",
@@ -107,7 +106,7 @@ func (a *App) ValidateFormFields(username, password, email string, validatePassw
 	return true, nil
 }
 
-func (a App) Return404(w http.ResponseWriter, r *http.Request) {
+func (a *App) Return404(w http.ResponseWriter, r *http.Request) {
 	tmpl, err := template.ParseFiles(
 		"./templates/base.html",
 		"./templates/404.html",
@@ -122,6 +121,7 @@ func (a App) Return404(w http.ResponseWriter, r *http.Request) {
 
 	if err := tmpl.Execute(w, data); err != nil {
 		a.Error(w, r, "template execution failed: ", err.Error())
+		return
 	}
 }
 
@@ -131,8 +131,13 @@ func (a *App) HasSessionToken(r *http.Request) bool {
 		return false
 	}
 
-	// optional: also ensure it's not empty
 	if cookie.Value == "" {
+		return false
+	}
+
+	_, err = a.CheckReqSessionTok(r)
+	if err != nil {
+		fmt.Printf("Failed to check users session token: %s\n", err.Error())
 		return false
 	}
 

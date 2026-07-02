@@ -287,7 +287,7 @@ func (a *App) AccountPOST(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	ok, err = a.ValidateFormFields(user.Username, user.Email, "", false)
+	ok, err = a.ValidateFormFields(user.Username, user.Password, user.Email, false)
 	if !ok {
 		a.Error(w, r, "Form field validation failed: "+err.Error())
 		return

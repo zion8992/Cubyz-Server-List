@@ -32,8 +32,6 @@ func (a *App) SparkUpdatePOST(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	fmt.Printf("server id: %d\n", sid)
-
 	switch updateType {
 	case "playerJoin":
 		err := a.ApiIncServerPlayers(sid)
@@ -51,9 +49,17 @@ func (a *App) SparkUpdatePOST(w http.ResponseWriter, r *http.Request) {
 
 	case "playerDeath":
 		// pass
+		if err != nil {
+			a.ApiError(w, r, "[4] Unsupported update type! "+err.Error())
+			return
+		}
 
 	case "serverLag":
 		// pass
+		if err != nil {
+			a.ApiError(w, r, "[4] Unsupported update type! "+err.Error())
+			return
+		}
 
 	case "serverReady":
 		err := a.ApiServerOn(sid)
