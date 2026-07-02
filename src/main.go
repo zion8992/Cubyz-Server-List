@@ -34,6 +34,7 @@ func main() {
 	mux.HandleFunc("POST /account-verify", app.AccountVerifyPOST)
 	mux.HandleFunc("GET /account-delete", app.DeleteAccountGET)
 	mux.HandleFunc("POST /account-delete-forever-and-ever", app.DeleteAccountPOST)
+	mux.HandleFunc("GET /api/v1/create-token-ui", app.CreateTokenUI)
 
 	// semi-static pages
 	mux.HandleFunc("/", app.SlashHandler)
@@ -48,6 +49,8 @@ func main() {
 
 	// api
 	mux.HandleFunc("POST /api/v1/sparkUpdate", app.SparkUpdatePOST)
+	mux.HandleFunc("POST /api/v1/create-token", app.ApiCreateTokenHandler)
+	mux.HandleFunc("POST /api/v1/delete-token", app.ApiDeleteTokenHandler)
 
 	app.Log.Info("Listening on :8000...")
 	err := http.ListenAndServe(":8000", handler)

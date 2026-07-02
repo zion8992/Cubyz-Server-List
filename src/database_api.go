@@ -4,7 +4,11 @@ import (
 	"database/sql"
 	"errors"
 	"time"
+	"crypto/rand"
+	"math/big"
 )
+
+const charset = "abcdefghijklmnopqrstuvwxyz0123456789" // charset for generating completely randomized tokens
 
 var (
 	ErrTokenNotFound = errors.New("token not found")
@@ -123,4 +127,103 @@ func (a *App) IsServerOnline(serverID uint64, lastSpark time.Time) bool {
 	}
 
 	return status
+}
+
+func (a *App) ApiCreateToken(serverID uint64, ownerID uint64, typ string, name string, tokenHash string) (error) {
+	dateCreated := time.Now()
+	expiry := dateCreated.Add(2160 * time.Hour) // expires in 90 days
+
+	_, err := a.DB.Exec(
+		`INSERT INTO api_tokens (
+			owner_id, server_id, type, token_hash, expiry, date_created, name
+		) VALUES (?, ?, ?, ?, ?, ?, ?)`,
+		ownerID,
+		serverID,
+		typ,
+		tokenHash,
+		expiry,
+		dateCreated,
+		name,
+	)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func generateToken(length int) (string, error) {
+	token := make([]byte, length)
+	for i := range token {
+		n, err := rand.Int(rand.Reader, big.NewInt(int64(len(charset))))
+		if err != nil {
+			return "", err
+		}
+		token[i] = charset[n.Int64()]
+	}
+	return string(token), nil
+}
+
+/** API AND TOKENS **/
+
+func (a *App) GetTokensFromUser(uid uint64) ([]Token, error) {
+	rows, err := a.DB.Query(
+		`SELECT id, owner_id, server_id, date_created, expiry, type, token_hash, name
+		FROM api_tokens
+		WHERE owner_id = ?`,
+		uid,
+	)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var tokens []Token
+	for rows.Next() {
+		var t Token
+		if err := rows.Scan(
+			&t.ID,
+			&t.OwnerID,
+			&t.ServerID,
+			&t.DateCreated,
+			&t.Expiry,
+			&t.Type,
+			&t.TokenHash,
+			&t.Name,
+		); err != nil {
+			return nil, err
+		}
+		tokens = append(tokens, t)
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+
+	return tokens, nil
+}
+
+func (a *App) ApiDeleteToken(tokenId uint64) error {
+	_, err := a.DB.Exec(
+		`DELETE FROM api_tokens WHERE id = ?`,
+		tokenId,
+	)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (a *App) IsTokenOwnedByUser(tokenID uint64, uid uint64) (bool, error) {
+	var ownerID uint64
+	err := a.DB.QueryRow(
+		`SELECT owner_id FROM api_tokens WHERE id = ?`,
+		tokenID,
+	).Scan(&ownerID)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return false, nil
+		}
+		return false, err
+	}
+	return ownerID == uid, nil
 }

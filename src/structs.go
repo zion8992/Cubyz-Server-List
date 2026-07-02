@@ -49,11 +49,22 @@ type Server struct {
 }
 
 type APIToken struct {
-	ID          uint64    `json:"id" db:"id"`
-	OwnerID     uint64    `json:"ownerID" db:"owner_id"`
-	ServerID    uint64    `json:"serverID" db:"server_id"`
-	DateCreated time.Time `json:"dateCreated" db:"date_created"`
-	Expiry      time.Time `json:"expiry" db:"expiry"`
-	Type        string    `json:"type" db:"type"`
-	TokenHash   string    `json:"-" db:"token_hash"`
+	ID          uint64   
+	OwnerID     uint64    
+	ServerID    uint64    
+	DateCreated time.Time 
+	Expiry      time.Time 
+	Type        string    
+	TokenHash   string
+}
+
+type Token struct {
+	ID          uint64
+	Name string
+	OwnerID     uint64
+	ServerID    uint64
+	DateCreated time.Time
+	Expiry      time.Time
+	Type        string
+	TokenHash   string
 }

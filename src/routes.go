@@ -217,9 +217,15 @@ func (a *App) AccountGET(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	tokens, err := a.GetTokensFromUser(uid)
+	if err != nil {
+		a.Error(w, r, "Failed to load users tokens: "+err.Error())
+		return
+	}
+
 	servers, err := a.GetServersByUser(uid)
 	if err != nil {
-		a.Error(w, r, "Failed to load servers: "+err.Error())
+		a.Error(w, r, "Failed to load users servers: "+err.Error())
 		return
 	}
 
@@ -227,10 +233,12 @@ func (a *App) AccountGET(w http.ResponseWriter, r *http.Request) {
 		Page
 		User
 		Servers []Server
+		Tokens []Token
 	}{
 		Page:    Page{IsLoggedIn: true},
 		User:    *user,
 		Servers: servers,
+		Tokens: tokens,
 	}
 
 	a.render(w, r, http.StatusOK, "account.html", data)
@@ -629,4 +637,131 @@ func (a *App) ServerDeletePOST(w http.ResponseWriter, r *http.Request) {
 	}
 
 	http.Redirect(w, r, "/account", http.StatusSeeOther)
+}
+
+func (a *App) CreateTokenUI(w http.ResponseWriter, r *http.Request) {
+	ok, err := a.CheckReqSessionTok(r)
+	if err != nil || !ok {
+		http.Redirect(w, r, "/login", http.StatusSeeOther)
+		return
+	}
+
+	uid, err := a.GetUIDFromToken(getSessionCookie(r))
+	if err != nil {
+		a.Error(w, r, "Failed to identify user: "+err.Error())
+		return
+	}
+
+	servers, err := a.GetServersByUser(uid)
+	if err != nil {
+		a.Error(w, r, "Failed to load servers: "+err.Error())
+		return
+	}
+
+	data := struct {
+		Page
+		Servers []Server
+	}{
+		Page:    Page{IsLoggedIn: a.HasSessionToken(r)},
+		Servers: servers,
+	}
+
+	a.render(w, r, http.StatusOK, "create-token-ui.html", data)
+}
+
+func (a *App) ApiCreateTokenHandler(w http.ResponseWriter, r *http.Request) {
+	ok, err := a.CheckReqSessionTok(r)
+	if err != nil || !ok {
+		http.Redirect(w, r, "/login", http.StatusSeeOther)
+		return
+	}
+
+	uid, err := a.GetUIDFromToken(getSessionCookie(r))
+	if err != nil {
+		a.Error(w, r, "Failed to identify user: "+err.Error())
+		return
+	}
+
+	r.ParseForm()
+
+	serverID, err := strconv.ParseUint(r.FormValue("server"), 10, 64)
+	if err != nil {
+		a.Error(w, r, "Invalid server ID: "+err.Error())
+		return
+	}
+
+	typ := r.FormValue("typ")
+	name := r.FormValue("name")
+	tokenHash, err := generateToken(15)
+	if err != nil {
+		a.Error(w,r,"Failed to generate token hash: "+err.Error())
+		return
+	}
+
+	switch typ {
+	case "spark":
+		// valid type, proceed
+	case "votifier":
+		a.Error(w,r,"Votifier tokens are not supported.")
+		return
+	default:
+		a.Error(w,r,"Invalid token type.")
+		return
+	}
+
+	err = a.ApiCreateToken(serverID, uid, typ, name, tokenHash)
+	if err != nil {
+		a.Error(w, r, "Failed to create token: "+err.Error())
+		return
+	}
+
+	data := struct{
+		Page
+		TokenHash string
+	}{
+		Page: Page{IsLoggedIn: a.HasSessionToken(r)},
+		TokenHash: tokenHash,
+	}
+
+	a.render(w, r, http.StatusOK, "your-api-token.html", data)
+}
+
+func (a *App) ApiDeleteTokenHandler(w http.ResponseWriter, r *http.Request) {
+	ok, err := a.CheckReqSessionTok(r)
+	if err != nil || !ok {
+		http.Redirect(w, r, "/login", http.StatusSeeOther)
+		return
+	}
+
+	uid, err := a.GetUIDFromToken(getSessionCookie(r))
+	if err != nil {
+		a.Error(w, r, "Failed to identify user: "+err.Error())
+		return
+	}
+
+	r.ParseForm()
+
+	tokenID, err := strconv.ParseUint(r.FormValue("tokenID"), 10, 64)
+	if err != nil {
+		a.Error(w, r, "Invalid token ID: "+err.Error())
+		return
+	}
+
+	owned, err := a.IsTokenOwnedByUser(tokenID, uid)
+	if err != nil {
+		a.Error(w, r, "Failed to verify token ownership: "+err.Error())
+		return
+	}
+	if !owned {
+		a.Error(w, r, "Token not found or not owned by you.")
+		return
+	}
+
+	err = a.ApiDeleteToken(tokenID)
+	if err != nil {
+		a.Error(w, r, "Failed to delete token: "+err.Error())
+		return
+	}
+
+	http.Redirect(w, r, "/account?tab=api", http.StatusSeeOther)
 }
