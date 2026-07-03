@@ -83,7 +83,7 @@ func NewApp() *App {
 		panic(err)
 	}
 
-	templateCache, err := newTemplateCache()
+	templateCache, err := newEmbedTemplateCache()
 	if err != nil {
 		fmt.Printf("%s\n", "Failed to create template cache!")
 		panic(err)
