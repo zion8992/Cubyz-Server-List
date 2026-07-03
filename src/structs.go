@@ -68,3 +68,15 @@ type Token struct {
 	Type        string
 	TokenHash   string
 }
+
+type ServerFilter struct {
+	Search       string
+	Version      string
+	MinPlayers   uint64
+	MaxPlayers   uint64
+	Gamemodes    []string
+	Languages    []string
+	RequiresMods bool
+	Status       string
+	Sort         string
+}

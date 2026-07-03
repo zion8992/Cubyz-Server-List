@@ -765,3 +765,55 @@ func (a *App) ApiDeleteTokenHandler(w http.ResponseWriter, r *http.Request) {
 
 	http.Redirect(w, r, "/account?tab=api", http.StatusSeeOther)
 }
+
+func (a *App) ServerListGET(w http.ResponseWriter, r *http.Request) {
+	q := r.URL.Query()
+
+	f := ServerFilter{
+		Search:       q.Get("search"),
+		Version:      q.Get("version"),
+		Gamemodes:    q["gamemode"],
+		Languages:    q["language"],
+		RequiresMods: q.Get("requires_mods") == "on",
+		Status:       q.Get("status"),
+		Sort:         q.Get("sort"),
+	}
+
+	if mp, err := strconv.ParseUint(q.Get("min_players"), 10, 64); err == nil {
+		f.MinPlayers = mp
+	}
+	if mp, err := strconv.ParseUint(q.Get("max_players"), 10, 64); err == nil {
+		f.MaxPlayers = mp
+	}
+
+	servers, err := a.ListServers(f)
+	if err != nil {
+		a.Error(w, r, "Failed to load servers: "+err.Error())
+		return
+	}
+
+	gmChecks := map[string]bool{}
+	for _, g := range f.Gamemodes {
+		gmChecks[g] = true
+	}
+	langChecks := map[string]bool{}
+	for _, l := range f.Languages {
+		langChecks[l] = true
+	}
+
+	data := struct {
+		Page
+		Servers        []Server
+		Filter         ServerFilter
+		GamemodeChecks map[string]bool
+		LanguageChecks map[string]bool
+	}{
+		Page:           Page{IsLoggedIn: a.HasSessionToken(r)},
+		Servers:        servers,
+		Filter:         f,
+		GamemodeChecks: gmChecks,
+		LanguageChecks: langChecks,
+	}
+
+	a.render(w, r, http.StatusOK, "list.html", data)
+}

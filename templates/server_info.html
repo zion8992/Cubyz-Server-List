@@ -1,7 +1,7 @@
 {{ define "content" }}
 <div class="server-info-page">
 	<header class="server-header">
-		<img src="{{ .Server }}" alt="Server logo" class="server-logo">
+		<img src="/static/img/default_server.svg" alt="Server logo" class="server-logo">
 		<h1>{{ .Server.Name }}</h1>
 		<div class="server-header-actions">
 			<button class="copy-ip" data-ip="{{ .Server.IP }}" onclick="copyIP()">Copy IP</button>

@@ -7,6 +7,7 @@ import (
 	"errors"
 	"golang.org/x/crypto/bcrypt"
 	"strconv"
+	"strings"
 	"time"
 )
 
@@ -385,4 +386,106 @@ func (a *App) UpdateServer(s Server) error {
 func (a *App) DeleteServer(id, ownerID uint64) error {
 	_, err := a.DB.Exec(`DELETE FROM servers WHERE id = ? AND owner_id = ?`, id, ownerID)
 	return err
+}
+
+func (a *App) ListServers(f ServerFilter) ([]Server, error) {
+	query := `SELECT id, name, description, xml_feed_link, ip, playercount, owner_id,
+	gamemodes, version, languages, requires_mods, website_url, chat_url, last_spark, status
+	FROM servers WHERE 1=1`
+
+	var args []interface{}
+
+	if f.Search != "" {
+		query += " AND (name LIKE ? OR description LIKE ?)"
+		args = append(args, "%"+f.Search+"%", "%"+f.Search+"%")
+	}
+	if f.Version != "" && f.Version != "Any" {
+		query += " AND version = ?"
+		args = append(args, f.Version)
+	}
+	if f.MinPlayers > 0 {
+		query += " AND playercount >= ?"
+		args = append(args, f.MinPlayers)
+	}
+	if f.MaxPlayers > 0 {
+		query += " AND playercount <= ?"
+		args = append(args, f.MaxPlayers)
+	}
+	if f.Status == "online" {
+		query += " AND status = 1"
+	} else if f.Status == "offline" {
+		query += " AND status = 0"
+	}
+	for _, gm := range f.Gamemodes {
+		query += " AND gamemodes LIKE ?"
+		args = append(args, "%"+strings.TrimSpace(gm)+"%")
+	}
+	for _, lang := range f.Languages {
+		query += " AND languages LIKE ?"
+		args = append(args, "%"+strings.TrimSpace(lang)+"%")
+	}
+	if f.RequiresMods {
+		query += " AND requires_mods = 1"
+	}
+
+	switch f.Sort {
+	case "newest":
+		query += " ORDER BY id DESC"
+	case "name":
+		query += " ORDER BY name ASC"
+	default:
+		query += " ORDER BY playercount DESC"
+	}
+
+	rows, err := a.DB.Query(query, args...)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var servers []Server
+	for rows.Next() {
+		var s Server
+		var description, xmlFeedLink, ip, gamemodes, version, languages, websiteURL, chatURL sql.NullString
+		var lastSpark sql.NullTime
+
+		err := rows.Scan(
+			&s.ID,
+			&s.Name,
+			&description,
+			&xmlFeedLink,
+			&ip,
+			&s.PlayerCount,
+			&s.OwnerID,
+			&gamemodes,
+			&version,
+			&languages,
+			&s.RequiresMods,
+			&websiteURL,
+			&chatURL,
+			&lastSpark,
+			&s.Status,
+		)
+		if err != nil {
+			return nil, err
+		}
+
+		s.Description = description.String
+		s.XMLFeedLink = xmlFeedLink.String
+		s.IP = ip.String
+		s.Gamemodes = gamemodes.String
+		s.Version = version.String
+		s.Languages = languages.String
+		s.WebsiteURL = websiteURL.String
+		s.ChatURL = chatURL.String
+		s.LastSpark = lastSpark.Time
+
+		servers = append(servers, s)
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+
+	return servers, nil
 }

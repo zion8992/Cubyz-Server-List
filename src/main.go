@@ -55,6 +55,9 @@ func main() {
 	mux.HandleFunc("POST /api/v1/create-token", app.ApiCreateTokenHandler)
 	mux.HandleFunc("POST /api/v1/delete-token", app.ApiDeleteTokenHandler)
 
+	// list
+	mux.HandleFunc("GET /list", app.ServerListGET)
+
 	app.Log.Info(fmt.Sprintf("Listening on port %s", *port))
 	err := http.ListenAndServe(*port, handler)
 	if err != nil {
