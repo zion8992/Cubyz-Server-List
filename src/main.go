@@ -2,6 +2,7 @@ package main
 
 import (
 	"database/sql"
+	"flag"
 	"fmt"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/justinas/alice"
@@ -9,7 +10,6 @@ import (
 	"net/http"
 	"os"
 	"time"
-	"flag"
 )
 
 func main() {

@@ -1,11 +1,11 @@
 package main
 
 import (
+	"crypto/rand"
 	"database/sql"
 	"errors"
-	"time"
-	"crypto/rand"
 	"math/big"
+	"time"
 )
 
 const charset = "abcdefghijklmnopqrstuvwxyz0123456789" // charset for generating completely randomized tokens
@@ -129,7 +129,7 @@ func (a *App) IsServerOnline(serverID uint64, lastSpark time.Time) bool {
 	return status
 }
 
-func (a *App) ApiCreateToken(serverID uint64, ownerID uint64, typ string, name string, tokenHash string) (error) {
+func (a *App) ApiCreateToken(serverID uint64, ownerID uint64, typ string, name string, tokenHash string) error {
 	dateCreated := time.Now()
 	expiry := dateCreated.Add(2160 * time.Hour) // expires in 90 days
 

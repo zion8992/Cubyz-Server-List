@@ -49,18 +49,18 @@ type Server struct {
 }
 
 type APIToken struct {
-	ID          uint64   
-	OwnerID     uint64    
-	ServerID    uint64    
-	DateCreated time.Time 
-	Expiry      time.Time 
-	Type        string    
+	ID          uint64
+	OwnerID     uint64
+	ServerID    uint64
+	DateCreated time.Time
+	Expiry      time.Time
+	Type        string
 	TokenHash   string
 }
 
 type Token struct {
 	ID          uint64
-	Name string
+	Name        string
 	OwnerID     uint64
 	ServerID    uint64
 	DateCreated time.Time

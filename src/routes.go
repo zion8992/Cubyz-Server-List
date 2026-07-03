@@ -233,12 +233,12 @@ func (a *App) AccountGET(w http.ResponseWriter, r *http.Request) {
 		Page
 		User
 		Servers []Server
-		Tokens []Token
+		Tokens  []Token
 	}{
 		Page:    Page{IsLoggedIn: true},
 		User:    *user,
 		Servers: servers,
-		Tokens: tokens,
+		Tokens:  tokens,
 	}
 
 	a.render(w, r, http.StatusOK, "account.html", data)
@@ -694,7 +694,7 @@ func (a *App) ApiCreateTokenHandler(w http.ResponseWriter, r *http.Request) {
 	name := r.FormValue("name")
 	tokenHash, err := generateToken(15)
 	if err != nil {
-		a.Error(w,r,"Failed to generate token hash: "+err.Error())
+		a.Error(w, r, "Failed to generate token hash: "+err.Error())
 		return
 	}
 
@@ -702,10 +702,10 @@ func (a *App) ApiCreateTokenHandler(w http.ResponseWriter, r *http.Request) {
 	case "spark":
 		// valid type, proceed
 	case "votifier":
-		a.Error(w,r,"Votifier tokens are not supported.")
+		a.Error(w, r, "Votifier tokens are not supported.")
 		return
 	default:
-		a.Error(w,r,"Invalid token type.")
+		a.Error(w, r, "Invalid token type.")
 		return
 	}
 
@@ -715,11 +715,11 @@ func (a *App) ApiCreateTokenHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	data := struct{
+	data := struct {
 		Page
 		TokenHash string
 	}{
-		Page: Page{IsLoggedIn: a.HasSessionToken(r)},
+		Page:      Page{IsLoggedIn: a.HasSessionToken(r)},
 		TokenHash: tokenHash,
 	}
 
