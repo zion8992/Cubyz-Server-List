@@ -283,12 +283,12 @@ func (a *App) CreateServer(s Server) (int64, error) {
 
 func (a *App) GetServer(id uint64) (*Server, error) {
 	var s Server
-	var description, xmlFeedLink, ip, gamemodes, version, languages, websiteURL, chatURL sql.NullString
+	var description, xmlFeedLink, ip, gamemodes, version, languages, websiteURL, chatURL, iconURL sql.NullString
 	var lastSpark sql.NullTime
 
 	err := a.DB.QueryRow(
 		`SELECT id, name, description, xml_feed_link, ip, playercount, owner_id,
-			gamemodes, version, languages, requires_mods, website_url, chat_url, last_spark, status
+			gamemodes, version, languages, requires_mods, website_url, chat_url, icon_url, last_spark, status
 		 FROM servers WHERE id=?`,
 		id,
 	).Scan(
@@ -305,6 +305,7 @@ func (a *App) GetServer(id uint64) (*Server, error) {
 		&s.RequiresMods,
 		&websiteURL,
 		&chatURL,
+		&iconURL,
 		&lastSpark,
 		&s.Status,
 	)
@@ -320,6 +321,7 @@ func (a *App) GetServer(id uint64) (*Server, error) {
 	s.Languages = languages.String
 	s.WebsiteURL = websiteURL.String
 	s.ChatURL = chatURL.String
+	s.IconURL = iconURL.String
 	s.LastSpark = lastSpark.Time
 
 	return &s, nil
@@ -365,7 +367,8 @@ func (a *App) UpdateServer(s Server) error {
 			languages = ?,
 			requires_mods = ?,
 			website_url = ?,
-			chat_url = ?
+			chat_url = ?,
+			icon_url = ?
 		 WHERE id = ? AND owner_id = ?`,
 		s.Name,
 		s.Description,
@@ -377,6 +380,7 @@ func (a *App) UpdateServer(s Server) error {
 		s.RequiresMods,
 		s.WebsiteURL,
 		s.ChatURL,
+		s.IconURL,
 		s.ID,
 		s.OwnerID,
 	)
@@ -389,10 +393,7 @@ func (a *App) DeleteServer(id, ownerID uint64) error {
 }
 
 func (a *App) ListServers(f ServerFilter) ([]Server, error) {
-	query := `SELECT id, name, description, xml_feed_link, ip, playercount, owner_id,
-	gamemodes, version, languages, requires_mods, website_url, chat_url, last_spark, status
-	FROM servers WHERE 1=1`
-
+	query := `SELECT id FROM servers WHERE 1=1`
 	var args []interface{}
 
 	if f.Search != "" {
@@ -443,48 +444,25 @@ func (a *App) ListServers(f ServerFilter) ([]Server, error) {
 	}
 	defer rows.Close()
 
-	var servers []Server
+	var ids []uint64
 	for rows.Next() {
-		var s Server
-		var description, xmlFeedLink, ip, gamemodes, version, languages, websiteURL, chatURL sql.NullString
-		var lastSpark sql.NullTime
+		var id uint64
+		if err := rows.Scan(&id); err != nil {
+			return nil, err
+		}
+		ids = append(ids, id)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
 
-		err := rows.Scan(
-			&s.ID,
-			&s.Name,
-			&description,
-			&xmlFeedLink,
-			&ip,
-			&s.PlayerCount,
-			&s.OwnerID,
-			&gamemodes,
-			&version,
-			&languages,
-			&s.RequiresMods,
-			&websiteURL,
-			&chatURL,
-			&lastSpark,
-			&s.Status,
-		)
+	var servers []Server
+	for _, id := range ids {
+		s, err := a.GetServer(id)
 		if err != nil {
 			return nil, err
 		}
-
-		s.Description = description.String
-		s.XMLFeedLink = xmlFeedLink.String
-		s.IP = ip.String
-		s.Gamemodes = gamemodes.String
-		s.Version = version.String
-		s.Languages = languages.String
-		s.WebsiteURL = websiteURL.String
-		s.ChatURL = chatURL.String
-		s.LastSpark = lastSpark.Time
-
-		servers = append(servers, s)
-	}
-
-	if err := rows.Err(); err != nil {
-		return nil, err
+		servers = append(servers, *s)
 	}
 
 	return servers, nil

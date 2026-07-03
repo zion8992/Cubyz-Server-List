@@ -600,6 +600,7 @@ func (a *App) ServerEditPOST(w http.ResponseWriter, r *http.Request) {
 		RequiresMods: r.FormValue("requires_mods") == "on",
 		WebsiteURL:   strings.TrimSpace(r.FormValue("website_url")),
 		ChatURL:      strings.TrimSpace(r.FormValue("chat_url")),
+		IconURL:      strings.TrimSpace(r.FormValue("icon_url")),
 		OwnerID:      uid,
 	}
 

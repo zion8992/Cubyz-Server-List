@@ -1,7 +1,11 @@
 {{ define "content" }}
 <div class="server-info-page">
 	<header class="server-header">
-		<img src="/static/img/default_server.svg" alt="Server logo" class="server-logo">
+		{{ if .IconURL }}
+		<img src="{{ .IconURL }}" alt="Server logo (Uncontrolled by the server list)" class="server-logo">
+		{{ else }}
+		<img src="/static/img/default_server.svg" alt="Default Server logo" class="server-logo">
+		{{ end }}
 		<h1>{{ .Server.Name }}</h1>
 		<div class="server-header-actions">
 			<button class="copy-ip" data-ip="{{ .Server.IP }}" onclick="copyIP()">Copy IP</button>

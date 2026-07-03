@@ -43,6 +43,7 @@ type Server struct {
 	RequiresMods bool
 	WebsiteURL   string
 	ChatURL      string
+	IconURL string
 	IP           string
 	LastSpark    time.Time
 	Status       bool

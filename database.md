@@ -55,6 +55,7 @@ CREATE TABLE servers (
   requires_mods BOOLEAN NOT NULL DEFAULT FALSE,
   website_url TEXT,
   chat_url TEXT,
+  icon_url TEXT,
   ip VARCHAR(255) NOT NULL DEFAULT '',
   last_spark TIMESTAMP NULL,
   status BOOLEAN NOT NULL DEFAULT FALSE;
