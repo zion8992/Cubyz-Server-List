@@ -1,0 +1,26 @@
+{{ define "content" }}
+<h2>Create API Token</h2>
+<form method="POST" action="/api/v1/create-token">
+    <label for="name">Token Name:</label>
+    <input type="text" id="name" name="name" placeholder="Name" />
+    <label for="type-select">Choose a type:</label>
+    <select name="typ" id="type-select">
+        <option value="">-- Please choose an option --</option>
+        <option value="spark">Spark</option>
+        <option value="votifier" disabled >Votifier</option>
+    </select>
+    {{ if .Servers }}
+    <label for="server-select">Choose Server:</label>
+    <select name="server" id="server-select">
+        <option value="">-- Please choose a server --</option>
+        {{ range .Servers }}
+        <option value="{{ .ID }}">{{ .Name }}</option>
+        {{ end }}
+    </select>
+    {{ else }}
+    <br><br>
+    <p class="empty">You don't have any servers yet. <a href="/servers/create">Create a server.</a></p>
+    {{ end }}
+    <button type="submit">Generate</button>
+</form>
+{{ end }}

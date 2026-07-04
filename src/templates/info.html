@@ -1,0 +1,134 @@
+{{ define "content" }}
+
+<div class="account-layout">
+	<aside class="account-sidebar">
+		<nav>
+			<button class="sidebar-tab active" data-tab="info">Info</button>
+			<button class="sidebar-tab" data-tab="votify">Votify</button>
+			<button class="sidebar-tab" data-tab="spark">Spark</button>
+			<button class="sidebar-tab" data-tab="fusion">Fusion</button>
+			<button class="sidebar-tab" data-tab="source">Source</button>
+			<button class="sidebar-tab" data-tab="rules">Rules</button>
+		</nav>
+	</aside>
+
+	<section class="account-content">
+		<div class="tab-panel active" id="tab-info">
+			<h2>Info</h2>
+			<p>Open source server list for Cubyz.</p>
+		</div>
+
+		<div class="tab-panel" id="tab-votify">
+			<h2>Votify</h2>
+			<p>Yet to be coded.</p>
+			<!--
+            <p>Simple Python app that allows you to get a list of the latest voters on your server. Useful for rewarding players for voting.</p>
+			<br>
+			<a href="https://github.com/zion8992/ironite/releases" class="button" target="_blank">Download Votify</a>-->
+		</div>
+
+		<div class="tab-panel" id="tab-spark">
+			<h2>Spark</h2>
+            <p>Simple Python client for setting the server status, version and playercount of your server on the server list.</p>
+			<br>
+			<a href="https://github.com/zion8992/ironite/releases" class="button" target="_blank">Download Spark</a>
+			<br><br>
+			<p>Instructions on how to setup Spark can be found <a href="https://github.com/zion8992/ironite/blob/main/spark/Spark_Setup.md">here</a>.</p>
+		</div>
+
+		<div class="tab-panel" id="tab-fusion">
+			<h2>Fusion</h2>
+            <p>Python script that allows you to manage, create, update and delete announcements/posts for your server.</p>
+			<br>
+			<a href="https://github.com/zion8992/ironite/releases" class="button" target="_blank">Download Fusion</a>
+			<br><br>
+			<p>Instructions on how to setup and use Fusion can be found <a href="https://github.com/zion8992/ironite/blob/main/fusion/Fusion_Setup.md">here</a>.</p>
+		</div>
+
+		<div class="tab-panel" id="tab-source">
+			<h2>Source Code</h2>
+            <p>Ironite source code is fully available on Github.</p>
+			<br>
+			<a href="https://github.com/zion8992/ironite" class="button" target="_blank">View</a>
+		</div>
+
+		<div class="tab-panel" id="tab-rules">
+			<h2>Rules</h2>
+
+			<p>Welcome to the community server list! By using this server list, you agree to follow all rules below. These rules apply to <strong>both server operators/administrators</strong> and <strong>users</strong> of this list.</p>
+			<br><br>
+			<h3>Enforcement</h3>
+			<p>Failure to follow these rules may result in a <strong>ban</strong> from the server list. <strong>Ban evasion</strong>, including creating new accounts, using alternate identities, or circumulating a ban in any way, is strictly prohibited and will result in a permanent ban with no possibility of appeal.</p>
+			<br><br>
+			<h3>Rules for Server Operators</h3>
+
+			<p><strong>1. Free to Join</strong><br>
+			All servers must be <strong>free to join</strong>. Servers may not require an upfront payment, subscription, or any mandatory fee for access.</p>
+			<br>
+			<p><strong>2. Pay-to-Win is Allowed</strong><br>
+			Pay-to-win (P2W) servers <em>are permitted</em> on this list. However, the server listing <strong>must clearly indicate</strong> that it is a pay-to-win server in the <b>first ten lines</b> of the server description</p>
+			<br>
+			<p><strong>3. No NSFW Content</strong><br>
+			Servers containing <strong>NSFW (Not Safe For Work)</strong> content, including sexual, pornographic, or otherwise explicitly adult material, are <strong>not allowed</strong> on this server list.</p>
+			<br>
+			<p><strong>4. Content Warnings Required</strong><br>
+			If your server contains or references any of the following, you <strong>must specify it clearly</strong> in the first <b>five lines</b> of your server description:</p>
+			<br>
+			<ul>
+			<li>Drugs or drug use</li>
+			<li>Alcohol or alcohol consumption</li>
+			<li>Tobacco or smoking</li>
+			<li>Gambling or betting mechanics</li>
+			<li>Strong/profane language</li>
+			<li>Violence or graphic content</li>
+			<li>Any other potentially sensitive or mature content</li>
+			<br>
+			</ul>
+			<p>Failure to properly disclose sensitive content will result in removal of your listing and possible ban.</p>
+			<br>
+			<p><strong>5. Accurate Descriptions and Data</strong><br>
+			Server descriptions and data (languages) must be accurate and not misleading. Do not use deceptive descriptions to attract players. You are allowed to use clickbait titles.</p>
+			<br>
+			<p><strong>6. No Malicious Servers</strong><br>
+			Servers that distribute malware, attempt to steal user data, or otherwise harm players are strictly prohibited. Operators found running malicious servers will be permanently banned.</p>
+			<br>
+			<p><strong>7. Keep Listings Updated</strong><br>
+			If your server goes offline <b>permanently</b> or changes significantly (e.g., new sensitive content is added), update your listing or remove it promptly.</p>
+			<br>
+			<br>
+			<h3>Rules for Server List Users</h3>
+
+			<p><strong>1. No Harassment or Abuse</strong><br>
+			Do not harass, threaten, or abuse other users, server operators, or server list staff. This includes hate speech, personal attacks, and targeted harassment.</p>
+			<br>
+			<p><strong>2. No Spamming</strong><br>
+			Do not spam the server list with duplicate submissions, fake reviews, or irrelevant content. This includes mass-downvoting or review-bombing servers.</p>
+			<br>
+			<p><strong>3. No Manipulation</strong><br>
+			Do not attempt to manipulate server rankings, ratings, votes or visibility through artificial means (bots, vote manipulation, fake accounts, etc.).</p>
+			<br>
+			<!--
+			<p><strong>4. Honest Reviews Only</strong><br>
+			Reviews must be honest and based on genuine experience. Fake reviews, whether positive or negative, are not allowed.</p>
+			<br>
+			-->
+			<p><strong>4. Respect Content Warnings</strong><br>
+			Respect the content warnings and tags provided by server operators. If you join a server with disclosed sensitive content, you accept that disclosure by choosing to join.</p>
+			<br>
+			<p><strong>5. Report Responsibly</strong><br>
+			If you report a server or user, do so "in good faith". False or malicious reports are considered abuse of the system and may result in a ban.</p>
+			<br>
+			<p><strong>6. No Ban Evasion</strong><br>
+			If you have been banned from the server list, you may not create a new account or use another identity to regain access. Ban evasion will result in a permanent ban.</p>
+			<br>
+			<h3>Reporting Violations</h3>
+			<p>If you encounter a server or user that violates these rules, please report it to the server list moderators. Provide as much detail as possible, including evidence if available.</p>
+			<br>
+
+			</div>
+	</section>
+</div>
+
+
+<script src="/static/js/sidebar.js"></script>
+{{ end }}

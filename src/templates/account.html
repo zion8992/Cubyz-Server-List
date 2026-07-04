@@ -1,0 +1,125 @@
+{{ define "content" }}
+<div class="account-layout">
+	<aside class="account-sidebar">
+		<nav>
+			<button class="sidebar-tab active" data-tab="account">Account</button>
+			<button class="sidebar-tab" data-tab="servers">Servers</button>
+			<button class="sidebar-tab" data-tab="verify">Verify Account</button>
+			<button class="sidebar-tab" data-tab="api">API & Tokens</button>
+			<button class="sidebar-tab" data-tab="verified" style="display: none;">Verified Account</button>
+			<a href="/logout" class="button">Logout</a>
+		</nav>
+	</aside>
+
+	<section class="account-content">
+		<div class="tab-panel active" id="tab-account">
+			<h2>Account Settings</h2>
+			<form method="POST" action="/account">
+				<label for="username">Username</label>
+				<input type="text" id="username" name="username" value="{{ .Username }}" required>
+
+				<label for="email">Email</label>
+				<input type="email" id="email" name="email" value="{{ .Email }}" required>
+
+				<label for="profile_picture_url">Profile Picture URL</label>
+				<input type="url" id="profile_picture_url" name="profile_picture_url" value="{{ .ProfilePictureURL }}" placeholder="https://example.com/avatar.png">
+
+				<label for="pronouns">Pronouns</label>
+				<input type="text" id="pronouns" name="pronouns" value="{{ .Pronouns }}" placeholder="e.g. they/them">
+
+				<label for="description">Bio / Description</label>
+				<textarea id="description" name="description" placeholder="Tell us about yourself...">{{ .Description }}</textarea>
+
+				<button type="submit">Save Changes</button>
+			</form>
+			<br>
+			<br>
+			<h2>Danger Zone</h2>
+			<a href="/account-delete" class="button">Delete Account (Forever)</a>
+		</div>
+
+		<div class="tab-panel" id="tab-servers">
+			<h2>Servers</h2>
+			<a href="/servers/create" class="button">Create Server</a>
+
+			{{ if .Servers }}
+			<ul class="server-list">
+				{{ range .Servers }}
+				<li class="server-list-item">
+					{{ if .IconURL }}
+					<img src="{{ .IconURL }}" alt="Server logo (Uncontrolled by the server list)" class="server-logo">
+					{{ else }}
+					<img src="/static/img/default_server.svg" alt="Default Server logo" class="server-logo">
+					{{ end }}
+					<a href="/servers/{{ .ID }}" class="server-list-name">{{ .Name }}</a>
+					<div class="server-list-actions">
+						<a href="/servers/edit/{{ .ID }}" class="button">Edit</a>
+						<form method="POST" action="/servers/delete/{{ .ID }}" onsubmit="return confirm('Delete this server?');">
+							<button type="submit" class="button danger">Delete</button>
+						</form>
+					</div>
+				</li>
+				{{ end }}
+			</ul>
+			{{ else }}
+			<p class="empty">You don't have any servers yet.</p>
+			{{ end }}
+		</div>
+
+		<div class="tab-panel" id="tab-verify">
+			<h2>Verify Account</h2>
+			<form method="POST" action="/account-verify">
+				<p>To verify your account, enter your Cubyz public key in the textarea below. <br> You can find your public key in <b>Settings</b> -> <b>Social</b> -> <b>Copy Public Key</b></p>
+				<label for="pubkey">Public Key</label>
+				<textarea id="pubkey" name="pubkey" placeholder="ed25519:key" style="resize:both;">{{ .Pubkey }}</textarea>
+
+				<button type="submit">Verify</button>
+			</form>
+		</div>
+
+		<div class="tab-panel" id="tab-verified">
+			<h2>Account Verified</h2>
+			<form method="POST" action="/account-verify">
+				<p>Thank you for verifying your account.</p>
+			</form>
+		</div>
+
+		<div class="tab-panel" id="tab-api">
+			<h2>API & Tokens</h2>
+			<a href="/api/v1/create-token-ui" class="button">Create Token</a>
+			<br><br>
+			{{ if .Tokens }}
+			<table>
+				<tr>
+					<td>Name</td>
+					<td>Type</td>
+					<td>Created</td>
+					<td>Expiry</td>
+					<td>Action</td>
+				</tr>
+				{{ range .Tokens }}
+				<tr>
+					<div class="server-list-actions">
+						<td>{{ .Name}}</td>
+						<td>{{ .Type }}</td>
+						<td>{{ .DateCreated }}</td>
+						<td>{{ .Expiry }}</td>
+						<td>
+						<form method="POST" action="/api/v1/delete-token" onsubmit="return confirm('Are you sure you want to delete this token?');">
+							<input type="hidden" name="tokenID" value="{{ .ID }}"/>
+							<button type="submit" class="button danger">Delete</button>
+						</form>
+						</td>
+					</div>
+				</tr>
+				{{ end }}
+			</ul>
+			{{ else }}
+			<p class="empty">You don't have any servers yet.</p>
+			{{ end }}
+		</div>
+	</section>
+</div>
+
+<script src="/static/js/sidebar.js"></script>
+{{ end }}

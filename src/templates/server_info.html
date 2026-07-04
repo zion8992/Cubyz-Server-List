@@ -1,0 +1,68 @@
+{{ define "content" }}
+<div class="server-info-page">
+	<header class="server-header">
+		{{ if .IconURL }}
+		<img src="{{ .IconURL }}" alt="Server logo (Uncontrolled by the server list)" class="server-logo">
+		{{ else }}
+		<img src="/static/img/default_server.svg" alt="Default Server logo" class="server-logo">
+		{{ end }}
+		<h1>{{ .Server.Name }}</h1>
+		<div class="server-header-actions">
+			<button class="copy-ip" data-ip="{{ .Server.IP }}" onclick="copyIP()">Copy IP</button>
+			{{ if .IsOwner }}
+			<a href="/servers/edit/{{ .Server.ID }}" class="button">Edit</a>
+			{{ end }}
+		</div>
+	</header>
+
+	<div class="server-body">
+		<section class="server-main">
+			<nav class="server-tabs">
+				<button class="server-tab active" data-tab="description">Description</button>
+				<button class="server-tab" data-tab="xmlfeed">XML Feed</button>
+			</nav>
+
+			<div class="tab-panel active" id="tab-description">
+				{{ if .Server.Description }}
+				<p>{{ .Server.Description }}</p>
+				{{ else }}
+				<p class="empty">No description provided.</p>
+				{{ end }}
+			</div>
+
+			<div class="tab-panel" id="tab-xmlfeed">
+				{{ if .Server.XMLFeedLink }}
+				<p><a href="{{ .Server.XMLFeedLink }}" target="_blank" rel="noopener">{{ .Server.XMLFeedLink }}</a></p>
+				{{ else }}
+				<p class="empty">No XML feed linked.</p>
+				{{ end }}
+			</div>
+		</section>
+
+		<aside class="server-sidebar">
+			<h3>Details</h3>
+			<ul>
+				{{ if .Server.IP }}<li><strong>IP:</strong> {{ .Server.IP }}</li>{{ end }}
+				{{ if .Server.Version }}<li><strong>Version:</strong> {{ .Server.Version }}</li>{{ end }}
+				{{ if .Server.Gamemodes }}<li><strong>Gamemodes:</strong> {{ .Server.Gamemodes }}</li>{{ end }}
+				{{ if .Server.Languages }}<li><strong>Languages:</strong> {{ .Server.Languages }}</li>{{ end }}
+				<li><strong>Mods required:</strong> {{ if .Server.RequiresMods }}Yes{{ else }}No{{ end }}</li>
+				{{ if .Server.WebsiteURL }}<li><strong>Website:</strong> <a href="{{ .Server.WebsiteURL }}" target="_blank" rel="noopener">Visit</a></li>{{ end }}
+				{{ if .Server.ChatURL }}<li><strong>Chat:</strong> <a href="{{ .Server.ChatURL }}" target="_blank" rel="noopener">Join</a></li>{{ end }}
+				<li><strong>Players:</strong> {{ .Server.PlayerCount }}</li>
+				<li><strong>Status:</strong> {{ if .ServerStatus }}Online{{else}}Offline{{end}}</li>
+			</ul>
+		</aside>
+	</div>
+</div>
+
+<script src="/static/js/server_tabs.js"></script>
+<script>
+function copyIP() {
+	const ip = document.querySelector('.copy-ip').dataset.ip;
+	navigator.clipboard.writeText(ip).then(() => {
+		alert('IP copied to clipboard: ' + ip);
+	});
+}
+</script>
+{{ end }}
