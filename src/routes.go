@@ -380,11 +380,31 @@ func (a *App) DeleteAccountPOST(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	var servers []Server
+	servers, err = a.GetServersByUser(uid)
+	for _, s := range servers {
+		if err := a.DeleteServer(s.ID, uid); err != nil {
+			a.Log.Error("failed to delete server: ",err.Error(),)
+			return
+		}
+	}
+
+	var tkns []Token
+	tkns, err = a.GetTokensFromUser(uid)
+	for _, t := range tkns {
+		if err := a.ApiDeleteToken(t.ID); err != nil {
+			a.Log.Error("failed to delete token: ",err.Error(),)
+			return
+		}
+	}
+
+
 	err = a.DeleteUser(uid)
 	if err != nil {
 		a.Error(w, r, "Failed to delete your account! "+err.Error())
 		return
 	}
+
 
 	http.Redirect(w, r, "/", http.StatusSeeOther)
 }
