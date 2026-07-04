@@ -4,7 +4,6 @@ import (
 	"database/sql"
 	"fmt"
 	"net/http"
-	"os"
 	"strconv"
 	"strings"
 	"time"
@@ -28,9 +27,7 @@ func (a *App) SlashHandler(w http.ResponseWriter, r *http.Request) {
 		page = "home"
 	}
 
-	path := "./templates/" + page + ".html"
-
-	if _, err := os.Stat(path); os.IsNotExist(err) {
+	if _, ok := a.TemplateCache[page+".html"]; !ok {
 		a.Return404(w, r)
 		return
 	}
@@ -41,6 +38,7 @@ func (a *App) SlashHandler(w http.ResponseWriter, r *http.Request) {
 
 	a.render(w, r, http.StatusOK, page+".html", data)
 }
+
 
 func (a *App) LogoutHandler(w http.ResponseWriter, r *http.Request) {
 	ok, err := a.CheckReqSessionTok(r)
@@ -484,14 +482,22 @@ func (a *App) ServerInfo(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
+	ownerUser, err := a.GetUser(server.OwnerID)
+	if err != nil {
+		a.Error(w,r,"Failed to load owner user profile"+err.Error())
+		return
+	}
+
 	data := struct {
 		Page
 		Server
+		*User // user who OWNS the server
 		IsOwner      bool
 		ServerStatus bool
 	}{
 		Page:         Page{IsLoggedIn: a.HasSessionToken(r)},
 		Server:       *server,
+		User: ownerUser,
 		IsOwner:      isOwner,
 		ServerStatus: a.IsServerOnline(server.ID, server.LastSpark),
 	}

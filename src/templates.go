@@ -3,7 +3,6 @@ package main
 import (
 	"html/template"
 	"path/filepath"
-	"io/fs"
 	"net/http"
 	"fmt"
 )
@@ -39,44 +38,6 @@ func newTemplateCache() (map[string]*template.Template, error) {
 		}
 
 		ts, err := template.ParseFiles(files...)
-		if err != nil {
-			return nil, err
-		}
-
-		cache[name] = ts
-	}
-
-	return cache, nil
-}
-
-func newEmbedTemplateCache() (map[string]*template.Template, error) {
-	cache := map[string]*template.Template{}
-
-	rootPages, err := fs.Glob(templatesFS, "templates/*.html")
-	if err != nil {
-		return nil, err
-	}
-
-	authPages, err := fs.Glob(templatesFS, "templates/auth/*.html")
-	if err != nil {
-		return nil, err
-	}
-
-	pages := append(rootPages, authPages...)
-
-	for _, page := range pages {
-		name := filepath.Base(page)
-
-		if name == "base.html" {
-			continue
-		}
-
-		files := []string{
-			"templates/base.html",
-			page,
-		}
-
-		ts, err := template.ParseFS(templatesFS, files...)
 		if err != nil {
 			return nil, err
 		}

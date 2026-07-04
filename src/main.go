@@ -10,6 +10,7 @@ import (
 	"net/http"
 	"os"
 	"time"
+	"io/fs"
 )
 
 func main() {
@@ -19,8 +20,25 @@ func main() {
 	mux := http.NewServeMux()
 	handler := alice.New(app.RouteLogger).Then(mux)
 
-	staticFS := http.FileServer(http.Dir("./static"))
-	mux.Handle("/static/", http.StripPrefix("/static/", staticFS))
+	staticSubFS, err := fs.Sub(staticFS, "static")
+	if err != nil {
+		panic(err)
+	}
+	staticFileServer := http.FileServer(http.FS(staticSubFS))
+	mux.Handle("/static/", http.StripPrefix("/static/", staticFileServer))
+
+
+	mux.HandleFunc("GET /debug/static", func(w http.ResponseWriter, r *http.Request) {
+		fs.WalkDir(staticFS, ".", func(path string, d fs.DirEntry, err error) error {
+			if err != nil {
+				fmt.Fprintln(w, "err:", err)
+				return nil
+			}
+			fmt.Fprintln(w, path)
+			return nil
+		})
+	})
+
 
 	// auth
 	mux.HandleFunc("GET /register", app.RegisterGET)
@@ -59,7 +77,7 @@ func main() {
 	mux.HandleFunc("GET /list", app.ServerListGET)
 
 	app.Log.Info(fmt.Sprintf("Listening on port %s", *port))
-	err := http.ListenAndServe(*port, handler)
+	err = http.ListenAndServe(*port, handler)
 	if err != nil {
 		app.Log.Error("server failed", slog.String("error", err.Error()))
 		os.Exit(1)
