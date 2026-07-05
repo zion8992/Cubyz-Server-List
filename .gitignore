@@ -5,7 +5,7 @@
 *venvee
 *enter-venv.sh
 *.ini
-
+*.xml
 # Binaries for programs and plugins
 *.exe
 *.exe~
