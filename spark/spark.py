@@ -71,7 +71,7 @@ def send_Spark_update(update: str) -> None:
 
 
 CONFIG_PATH = Path("sparkConfig.ini")
-CUBYZ_VERSION = "0.2.0"
+CUBYZ_VERSION = "0.3.0"
 
 DEFAULTS: Dict[str, str] = {
     "user_api_token": "",
@@ -92,12 +92,12 @@ PATTERNS: List[Tuple[str, re.Pattern, Callable[[re.Match], Dict]]] = [
     ),
     (
         "leave",
-        re.compile(r"Chat: (?P<user>.+?) left"),
+        re.compile(r"\[chat\]: (?P<user>.+?) left"),
         lambda m: m.groupdict(),
     ),
     (
         "death",
-        re.compile(r"Chat: (?P<user>.+?) died of fall damage"),
+        re.compile(r"\[chat\]: (?P<user>.+?) died of fall damage"),
         lambda m: m.groupdict(),
     ),
     (
@@ -217,8 +217,8 @@ def printer(q: queue.Queue, stop: threading.Event) -> None:
 def main() -> None:
     global Spark_server, user_api_token, CONFIG_PATH
 
-    print(f"You are running Spark for Cubyz version {CUBYZ_VERSION}.")
-    print(f"There may be compatibility issues if your server isn't running {CUBYZ_VERSION}.")
+    print(f"Started Spark for Cubyz v{CUBYZ_VERSION}.")
+    #print(f"There may be compatibility issues if your server isn't running {CUBYZ_VERSION}.")
 
     config = ensure_config(CONFIG_PATH)
 
@@ -232,9 +232,9 @@ def main() -> None:
         "settings", "Spark_server", fallback=DEFAULTS["Spark_server"]
     )
 
-    print(f"Spark server: {Spark_server}")
-    print(f"Spark cubyz log: {log_path}")
-    print(f"Spark config file: {CONFIG_PATH}")
+    print(f"Spark host: {Spark_server}")
+    print(f"Spark Cubyz log: {log_path}")
+    print(f"Spark config: {CONFIG_PATH}")
 
     if not Path(log_path).exists():
         print(
