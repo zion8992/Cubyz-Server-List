@@ -110,6 +110,11 @@ func (a *App) RegisterPOST(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	if banned, word := a.CheckBanned(r.FormValue("username")); banned {
+		a.Error(w, r, "Username contains a banned word: "+word)
+		return
+	}
+
 	_, err = a.GetUserIDByUsername(r.FormValue("username"))
 	if err != nil && err != sql.ErrNoRows {
 		a.Error(w, r, "Failed to check user: "+err.Error())
@@ -156,6 +161,12 @@ func (a *App) LoginPOST(w http.ResponseWriter, r *http.Request) {
 		a.Error(w, r, "Invalid credentials")
 		return
 	}
+
+	if banned, word := a.CheckBanned(r.FormValue("username")); banned {
+		a.Error(w, r, "Username contains a banned word: "+word+" You will no longer be able to login into this acccount.")
+		return
+	}
+
 	if err != nil {
 		a.Error(w, r, "Failed to check user: "+err.Error())
 		return
@@ -248,6 +259,11 @@ func (a *App) AccountPOST(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	if banned, word := a.CheckBanned(r.FormValue("username")); banned {
+		a.Error(w, r, "Username contains a banned word: "+word+" You will no longer be able to login into this acccount.")
+		return
+	}
+
 	_, err = a.GetUserIDByUsername(r.FormValue("username"))
 	if err != nil && err != sql.ErrNoRows {
 		a.Error(w, r, "Failed to check user: "+err.Error())
@@ -317,6 +333,11 @@ func (a *App) AccountVerifyPOST(w http.ResponseWriter, r *http.Request) {
 
 	if pubkey == "" {
 		a.Error(w, r, "Public Key is required.")
+		return
+	}
+
+	if banned, word := a.CheckBanned(pubkey); banned {
+		a.Error(w, r, "Public key contains a banned word: "+word)
 		return
 	}
 
@@ -457,6 +478,21 @@ func (a *App) ServerCreatePOST(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	if banned, word := a.CheckBanned(name); banned {
+		a.Error(w, r, "Server name contains a banned word: "+word)
+		return
+	}
+
+	if banned, word := a.CheckBanned(strings.TrimSpace(r.FormValue("description"))); banned {
+		a.Error(w, r, "Server description contains a banned word: "+word)
+		return
+	}
+
+	if banned, word := a.CheckBanned(ip); banned {
+		a.Error(w, r, "Server IP contains a banned word: "+word)
+		return
+	}
+
 	s := Server{
 		Name:        name,
 		Description: strings.TrimSpace(r.FormValue("description")),
@@ -581,12 +617,14 @@ func (a *App) ServerEditPOST(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	
 	idStr := r.PathValue("id")
 	id, err := strconv.ParseUint(idStr, 10, 64)
 	if err != nil {
 		a.Return404(w, r)
 		return
 	}
+	
 
 	server, err := a.GetServer(id)
 	if err != nil {
@@ -611,12 +649,46 @@ func (a *App) ServerEditPOST(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	ip := strings.TrimSpace(r.FormValue("ip"))
+	if ip == "" {
+		a.Error(w, r, "Server IP is required")
+		return
+	}
+
+	if banned, word := a.CheckBanned(r.FormValue("username")); banned {
+		a.Error(w, r, "Server name contains a banned word: "+word)
+		return
+	}
+
+	fields := []struct {
+		label string
+		value string
+	}{
+		{"Name", name},
+		{"Description", strings.TrimSpace(r.FormValue("description"))},
+		{"XML Feed Link", strings.TrimSpace(r.FormValue("xml_feed_link"))},
+		{"Gamemodes", strings.TrimSpace(r.FormValue("gamemodes"))},
+		{"Version", strings.TrimSpace(r.FormValue("version"))},
+		{"Languages", strings.TrimSpace(r.FormValue("languages"))},
+		{"Website URL", strings.TrimSpace(r.FormValue("website_url"))},
+		{"Chat URL", strings.TrimSpace(r.FormValue("chat_url"))},
+		{"Icon URL", strings.TrimSpace(r.FormValue("icon_url"))},
+	}
+
+	for _, f := range fields {
+		if banned, word := a.CheckBanned(f.value); banned {
+			a.Error(w, r, f.label+" contains a banned word: "+word)
+			return
+		}
+	}
+
+
 	s := Server{
 		ID:           id,
 		Name:         name,
 		Description:  strings.TrimSpace(r.FormValue("description")),
 		XMLFeedLink:  strings.TrimSpace(r.FormValue("xml_feed_link")),
-		IP:           strings.TrimSpace(r.FormValue("ip")),
+		IP:           ip,
 		Gamemodes:    strings.TrimSpace(r.FormValue("gamemodes")),
 		Version:      strings.TrimSpace(r.FormValue("version")),
 		Languages:    strings.TrimSpace(r.FormValue("languages")),
@@ -715,7 +787,13 @@ func (a *App) ApiCreateTokenHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	typ := r.FormValue("typ")
-	name := r.FormValue("name")
+	name := strings.TrimSpace(r.FormValue("name"))
+
+	if banned, word := a.CheckBanned(name); banned {
+		a.Error(w, r, "Token name contains a banned word: "+word)
+		return
+	}
+
 	tokenHash, err := generateToken(15)
 	if err != nil {
 		a.Error(w, r, "Failed to generate token hash: "+err.Error())

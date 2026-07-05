@@ -112,5 +112,9 @@ func NewApp() *App {
 		TemplateCache: templateCache,
 	}
 
+	if err := a.LoadBannedWords(); err != nil {
+		panic(err)
+	}
+
 	return a
 }

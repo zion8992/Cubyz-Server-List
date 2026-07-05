@@ -6,6 +6,8 @@ import (
 	"net/http"
 	"regexp"
 	"strings"
+	"bufio"
+	"io"
 )
 
 func (a *App) Error(w http.ResponseWriter, r *http.Request, errs ...string) {
@@ -195,4 +197,51 @@ func (a *App) NoEmbedrender(w http.ResponseWriter, r *http.Request, status int, 
 	if err := ts.Execute(w, data); err != nil {
 		a.Error(w, r, "template execution failed: "+err.Error())
 	}
+}
+
+func (a *App) LoadBannedWords() error {
+	a.BannedWords = make(map[string]struct{})
+
+	file, err := staticFS.Open("static/banned-words.txt")
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+
+	scanner := bufio.NewScanner(file)
+	for scanner.Scan() {
+		word := strings.ToLower(strings.TrimSpace(scanner.Text()))
+		if word == "" || strings.HasPrefix(word, "#") {
+			continue
+		}
+		a.BannedWords[word] = struct{}{}
+	}
+
+	if err := scanner.Err(); err != nil && err != io.EOF {
+		return err
+	}
+
+	return nil
+}
+
+func (a *App) ContainsBannedWord(input string) bool {
+	words := strings.Fields(strings.ToLower(input))
+	for _, word := range words {
+		cleaned := strings.Trim(word, "!?.,;:\"'()[]{}")
+		if _, ok := a.BannedWords[cleaned]; ok {
+			return true
+		}
+	}
+	return false
+}
+
+func (a *App) CheckBanned(input string) (bool, string) {
+	words := strings.Fields(strings.ToLower(input))
+	for _, word := range words {
+		cleaned := strings.Trim(word, "!?.,;:\"'()[]{}")
+		if _, ok := a.BannedWords[cleaned]; ok {
+			return true, cleaned
+		}
+	}
+	return false, ""
 }

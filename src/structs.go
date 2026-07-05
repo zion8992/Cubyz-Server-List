@@ -10,7 +10,7 @@ import (
 type App struct {
 	Log           *slog.Logger
 	DB            *sql.DB
-	BlockedWords  string
+	BannedWords   map[string]struct{}
 	DefaultExpiry time.Duration
 	TemplateCache map[string]*template.Template
 }
