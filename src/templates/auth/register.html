@@ -3,6 +3,7 @@
 <div class="center-me-pls">
     <h2>Register</h2>
     <form action="/register" method="post">
+		<input type="hidden" name="csrf_token" value="{{.CSRFToken}}">
         <input type="text" name="username" placeholder="Username" required /> <br>
         <input type="text" name="email" placeholder="Email" required /> <br>
         <input type="password" id="password" name="password" placeholder="Secure Password" required /> <br>

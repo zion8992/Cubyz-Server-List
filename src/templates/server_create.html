@@ -1,5 +1,6 @@
 {{define "content" }}
 <form method="POST" action="/servers/create">
+	<input type="hidden" name="csrf_token" value="{{.CSRFToken}}">
 	<h2>Create Server</h2>
 
 	<label for="name">Server Name*</label>

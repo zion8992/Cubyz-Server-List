@@ -13,6 +13,7 @@ import (
 type Page struct {
 	// Sessions
 	IsLoggedIn bool
+	CSRFToken  string
 
 	// Theming
 	//Theme string // "light" or "dark"
@@ -96,6 +97,7 @@ func (a *App) LogoutHandler(w http.ResponseWriter, r *http.Request) {
 func (a *App) RegisterGET(w http.ResponseWriter, r *http.Request) {
 	data := Page{
 		IsLoggedIn: a.HasSessionToken(r),
+		CSRFToken:  a.GetCSRFTokenFromRequest(r),
 	}
 
 	a.render(w, r, http.StatusOK, "register.html", data)
@@ -148,6 +150,7 @@ func (a *App) RegisterPOST(w http.ResponseWriter, r *http.Request) {
 func (a *App) LoginGET(w http.ResponseWriter, r *http.Request) {
 	data := Page{
 		IsLoggedIn: a.HasSessionToken(r),
+		CSRFToken:  a.GetCSRFTokenFromRequest(r),
 	}
 
 	a.render(w, r, http.StatusOK, "login.html", data)
@@ -243,7 +246,7 @@ func (a *App) AccountGET(w http.ResponseWriter, r *http.Request) {
 		Servers []Server
 		Tokens  []Token
 	}{
-		Page:    Page{IsLoggedIn: true},
+		Page:    Page{IsLoggedIn: true, CSRFToken: a.GetCSRFTokenFromRequest(r)},
 		User:    *user,
 		Servers: servers,
 		Tokens:  tokens,
@@ -379,7 +382,7 @@ func (a *App) DeleteAccountGET(w http.ResponseWriter, r *http.Request) {
 		User
 		Servers []Server
 	}{
-		Page:    Page{IsLoggedIn: true},
+		Page:    Page{IsLoggedIn: true, CSRFToken: a.GetCSRFTokenFromRequest(r)},
 		User:    *user,
 		Servers: servers,
 	}
@@ -446,6 +449,7 @@ func (a *App) ServerCreateGET(w http.ResponseWriter, r *http.Request) {
 
 	data := Page{
 		IsLoggedIn: true,
+		CSRFToken:  a.GetCSRFTokenFromRequest(r),
 	}
 
 	a.render(w, r, http.StatusOK, "server_create.html", data)
@@ -597,7 +601,7 @@ func (a *App) ServerEditGET(w http.ResponseWriter, r *http.Request) {
 		Page
 		Server
 	}{
-		Page:   Page{IsLoggedIn: true},
+		Page:   Page{IsLoggedIn: true, CSRFToken: a.GetCSRFTokenFromRequest(r)},
 		Server: *server,
 	}
 
@@ -617,14 +621,12 @@ func (a *App) ServerEditPOST(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	
 	idStr := r.PathValue("id")
 	id, err := strconv.ParseUint(idStr, 10, 64)
 	if err != nil {
 		a.Return404(w, r)
 		return
 	}
-	
 
 	server, err := a.GetServer(id)
 	if err != nil {
@@ -681,7 +683,6 @@ func (a *App) ServerEditPOST(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	}
-
 
 	s := Server{
 		ID:           id,
@@ -758,7 +759,7 @@ func (a *App) CreateTokenUI(w http.ResponseWriter, r *http.Request) {
 		Page
 		Servers []Server
 	}{
-		Page:    Page{IsLoggedIn: a.HasSessionToken(r)},
+		Page:    Page{IsLoggedIn: a.HasSessionToken(r), CSRFToken: a.GetCSRFTokenFromRequest(r)},
 		Servers: servers,
 	}
 

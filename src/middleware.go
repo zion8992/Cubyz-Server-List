@@ -11,3 +11,27 @@ func (app *App) RouteLogger(next http.Handler) http.Handler {
 		next.ServeHTTP(w, r)
 	})
 }
+
+func (app *App) CSRFMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		cookie, err := r.Cookie("csrf_token")
+		if err != nil || cookie.Value == "" {
+			token, err := app.GenerateCSRFToken()
+			if err != nil {
+				app.Error(w, r, "Failed to generate CSRF token: "+err.Error())
+				return
+			}
+			app.SetCSRFTokenCookie(w, token)
+			r.AddCookie(&http.Cookie{Name: "csrf_token", Value: token})
+		}
+
+		if r.Method == "POST" || r.Method == "PUT" || r.Method == "DELETE" || r.Method == "PATCH" {
+			if !app.ValidateCSRFToken(r) {
+				http.Error(w, "Invalid or missing CSRF token", http.StatusForbidden)
+				return
+			}
+		}
+
+		next.ServeHTTP(w, r)
+	})
+}

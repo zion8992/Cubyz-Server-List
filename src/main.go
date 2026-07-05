@@ -18,7 +18,7 @@ func main() {
 
 	app := NewApp()
 	mux := http.NewServeMux()
-	handler := alice.New(app.RouteLogger).Then(mux)
+	handler := alice.New(app.RouteLogger, app.CSRFMiddleware).Then(mux)
 
 	staticSubFS, err := fs.Sub(staticFS, "static")
 	if err != nil {

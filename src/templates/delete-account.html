@@ -5,6 +5,7 @@
 <h3>Your account will be sent to the deleted accounts world forever (a very very very VERY long time!).</h3>
 
 <form method="POST" action="/account-delete-forever-and-ever">
+    <input type="hidden" name="csrf_token" value="{{.CSRFToken}}">
     <button type="submit" class="button danger" style="border:none;">DELETE PERMANENTLY</button>
 </form>
 

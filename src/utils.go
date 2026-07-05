@@ -1,13 +1,14 @@
 package main
 
 import (
+	"bufio"
 	"errors"
 	"fmt"
+	"io"
 	"net/http"
 	"regexp"
 	"strings"
-	"bufio"
-	"io"
+	"time"
 )
 
 func (a *App) Error(w http.ResponseWriter, r *http.Request, errs ...string) {
@@ -244,4 +245,40 @@ func (a *App) CheckBanned(input string) (bool, string) {
 		}
 	}
 	return false, ""
+}
+
+func (a *App) GenerateCSRFToken() (string, error) {
+	return generateToken(32)
+}
+
+func (a *App) SetCSRFTokenCookie(w http.ResponseWriter, token string) {
+	http.SetCookie(w, &http.Cookie{
+		Name:     "csrf_token",
+		Value:    token,
+		Path:     "/",
+		Expires:  time.Now().Add(24 * time.Hour),
+		HttpOnly: true,
+		SameSite: http.SameSiteStrictMode,
+	})
+}
+
+func (a *App) GetCSRFTokenFromRequest(r *http.Request) string {
+	cookie, err := r.Cookie("csrf_token")
+	if err == nil && cookie.Value != "" {
+		return cookie.Value
+	}
+	if r.Method == "POST" || r.Method == "PUT" || r.Method == "DELETE" || r.Method == "PATCH" {
+		r.ParseForm()
+		return r.FormValue("csrf_token")
+	}
+	return ""
+}
+
+func (a *App) ValidateCSRFToken(r *http.Request) bool {
+	cookie, err := r.Cookie("csrf_token")
+	if err != nil || cookie.Value == "" {
+		return false
+	}
+	r.ParseForm()
+	return r.FormValue("csrf_token") == cookie.Value
 }

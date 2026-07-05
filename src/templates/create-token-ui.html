@@ -1,6 +1,7 @@
 {{ define "content" }}
 <h2>Create API Token</h2>
 <form method="POST" action="/api/v1/create-token">
+    <input type="hidden" name="csrf_token" value="{{.CSRFToken}}">
     <label for="name">Token Name:</label>
     <input type="text" id="name" name="name" placeholder="Name" />
     <label for="type-select">Choose a type:</label>
