@@ -6,11 +6,11 @@ import (
 	"fmt"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/justinas/alice"
+	"io/fs"
 	"log/slog"
 	"net/http"
 	"os"
 	"time"
-	"io/fs"
 )
 
 func main() {
@@ -27,7 +27,6 @@ func main() {
 	staticFileServer := http.FileServer(http.FS(staticSubFS))
 	mux.Handle("/static/", http.StripPrefix("/static/", staticFileServer))
 
-
 	mux.HandleFunc("GET /debug/static", func(w http.ResponseWriter, r *http.Request) {
 		fs.WalkDir(staticFS, ".", func(path string, d fs.DirEntry, err error) error {
 			if err != nil {
@@ -38,7 +37,6 @@ func main() {
 			return nil
 		})
 	})
-
 
 	// auth
 	mux.HandleFunc("GET /register", app.RegisterGET)

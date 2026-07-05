@@ -3,8 +3,8 @@ package main
 import (
 	"embed"
 	"html/template"
-	"path"
 	"io/fs"
+	"path"
 )
 
 //go:embed all:templates

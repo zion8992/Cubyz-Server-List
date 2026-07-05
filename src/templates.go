@@ -1,10 +1,10 @@
 package main
 
 import (
-	"html/template"
-	"path/filepath"
-	"net/http"
 	"fmt"
+	"html/template"
+	"net/http"
+	"path/filepath"
 )
 
 func newTemplateCache() (map[string]*template.Template, error) {

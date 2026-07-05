@@ -13,9 +13,12 @@
                 <label>Version</label>
                 <select name="version">
                     <option value="Any" {{if eq .Filter.Version "Any"}}selected{{end}}>Any</option>
-                    <option value="1.0" {{if eq .Filter.Version "1.0"}}selected{{end}}>1.0</option>
-                    <option value="1.1" {{if eq .Filter.Version "1.1"}}selected{{end}}>1.1</option>
-                    <option value="1.2" {{if eq .Filter.Version "1.2"}}selected{{end}}>1.2</option>
+                    <option value="0.0.0" {{if eq .Filter.Version "0.0.0"}}selected{{end}}>0.0.0</option>
+                    <option value="0.0.1" {{if eq .Filter.Version "0.0.1"}}selected{{end}}>0.0.1</option>
+                    <option value="0.1.0" {{if eq .Filter.Version "0.1.0"}}selected{{end}}>0.1.0</option>
+                    <option value="0.1.1" {{if eq .Filter.Version "0.1.1"}}selected{{end}}>0.1.1</option>
+                    <option value="0.2.0" {{if eq .Filter.Version "0.2.0"}}selected{{end}}>0.2.0</option>
+                    <option value="0.3.0" {{if eq .Filter.Version "0.3.0"}}selected{{end}}>0.3.0 (Latest)</option>   
                 </select>
             </p>
 

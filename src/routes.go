@@ -39,7 +39,6 @@ func (a *App) SlashHandler(w http.ResponseWriter, r *http.Request) {
 	a.render(w, r, http.StatusOK, page+".html", data)
 }
 
-
 func (a *App) LogoutHandler(w http.ResponseWriter, r *http.Request) {
 	ok, err := a.CheckReqSessionTok(r)
 	if err != nil || !ok {
@@ -384,7 +383,7 @@ func (a *App) DeleteAccountPOST(w http.ResponseWriter, r *http.Request) {
 	servers, err = a.GetServersByUser(uid)
 	for _, s := range servers {
 		if err := a.DeleteServer(s.ID, uid); err != nil {
-			a.Log.Error("failed to delete server: ",err.Error(),)
+			a.Log.Error("failed to delete server: ", err.Error())
 			return
 		}
 	}
@@ -393,18 +392,16 @@ func (a *App) DeleteAccountPOST(w http.ResponseWriter, r *http.Request) {
 	tkns, err = a.GetTokensFromUser(uid)
 	for _, t := range tkns {
 		if err := a.ApiDeleteToken(t.ID); err != nil {
-			a.Log.Error("failed to delete token: ",err.Error(),)
+			a.Log.Error("failed to delete token: ", err.Error())
 			return
 		}
 	}
-
 
 	err = a.DeleteUser(uid)
 	if err != nil {
 		a.Error(w, r, "Failed to delete your account! "+err.Error())
 		return
 	}
-
 
 	http.Redirect(w, r, "/", http.StatusSeeOther)
 }
@@ -504,20 +501,20 @@ func (a *App) ServerInfo(w http.ResponseWriter, r *http.Request) {
 
 	ownerUser, err := a.GetUser(server.OwnerID)
 	if err != nil {
-		a.Error(w,r,"Failed to load owner user profile"+err.Error())
+		a.Error(w, r, "Failed to load owner user profile"+err.Error())
 		return
 	}
 
 	data := struct {
 		Page
 		Server
-		*User // user who OWNS the server
+		*User        // user who OWNS the server
 		IsOwner      bool
 		ServerStatus bool
 	}{
 		Page:         Page{IsLoggedIn: a.HasSessionToken(r)},
 		Server:       *server,
-		User: ownerUser,
+		User:         ownerUser,
 		IsOwner:      isOwner,
 		ServerStatus: a.IsServerOnline(server.ID, server.LastSpark),
 	}
