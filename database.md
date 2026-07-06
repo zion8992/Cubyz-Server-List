@@ -1,5 +1,7 @@
 # Setup Database
 
+### Install MySQL
+
 This file will guide you through how to setup a MySQL database for ironite.<br>
 If you have Docker installed you can easily create and run a database with the scripts in `scripts/`.<br>
 ```sh
@@ -11,10 +13,11 @@ cd scripts
 ./delete_db.sh # deletes database docker volume
 ```
 <br>
-If you don't, install MySQL or download it from [https://www.mysql.com/downloads/](mysql.com/downloads).<br>
+If you don't want to use docker, install MySQL or download it from [https://www.mysql.com/downloads/](mysql.com/downloads).<br>
+Once the database is setup, **paste** and **run** the following snippet to setup the tables required for Ironite.
 <br>
 
-### Database Tables
+### Setup Tables for Ironite
 
 ```sql
 create database ironite;
@@ -88,7 +91,7 @@ CREATE INDEX idx_api_tokens_expiry ON api_tokens(expiry);
 CREATE INDEX idx_api_tokens_token_hash ON api_tokens(token_hash);
 ```
 
-## Create test token
+## Create test token (dev only)
 
 ```sql
 INSERT INTO api_tokens (
