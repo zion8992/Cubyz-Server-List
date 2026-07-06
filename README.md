@@ -2,11 +2,13 @@
 Open source server list for Cubyz made using Go.
 
 ### Run
+Guide to setup the MySQL database can be found [here](https://github.com/zion8992/ironite/blob/main/database.md)
 
-#### Prebuilt Binaries
-Prebuilt executables can be found [here](https://github.com/zion8992/ironite/releases)
+#### Run using: Prebuilt Binaries
+Prebuilt executables can be found [here](https://github.com/zion8992/ironite/releases). And a database setup guide can be found [here](https://github.com/zion8992/ironite/blob/main/database.md).
 
-#### Using Script
+#### Run using:  Script
+
 Requires Go `1.25` or later to run. You can download Go from [go.dev](https://go.dev).
 Runs on all platforms.
 
@@ -15,12 +17,13 @@ Runs on all platforms.
 ```
 
 #### Command Line Arugments
-`dbpass`: Password for the root account of your mysql database. If you are running Ironite `1.0`, ironite auto assumes you are running MySQL on `127.0.0.1:3306`, Default: `H0EeLfLnO,xDEVELOPERSx4c!#%`.<br>
+`dbpass`: Password for the root account of your mysql database. <br>
+If you are running Ironite `1.0`, ironite auto assumes you are running MySQL on `127.0.0.1:3306`, Default: `H0EeLfLnO,xDEVELOPERSx4c!#%`. <br>
 `port`: Port to host http server, Default: `:8000`.
 
 ### Build from source
-Requires Go `1.25` or later to run. You can download Go from [go.dev](https://go.dev).
-Runs on all platforms.
+Requires Go `1.25` or later to build. You can download Go from [go.dev](https://go.dev).
+You can build for all platforms on any platform.
 
 ```bash
 GOOS=linux GOARCH=amd64 go build -o ironite ./src/ # for linux amd64
