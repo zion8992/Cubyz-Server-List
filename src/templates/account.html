@@ -4,7 +4,12 @@
 		<nav>
 			<button class="sidebar-tab active" data-tab="account">Account</button>
 			<button class="sidebar-tab" data-tab="servers">Servers</button>
+			<button class="sidebar-tab" data-tab="security">Security</button>
+			{{ if .Pubkey }}
+			<button class="sidebar-tab" data-tab="verify">Public Key</button>
+			{{ else }}
 			<button class="sidebar-tab" data-tab="verify">Verify Account</button>
+			{{ end }}
 			<button class="sidebar-tab" data-tab="api">API & Tokens</button>
 			<button class="sidebar-tab" data-tab="verified" style="display: none;">Verified Account</button>
 			<a href="/logout" class="button">Logout</a>
@@ -66,6 +71,19 @@
 			{{ else }}
 			<p class="empty">You don't have any servers yet.</p>
 			{{ end }}
+		</div>
+
+		<div class="tab-panel" id="tab-security">
+			<h2>Security</h2>
+			<h4>Change Password</h4><br><br>
+			<form method="POST" action="/account-changepass">
+				<input type="hidden" name="csrf_token" value="{{ .Page.CSRFToken}}">
+				<input type="text" name="oldPass" placeholder="Old Password" required />
+				<input type="text" name="newPass" placeholder="New Password" required />
+				<button type="submit">Change Password</button>
+			</form><br><br>
+			<h4>Setup 2FA</h4>
+			<p>Work in Progress!</p>
 		</div>
 
 		<div class="tab-panel" id="tab-verify">

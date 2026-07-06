@@ -3,6 +3,7 @@ package main
 import (
 	"database/sql"
 	"fmt"
+	"golang.org/x/crypto/bcrypt"
 	"net/http"
 	"strconv"
 	"strings"
@@ -350,6 +351,59 @@ func (a *App) AccountVerifyPOST(w http.ResponseWriter, r *http.Request) {
 	}
 
 	http.Redirect(w, r, "/account?tab=verified", http.StatusSeeOther)
+}
+
+func (a *App) AccountChangePassPOST(w http.ResponseWriter, r *http.Request) {
+	ok, err := a.CheckReqSessionTok(r)
+	if err != nil || !ok {
+		http.Redirect(w, r, "/login", http.StatusSeeOther)
+		return
+	}
+
+	uid, err := a.GetUIDFromToken(getSessionCookie(r))
+	if err != nil {
+		a.Error(w, r, "Failed to identify user: "+err.Error())
+		return
+	}
+
+	u, err := a.GetUser(uid)
+	if err != nil {
+		a.Error(w, r, "Failed to get user data: "+err.Error())
+		return
+	}
+
+	r.ParseForm()
+
+	oldPass := strings.TrimSpace(r.FormValue("oldPass"))
+	newPass := strings.TrimSpace(r.FormValue("newPass"))
+
+	if oldPass == "" {
+		a.Error(w, r, "Missing old password!")
+		return
+	}
+
+	if newPass == "" {
+		a.Error(w, r, "Missing new password!")
+		return
+	}
+
+	if err := bcrypt.CompareHashAndPassword([]byte(u.Password), []byte(oldPass)); err != nil {
+		a.Error(w, r, "Old password is incorrect!")
+		return
+	}
+
+	hash, err := a.HashPassword(newPass)
+	if err != nil {
+		a.Error(w, r, "Failed to hash password: "+err.Error())
+		return
+	}
+
+	if err := a.UpdateUserPass(uid, hash); err != nil {
+		a.Error(w, r, "Failed to change your password: "+err.Error())
+		return
+	}
+
+	http.Redirect(w, r, "/account?tab=security", http.StatusSeeOther)
 }
 
 func (a *App) DeleteAccountGET(w http.ResponseWriter, r *http.Request) {

@@ -102,6 +102,14 @@ func (a *App) UpdateUserPubkey(id uint64, pubkey string) error {
 	return err
 }
 
+func (a *App) UpdateUserPass(id uint64, password string) error {
+	_, err := a.DB.Exec(
+		`UPDATE users SET password=? WHERE id=?`,
+		password, id,
+	)
+	return err
+}
+
 func (a *App) UpdateUser(u User) error {
 	_, err := a.DB.Exec(
 		`UPDATE users SET username=?, email=? WHERE id=?`,
