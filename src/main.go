@@ -85,9 +85,10 @@ func main() {
 
 func NewApp() *App {
 	var DBPass = flag.String("dbpass", "H0EeLfLnO,xDEVELOPERSx4c!#%", "Root user's database password for MySQL")
+	var DBIP = flag.String("dburl", "127.0.0.1:3306", "IP and Port of the database")
 	flag.Parse()
 
-	dsn := fmt.Sprintf("root:%s@tcp(127.0.0.1:3306)/ironite?parseTime=true", *DBPass)
+	dsn := fmt.Sprintf("root:%s@tcp(%s)/ironite?parseTime=true", *DBPass, *DBIP)
 
 	db, err := sql.Open("mysql", dsn)
 	if err != nil {

@@ -21,7 +21,7 @@ Once the database is setup, **paste** and **run** the following snippet to setup
 
 ```sql
 create database ironite;
-
+use ironite;
 
 /** USERS **/
 
@@ -34,11 +34,11 @@ CREATE TABLE users (
   password VARCHAR(255) NOT NULL,
   date_created TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   session_token VARCHAR(255) NULL,
-  session_token_expires TIMESTAMP NULL
+  session_token_expires TIMESTAMP NULL,        
   profile_picture_url VARCHAR(500) NULL,
   description TEXT NULL,
   pubkey TEXT NULL,
-  pronouns VARCHAR(50) NULL;
+  pronouns VARCHAR(50) NULL                    
 );
 
 /** SERVERS **/
@@ -61,12 +61,12 @@ CREATE TABLE servers (
   icon_url TEXT,
   ip VARCHAR(255) NOT NULL DEFAULT '',
   last_spark TIMESTAMP NULL,
-  status BOOLEAN NOT NULL DEFAULT FALSE;
+  status BOOLEAN NOT NULL DEFAULT FALSE,       
   FOREIGN KEY (owner_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
-
 /** API TOKENS **/
+
 CREATE TABLE api_tokens (
     id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(50) NOT NULL,
