@@ -28,6 +28,7 @@
 
 				<div class="tab-panel" id="tab-xmlfeed">
 					<input type="url" name="xml_feed_link" value="{{ .Server.XMLFeedLink }}" placeholder="https://myserver.gg/feed.xml"><br><br>
+					<p>NOTE: Ensure CORS is enabled on your server. If you don't know how to do this, you can use Fusion Server.</p>
 					<a href="/info?tab=fusion">Learn more about XML feeds for your server.</a>
 				</div>
 			</section>
@@ -36,7 +37,7 @@
 				<h3>Details</h3>
 				<ul>
 					<li>
-						<strong>IP:</strong>
+						<strong>Hostname or IP address:</strong><p>Format "host:port"</p>
 						<input type="text" name="ip" value="{{ .Server.IP }}" required maxlength="255">
 					</li>
 					<li>
@@ -45,10 +46,12 @@
 					</li>
 					<li>
 						<strong>Gamemodes:</strong>
+						<p>Seperated using commas: "Survival, Creative"</p>
 						<input type="text" name="gamemodes" value="{{ .Server.Gamemodes }}" maxlength="255">
 					</li>
 					<li>
 						<strong>Languages:</strong>
+						<p>Seperated using commas: "English, Frensh"</p>
 						<input type="text" name="languages" value="{{ .Server.Languages }}" maxlength="255">
 					</li>
 					<li>
