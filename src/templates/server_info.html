@@ -19,7 +19,7 @@
 		<section class="server-main">
 			<nav class="server-tabs">
 				<button class="server-tab active" data-tab="description">Description</button>
-				<button class="server-tab" data-tab="xmlfeed">XML Feed</button>
+				<button class="server-tab" data-tab="xmlfeed">Announcements</button>
 			</nav>
 
 			<div class="tab-panel active" id="tab-description">
@@ -32,11 +32,19 @@
 
 			<div class="tab-panel" id="tab-xmlfeed">
 				{{ if .Server.XMLFeedLink }}
-				<p><a href="{{ .Server.XMLFeedLink }}" target="_blank" rel="noopener">{{ .Server.XMLFeedLink }}</a></p>
+				<p>
+					Feed at: <a href="{{ .Server.XMLFeedLink }}" target="_blank" rel="noopener">
+						{{ .Server.XMLFeedLink }}
+					</a>
+				</p>
+				<div id="xml-feed-container" data-feed-url="{{ .Server.XMLFeedLink }}">
+					<p class="feed-loading">Loading feed…</p>
+				</div>
 				{{ else }}
 				<p class="empty">No XML feed linked.</p>
 				{{ end }}
 			</div>
+
 		</section>
 
 		<aside class="server-sidebar">
@@ -66,4 +74,182 @@ function copyIP() {
 	});
 }
 </script>
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/dompurify@3.0.6/dist/purify.min.js"></script>
+
+<script>
+(function () {
+	const container = document.getElementById('xml-feed-container');
+	if (!container) return;
+
+	const url = container.dataset.feedUrl;
+	if (!url) {
+		container.innerHTML = '<p class="empty">No XML feed linked.</p>';
+		return;
+	}
+
+	Promise.all([
+		fetch(url),
+		fetch('/static/banned-words.txt')
+	])
+		.then(([feedResponse, bannedResponse]) => {
+			if (!feedResponse.ok) throw new Error('Feed returned HTTP ' + feedResponse.status);
+			const type = (feedResponse.headers.get('content-type') || '').toLowerCase();
+			if (!type.includes('xml')) throw new Error('Linked URL is not an XML feed (' + type + ')');
+
+			return Promise.all([
+				feedResponse.text(),
+				bannedResponse.ok ? bannedResponse.text() : Promise.resolve('')
+			]);
+		})
+		.then(([xmlText, bannedText]) => {
+			const bannedWords = bannedText.split('\n')
+				.map(w => w.trim().toLowerCase())
+				.filter(w => w.length > 0);
+
+			const doc = new DOMParser().parseFromString(xmlText, 'application/xml');
+			const parseError = doc.querySelector('parsererror');
+			if (parseError) throw new Error('Invalid XML: ' + parseError.textContent);
+
+			const announcements = doc.querySelectorAll('feed > announcement');
+			if (announcements.length === 0) {
+				container.innerHTML = '<p class="empty">No announcements found.</p>';
+				return;
+			}
+
+			const list = document.createElement('div');
+			list.className = 'feed-list';
+
+			announcements.forEach(announcement => {
+				let title = announcement.querySelector('title')?.textContent || 'Untitled';
+				let rawContent = announcement.querySelector('content')?.textContent || '';
+
+				title = censorBannedWords(title, bannedWords);
+				rawContent = censorBannedWords(rawContent, bannedWords);
+
+				const item = document.createElement('article');
+				item.className = 'feed-item';
+
+				const titleEl = document.createElement('strong');
+				titleEl.className = 'feed-title';
+				titleEl.textContent = title;
+
+				const contentEl = document.createElement('div');
+				contentEl.className = 'feed-content';
+				contentEl.innerHTML = DOMPurify.sanitize(marked.parse(rawContent));
+
+				item.appendChild(titleEl);
+				item.appendChild(contentEl);
+				list.appendChild(item);
+			});
+
+			container.innerHTML = '';
+			container.appendChild(list);
+		})
+		.catch(error => {
+			container.innerHTML = '<p class="feed-error">Error loading feed: ' + escapeHtml(error.message) + '</p>';
+		});
+
+	function stripMarkdown(text) {
+		return text
+			.replace(/(\*\*|__)(.*?)\1/g, '$2')
+			.replace(/(\*|_)(.*?)\1/g, '$2')
+			.replace(/`{1,3}([^`]+)`{1,3}/g, '$1')
+			.replace(/#{1,6}\s?/g, '')
+			.replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')
+			.replace(/!\[([^\]]*)\]\([^)]+\)/g, '$1')
+			.replace(/~~(.*?)~~/g, '$1')
+			.replace(/^\s*[-*+]\s+/gm, '')
+			.replace(/^\s*\d+\.\s+/gm, '')
+			.replace(/^\s*>\s?/gm, '');
+	}
+
+	function censorBannedWords(text, bannedWords) {
+		if (!bannedWords.length) return text;
+
+		const stripped = stripMarkdown(text);
+		const words = stripped.toLowerCase().split(/\s+/);
+		const found = new Set();
+
+		words.forEach(word => {
+			const clean = word.replace(/[^\w]/g, '');
+			if (clean && bannedWords.includes(clean)) found.add(clean);
+		});
+
+		if (!found.size) return text;
+
+		let censored = text;
+		found.forEach(word => {
+			const re = new RegExp('\\b' + escapeRegex(word) + '\\b', 'gi');
+			censored = censored.replace(re, '[censored]');
+		});
+
+		return censored;
+	}
+
+	function escapeRegex(str) {
+		return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+	}
+
+	function escapeHtml(text) {
+		const div = document.createElement('div');
+		div.textContent = text;
+		return div.innerHTML;
+	}
+})();
+</script>
+
+<style>
+.feed-list {
+	margin-top: 1rem;
+}
+.feed-item {
+	margin-bottom: 1.5rem;
+	padding-bottom: 1rem;
+	border-bottom: 1px solid #eee;
+}
+.feed-title {
+	display: block;
+	font-size: 1.1em;
+	margin-bottom: 0.4rem;
+}
+.feed-content {
+	margin: 0;
+}
+.feed-content p {
+	margin: 0.5rem 0;
+}
+.feed-content code {
+	background: #f4f4f4;
+	padding: 0.1rem 0.3rem;
+	border-radius: 3px;
+	font-family: monospace;
+}
+.feed-content pre {
+	background: #f4f4f4;
+	padding: 0.75rem;
+	overflow-x: auto;
+	border-radius: 4px;
+}
+.feed-content pre code {
+	background: none;
+	padding: 0;
+}
+.feed-content ul, .feed-content ol {
+	margin: 0.5rem 0;
+	padding-left: 1.5rem;
+}
+.feed-content strong {
+	font-weight: bold;
+}
+.feed-content em {
+	font-style: italic;
+}
+.feed-error {
+	color: #c00;
+}
+.feed-loading {
+	color: #666;
+}
+</style>
 {{ end }}

@@ -34,6 +34,7 @@
                     <label><input type="checkbox" name="gamemode" value="Survival" {{if index .GamemodeChecks "Survival"}}checked{{end}}> Survival</label><br>
                     <label><input type="checkbox" name="gamemode" value="Creative" {{if index .GamemodeChecks "Creative"}}checked{{end}}> Creative</label><br>
                     <label><input type="checkbox" name="gamemode" value="PvP" {{if index .GamemodeChecks "PvP"}}checked{{end}}> PvP</label>
+                    <label><input type="checkbox" name="gamemode" value="Spleef" {{if index .GamemodeChecks "Spleef"}}checked{{end}}> Spleef</label>
                 </div>
             </p>
 
@@ -91,8 +92,23 @@
             {{ end }}
             <div class="info">
                 <h2>{{.Name}}</h2>
-                <p class="playerCount">{{.PlayerCount}} Players Online</p>
-                <p class="playerCount">{{ if .Status }}Online{{else}}Offline{{end}}</p>
+                <p class="playerCount"><b>{{ if .Status }}Online | {{.PlayerCount}} Players{{else}}Offline{{end}}</b></p>
+                <p class="desc" data-max-lines="2">
+                {{ if .Description }}{{.Description}}{{else}}No Description{{end}}
+                </p>
+                <p class="gamemodes"><b>{{ .Gamemodes }}</b></p>
+
+                <script>
+                document.addEventListener('DOMContentLoaded', () => {
+                    document.querySelectorAll('.desc').forEach(el => {
+                        const max = parseInt(el.dataset.maxLines, 10) || 3;
+                        const lines = el.textContent.split('\n');
+                        if (lines.length > max) {
+                            el.textContent = lines.slice(0, max).join('\n') + '…';
+                        }
+                    });
+                });
+                </script>
                 <a href="/servers/{{.ID}}" class="button">View Server</a>
             </div>
         </div>
