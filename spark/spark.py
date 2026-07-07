@@ -54,6 +54,9 @@ def send_Spark_update(update: str) -> None:
             case "5":
                 print("Server couldn't update your server. Try again, if the issue persists, please contact the server list's support.")
                 sys.exit()
+            case "6":
+                print("Your server's playercount is negative.")
+                sys.exit()
             case _:
                 print(f"Unknown error code in response: {body}")
         sys.exit()

@@ -2,6 +2,8 @@ package main
 
 import (
 	"net/http"
+	"errors"
+	"github.com/go-sql-driver/mysql"
 )
 
 func (a *App) SparkUpdatePOST(w http.ResponseWriter, r *http.Request) {
@@ -42,9 +44,16 @@ func (a *App) SparkUpdatePOST(w http.ResponseWriter, r *http.Request) {
 	case "playerLeave":
 		err := a.ApiDecServerPlayers(sid)
 		if err != nil {
+			var mysqlErr *mysql.MySQLError
+			if errors.As(err, &mysqlErr) && mysqlErr.Number == 1690 {
+				a.ApiError(w, r, "[6] Nice try. You cannot set a negative playercount :)")
+				return
+			}
 			a.ApiError(w, r, "[5] Failed to update your server! "+err.Error())
 			return
 		}
+
+
 
 	case "playerDeath":
 		// pass

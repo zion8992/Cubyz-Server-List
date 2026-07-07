@@ -3,6 +3,7 @@ package main
 import (
 	"log/slog"
 	"net/http"
+	"strings"
 )
 
 func (app *App) RouteLogger(next http.Handler) http.Handler {
@@ -14,6 +15,14 @@ func (app *App) RouteLogger(next http.Handler) http.Handler {
 
 func (app *App) CSRFMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		path := r.URL.Path
+
+		// Skip CSRF entirely for API and static routes
+		if strings.HasPrefix(path, "/api/") || strings.HasPrefix(path, "/static/") {
+			next.ServeHTTP(w, r)
+			return
+		}
+
 		cookie, err := r.Cookie("csrf_token")
 		if err != nil || cookie.Value == "" {
 			token, err := app.GenerateCSRFToken()
