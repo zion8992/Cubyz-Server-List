@@ -92,7 +92,7 @@
             {{ end }}
             <div class="info">
                 <h2>{{.Name}}</h2>
-                <p class="playerCount"><b>{{ if .Status }}Online | {{.PlayerCount}} Players{{else}}Offline{{end}}</b></p>
+                <p class="playerCount"><b>{{ .Status }}</b></p>
                 <p class="desc" data-max-lines="2">
                 {{ if .Description }}{{.Description}}{{else}}No Description{{end}}
                 </p>

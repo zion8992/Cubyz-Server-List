@@ -296,7 +296,7 @@ func (a *App) GetServer(id uint64) (*Server, error) {
 
 	err := a.DB.QueryRow(
 		`SELECT id, name, description, xml_feed_link, ip, playercount, owner_id,
-			gamemodes, version, languages, requires_mods, website_url, chat_url, icon_url, last_spark, status
+			gamemodes, version, languages, requires_mods, website_url, chat_url, icon_url, last_spark
 		 FROM servers WHERE id=?`,
 		id,
 	).Scan(
@@ -315,7 +315,6 @@ func (a *App) GetServer(id uint64) (*Server, error) {
 		&chatURL,
 		&iconURL,
 		&lastSpark,
-		&s.Status,
 	)
 	if err != nil {
 		return nil, err
@@ -402,7 +401,7 @@ func (a *App) DeleteServer(id, ownerID uint64) error {
 
 func (a *App) ListServers(f ServerFilter) ([]Server, error) {
 	query := `SELECT id FROM servers WHERE 1=1`
-	var args []interface{}
+	var args []any // someone put 'interface{}' here like it's 2012
 
 	if f.Search != "" {
 		query += " AND (name LIKE ? OR description LIKE ?)"
@@ -420,11 +419,7 @@ func (a *App) ListServers(f ServerFilter) ([]Server, error) {
 		query += " AND playercount <= ?"
 		args = append(args, f.MaxPlayers)
 	}
-	if f.Status == "online" {
-		query += " AND status = 1"
-	} else if f.Status == "offline" {
-		query += " AND status = 0"
-	}
+
 	for _, gm := range f.Gamemodes {
 		query += " AND gamemodes LIKE ?"
 		args = append(args, "%"+strings.TrimSpace(gm)+"%")
@@ -470,6 +465,15 @@ func (a *App) ListServers(f ServerFilter) ([]Server, error) {
 		if err != nil {
 			return nil, err
 		}
+
+		if f.Status == "online" && !a.IsServerOnline(s.ID) {
+			continue
+		}
+		if f.Status == "offline" && a.IsServerOnline(s.ID) {
+			continue
+		}
+
+
 		servers = append(servers, *s)
 	}
 

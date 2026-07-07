@@ -11,7 +11,7 @@ type App struct {
 	Log           *slog.Logger
 	DB            *sql.DB
 	BannedWords   map[string]struct{}
-	DefaultExpiry time.Duration
+	DefaultTokenExpiry time.Duration
 	TemplateCache map[string]*template.Template
 }
 
@@ -46,7 +46,7 @@ type Server struct {
 	IconURL      string
 	IP           string
 	LastSpark    time.Time
-	Status       bool
+	Status       string // Not in database, used only for list filtering
 }
 
 type APIToken struct {

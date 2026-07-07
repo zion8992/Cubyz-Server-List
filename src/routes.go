@@ -195,7 +195,7 @@ func (a *App) LoginPOST(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	expires := time.Now().Add(a.DefaultExpiry)
+	expires := time.Now().Add(a.DefaultTokenExpiry)
 	err = a.SetSessionToken(id, token, expires)
 
 	c := http.Cookie{
@@ -610,7 +610,7 @@ func (a *App) ServerInfo(w http.ResponseWriter, r *http.Request) {
 		Server:       *server,
 		User:         ownerUser,
 		IsOwner:      isOwner,
-		ServerStatus: a.IsServerOnline(server.ID, server.LastSpark),
+		ServerStatus: a.IsServerOnline(server.ID),
 	}
 
 	a.render(w, r, http.StatusOK, "server_info.html", data)
@@ -947,6 +947,14 @@ func (a *App) ServerListGET(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		a.Error(w, r, "Failed to load servers: "+err.Error())
 		return
+	}
+
+	for i := range servers {
+		if a.IsServerOnline(servers[i].ID) {
+			servers[i].Status = "Online"
+		} else {
+			servers[i].Status = "Offline"
+		}
 	}
 
 	gmChecks := map[string]bool{}

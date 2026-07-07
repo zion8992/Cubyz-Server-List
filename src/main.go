@@ -110,7 +110,7 @@ func NewApp() *App {
 	a := &App{
 		Log:           slog.New(slog.NewTextHandler(os.Stderr, nil)),
 		DB:            db,
-		DefaultExpiry: 4 * time.Hour,
+		DefaultTokenExpiry: 4 * time.Hour,
 		TemplateCache: templateCache,
 	}
 

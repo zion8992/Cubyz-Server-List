@@ -115,19 +115,25 @@ func (a *App) ApiServerOff(serverID uint64) error {
 	return err
 }
 
-func (a *App) IsServerOnline(serverID uint64, lastSpark time.Time) bool {
-	if time.Since(lastSpark) < time.Hour {
-		return true
-	}
+func (a *App) IsServerOnline(serverID uint64) bool {
+	var lastSpark sql.NullTime
 
-	var status bool
-	err := a.DB.QueryRow("SELECT status FROM servers WHERE id = ?", serverID).Scan(&status)
+	err := a.DB.QueryRow(
+		`select last_spark from servers where id=?;`,
+		serverID,
+	).Scan(&lastSpark)
 	if err != nil {
+		a.Log.Error("Failed to get a server status: " + err.Error())
 		return false
 	}
 
-	return status
+	if !lastSpark.Valid {
+		return false
+	}
+
+	return time.Since(lastSpark.Time) < time.Hour
 }
+
 
 func (a *App) ApiCreateToken(serverID uint64, ownerID uint64, typ string, name string, tokenHash string) error {
 	dateCreated := time.Now()
