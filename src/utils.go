@@ -169,7 +169,7 @@ func (a *App) CheckReqSessionTok(r *http.Request) (bool, error) {
 		return false, errors.New("Failed to get the uid from your session token: " + err.Error())
 	}
 
-	if uid == 0 {
+	if uid == 0 { // if this ever happens, send @astr0_steve on discord a DM or Friend Request please, you can also find me on "Cubyz Discord"
 		return false, errors.New("Failed to get the username from your session token: uid is 0")
 	}
 
