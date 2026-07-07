@@ -118,4 +118,17 @@
     </div>
 </div>
 
+<script>
+// auto-refresh JS
+// 10 seconds = 10000
+// 50 seconds = 50000
+const REFRESH_INTERVAL_MS = 10000;
+
+setTimeout(() => {
+  location.reload();
+  console.log("Refreshed Current Page");
+}, REFRESH_INTERVAL_MS);
+
+</script>
+
 {{ end }}
