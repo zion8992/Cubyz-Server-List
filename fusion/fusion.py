@@ -4,6 +4,7 @@ import markdown
 import xml.etree.ElementTree as ET
 import configparser
 import os
+from datetime import datetime  # >>> added
 
 try:
     from tkinterweb import HtmlFrame
@@ -13,6 +14,24 @@ except ImportError:
 CONFIG_FILE = "fusion.ini"
 INTRO_DURATION_MS = 2000
 INTRO_FADE_STEPS = 27
+
+# >>> Go uses a reference-date layout ("Mon Jan 2 15:04:05 MST 2006") instead
+#     of specifiers like yyyy-mm-dd. Each token is a fixed component of that
+#     reference time (2006=year, 01=month, 02=day, 15=hour, 04=min, 05=sec,
+#     MST=tz abbrev). We replicate that exact layout in Python's strftime.
+GO_TIME_LAYOUT_ABBR = "%b %d %H:%M:%S %Z %Y"   # Mon Jan 2 15:04:05 MST 2006
+GO_TIME_LAYOUT_OFFSET = "%b %d %H:%M:%S %z %Y" # Mon Jan 2 15:04:05 -0700 2006
+
+
+def go_format_now():
+    """Return the current datetime as a string in Go's time layout format."""
+    now = datetime.now().astimezone()
+    tz_abbr = now.tzname() or ""
+    # Prefer the timezone abbreviation ("MST") like Go's reference layout;
+    # fall back to the numeric offset ("-0700") when no abbreviation exists.
+    if tz_abbr and not tz_abbr.startswith(("+", "-")):
+        return now.strftime(GO_TIME_LAYOUT_ABBR)
+    return now.strftime(GO_TIME_LAYOUT_OFFSET)
 
 
 class AnnouncementApp:
@@ -680,7 +699,8 @@ class AnnouncementApp:
         self.colors = self.THEMES[self.theme_name][self.mode].copy()
 
         self.announcements = [
-            {"name": "Welcome to Fusion", "content": "Welcome to fusion!\n\nInstructions on how to use Fusion can be found [here](https://github.com/zion8992/ironite/blob/main/fusion/Fusion_Setup.m)\n\nYou can change the size of the preview to make it larger if needed."},
+            {"name": "Welcome to Fusion", "content": "Welcome to fusion!\n\nInstructions on how to use Fusion can be found [here](https://github.com/zion8992/ironite/blob/main/fusion/Fusion_Setup.m)\n\nYou can change the size of the preview to make it larger if needed.",
+             "date": go_format_now()},  # >>> added date field
         ]
 
         self.current_index = None
@@ -862,7 +882,6 @@ class AnnouncementApp:
         self.intro_label.place(relx=0.5, rely=0.45, anchor="center")
 
         self._animate_intro(0)
-
 
     def _animate_intro(self, step):
         if step > INTRO_FADE_STEPS:
@@ -1154,9 +1173,20 @@ class AnnouncementApp:
             return
 
         if self.current_index is None:
-            self.announcements.append({"name": name, "content": content})
+            self.announcements.append({
+                "name": name,
+                "content": content,
+                "date": go_format_now(),  # >>> added date field
+            })
         else:
-            self.announcements[self.current_index] = {"name": name, "content": content}
+            # Preserve the existing date on edits; only new announcements
+            # get a freshly stamped date at creation time.
+            existing_date = self.announcements[self.current_index].get("date", go_format_now())
+            self.announcements[self.current_index] = {
+                "name": name,
+                "content": content,
+                "date": existing_date,  # >>> added date field
+            }
 
         self._refresh_list()
 
@@ -1219,6 +1249,9 @@ class AnnouncementApp:
                 title.text = item["name"]
                 content = ET.SubElement(ann, "content")
                 content.text = item["content"]
+                # >>> write the date field to the exported XML
+                date_elem = ET.SubElement(ann, "date")
+                date_elem.text = item.get("date", "")
 
             tree = ET.ElementTree(root)
             ET.indent(tree, space="  ")
@@ -1245,11 +1278,17 @@ class AnnouncementApp:
             for ann in root.findall("announcement"):
                 title_elem = ann.find("title")
                 content_elem = ann.find("content")
+                date_elem = ann.find("date")  # >>> read the date element if present
                 title = (title_elem.text or "").strip() if title_elem is not None else ""
                 content = (content_elem.text or "") if content_elem is not None else ""
+                date = (date_elem.text or "").strip() if date_elem is not None and date_elem.text else ""
 
                 if title:
-                    imported.append({"name": title, "content": content})
+                    imported.append({
+                        "name": title,
+                        "content": content,
+                        "date": date,  # >>> added date field
+                    })
 
             if not imported:
                 messagebox.showwarning("Import", "Invalid announcement file.")
