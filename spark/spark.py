@@ -14,10 +14,11 @@ import urllib.error
 
 Spark_server = None
 user_api_token = None
+LAST_API_SEND = 0
 
 
 def send_Spark_update(update: str) -> None:
-    global Spark_server, user_api_token
+    global Spark_server, user_api_token, LAST_API_SEND
 
     error_pattern = re.compile(r"^\[(?P<code>[^]]+)\]")
 
@@ -28,6 +29,7 @@ def send_Spark_update(update: str) -> None:
     req = urllib.request.Request(url, data=data, method="POST")
     try:
         urllib.request.urlopen(req, timeout=10)
+        LAST_API_SEND = time.time()
     except urllib.error.HTTPError as e:
         body = e.read().decode("utf-8", errors="replace")
         print(f"HTTP error {e.code}: {body}", flush=True)
@@ -70,7 +72,7 @@ def send_Spark_update(update: str) -> None:
                 print(f"Error code {code} detected in exception message.")
             case _:
                 print("No recognized error code in exception message.")
-        
+
 
 
 CONFIG_PATH = Path("sparkConfig.ini")
@@ -218,7 +220,7 @@ def printer(q: queue.Queue, stop: threading.Event) -> None:
 
 
 def main() -> None:
-    global Spark_server, user_api_token, CONFIG_PATH
+    global Spark_server, user_api_token, CONFIG_PATH, LAST_API_SEND
 
     print(f"Started Spark for Cubyz v{CUBYZ_VERSION}.")
     #print(f"There may be compatibility issues if your server isn't running {CUBYZ_VERSION}.")
@@ -262,13 +264,16 @@ def main() -> None:
 
     try:
         while True:
-            time.sleep(0.5)
+            time.sleep(5)
+            if time.time() - LAST_API_SEND > 3600:
+                print("No API update sent in over an hour, sending serverReady heartbeat.")
+                send_Spark_update("serverReady")
     except KeyboardInterrupt:
         stop.set()
         t_reader.join()
         t_printer.join()
-        print("Shutting Spark down...")
         send_Spark_update("serverOff")
+        print("Shutting Spark down...")
 
 
 if __name__ == "__main__":
