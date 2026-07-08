@@ -1,9 +1,9 @@
 package main
 
 import (
-	"net/http"
 	"errors"
 	"github.com/go-sql-driver/mysql"
+	"net/http"
 )
 
 func (a *App) SparkUpdatePOST(w http.ResponseWriter, r *http.Request) {
@@ -52,8 +52,6 @@ func (a *App) SparkUpdatePOST(w http.ResponseWriter, r *http.Request) {
 			a.ApiError(w, r, "[5] Failed to update your server! "+err.Error())
 			return
 		}
-
-
 
 	case "playerDeath":
 		// pass

@@ -134,7 +134,6 @@ func (a *App) IsServerOnline(serverID uint64) bool {
 	return time.Since(lastSpark.Time) < time.Hour
 }
 
-
 func (a *App) ApiCreateToken(serverID uint64, ownerID uint64, typ string, name string, tokenHash string) error {
 	dateCreated := time.Now()
 	expiry := dateCreated.Add(2160 * time.Hour) // expires in 90 days

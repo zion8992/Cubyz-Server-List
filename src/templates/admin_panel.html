@@ -1,0 +1,24 @@
+{{ define "content" }}
+
+<div class="account-layout">
+	<aside class="account-sidebar">
+		<nav>
+			<button class="sidebar-tab active" data-tab="users">Users</button>
+			<button class="sidebar-tab" data-tab="servers">Servers</button>
+		</nav>
+	</aside>
+
+	<section class="account-users">
+		<div class="tab-panel active" id="tab-users">
+			<h2>Users</h2>
+		</div>
+
+		<div class="tab-panel" id="tab-servers">
+			<h2>Servers</h2>
+		</div>
+	</section>
+</div>
+
+
+<script src="/static/js/sidebar.js"></script>
+{{ end }}

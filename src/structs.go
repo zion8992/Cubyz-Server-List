@@ -8,11 +8,11 @@ import (
 )
 
 type App struct {
-	Log           *slog.Logger
-	DB            *sql.DB
-	BannedWords   map[string]struct{}
+	Log                *slog.Logger
+	DB                 *sql.DB
+	BannedWords        map[string]struct{}
 	DefaultTokenExpiry time.Duration
-	TemplateCache map[string]*template.Template
+	TemplateCache      map[string]*template.Template
 }
 
 type User struct {
@@ -28,6 +28,7 @@ type User struct {
 	Description         string
 	Pronouns            string
 	Pubkey              string
+	PrivLevel           string
 }
 
 type Server struct {

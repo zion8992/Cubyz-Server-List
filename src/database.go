@@ -57,11 +57,11 @@ func (a *App) CreateUser(u User) (int64, error) {
 
 func (a *App) GetUser(id uint64) (*User, error) {
 	var u User
-	var profilePictureURL, description, pronouns, pubkey sql.NullString
+	var profilePictureURL, description, pronouns, pubkey, privLevel sql.NullString
 
 	err := a.DB.QueryRow(
 		`SELECT id,username,email,password,date_created,session_token,session_token_expires,
-		        profile_picture_url, description, pronouns, pubkey
+		        profile_picture_url, description, pronouns, pubkey, priv_level
 		 FROM users WHERE id=?`,
 		id,
 	).Scan(
@@ -76,12 +76,14 @@ func (a *App) GetUser(id uint64) (*User, error) {
 		&description,
 		&pronouns,
 		&pubkey,
+		&privLevel,
 	)
 
 	u.ProfilePictureURL = profilePictureURL.String
 	u.Description = description.String
 	u.Pronouns = pronouns.String
 	u.Pubkey = pubkey.String
+	u.PrivLevel = privLevel.String
 
 	return &u, err
 }
@@ -473,9 +475,25 @@ func (a *App) ListServers(f ServerFilter) ([]Server, error) {
 			continue
 		}
 
-
 		servers = append(servers, *s)
 	}
 
 	return servers, nil
+}
+
+func (a *App) IsUserAdmin(uid uint64) (bool, error) {
+	const query = `
+        SELECT EXISTS(
+            SELECT 1 FROM users
+            WHERE id = ? AND priv_level = 'admin'
+        )
+    `
+
+	var isAdmin bool
+	err := a.DB.QueryRow(query, uid).Scan(&isAdmin)
+	if err != nil {
+		return false, err
+	}
+
+	return isAdmin, nil
 }

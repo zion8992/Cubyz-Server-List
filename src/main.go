@@ -72,6 +72,9 @@ func main() {
 	mux.HandleFunc("POST /api/v1/create-token", app.ApiCreateTokenHandler)
 	mux.HandleFunc("POST /api/v1/delete-token", app.ApiDeleteTokenHandler)
 
+	// admin panel
+	mux.HandleFunc("GET /admin/panel", app.AdminPanel)
+
 	// list
 	mux.HandleFunc("GET /list", app.ServerListGET)
 
@@ -108,10 +111,10 @@ func NewApp() *App {
 	}
 
 	a := &App{
-		Log:           slog.New(slog.NewTextHandler(os.Stderr, nil)),
-		DB:            db,
+		Log:                slog.New(slog.NewTextHandler(os.Stderr, nil)),
+		DB:                 db,
 		DefaultTokenExpiry: 4 * time.Hour,
-		TemplateCache: templateCache,
+		TemplateCache:      templateCache,
 	}
 
 	if err := a.LoadBannedWords(); err != nil {
