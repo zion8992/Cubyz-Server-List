@@ -120,28 +120,45 @@ function copyIP() {
 			const list = document.createElement('div');
 			list.className = 'feed-list';
 
-			announcements.forEach(announcement => {
-				let title = announcement.querySelector('title')?.textContent || 'Untitled';
-				let rawContent = announcement.querySelector('content')?.textContent || '';
+			                        announcements.forEach(announcement => {
+                                let title =
+announcement.querySelector('title')?.textContent || 'Untitled';
+                                let rawContent =
+announcement.querySelector('content')?.textContent || '';
+                                let date =
+announcement.querySelector('date')?.textContent.trim() || '';
 
-				title = censorBannedWords(title, bannedWords);
-				rawContent = censorBannedWords(rawContent, bannedWords);
+                                title = censorBannedWords(title, bannedWords);
+                                rawContent = censorBannedWords(rawContent,
+bannedWords);
+                                date = censorBannedWords(date, bannedWords);
 
-				const item = document.createElement('article');
-				item.className = 'feed-item';
+                                const item = document.createElement('article');
+                                item.className = 'feed-item';
 
-				const titleEl = document.createElement('strong');
-				titleEl.className = 'feed-title';
-				titleEl.textContent = title;
+                                const titleEl =
+document.createElement('strong');
+                                titleEl.className = 'feed-title';
+                                titleEl.textContent = title;
 
-				const contentEl = document.createElement('div');
-				contentEl.className = 'feed-content';
-				contentEl.innerHTML = DOMPurify.sanitize(marked.parse(rawContent));
+                                if (date) {
+                                        const dateEl =
+document.createElement('span');
+                                        dateEl.className = 'feed-date';
+                                        dateEl.textContent = date;
+                                        titleEl.appendChild(dateEl);
+                                }
 
-				item.appendChild(titleEl);
-				item.appendChild(contentEl);
-				list.appendChild(item);
-			});
+                                const contentEl = document.createElement('div');
+                                contentEl.className = 'feed-content';
+                                contentEl.innerHTML =
+DOMPurify.sanitize(marked.parse(rawContent));
+
+                                item.appendChild(titleEl);
+                                item.appendChild(contentEl);
+                                list.appendChild(item);
+                        });
+
 
 			container.innerHTML = '';
 			container.appendChild(list);
@@ -251,5 +268,12 @@ function copyIP() {
 .feed-loading {
 	color: #666;
 }
+.feed-date {
+        margin-left: 0.5rem;
+        font-size: 0.85em;
+        font-weight: normal;
+        color: #666;
+}
+
 </style>
 {{ end }}
