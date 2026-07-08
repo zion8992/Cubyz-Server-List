@@ -6,6 +6,8 @@
 *enter-venv.sh
 *.ini
 *.xml
+build/*
+
 # Binaries for programs and plugins
 *.exe
 *.exe~
