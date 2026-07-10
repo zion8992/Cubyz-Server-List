@@ -15,7 +15,7 @@ import urllib.error
 Spark_server = None
 user_api_token = None
 LAST_API_SEND = 0
-
+LAST_LOG_ACTIVITY = 0.0
 
 def send_Spark_update(update: str) -> None:
     global Spark_server, user_api_token, LAST_API_SEND
@@ -134,6 +134,8 @@ def classify(line: str) -> Tuple[str, Dict]:
 
 
 def reader(log_path: str, q: queue.Queue, stop: threading.Event) -> None:
+    global LAST_LOG_ACTIVITY
+
     path = Path(log_path)
     f = None
     try:
@@ -159,6 +161,8 @@ def reader(log_path: str, q: queue.Queue, stop: threading.Event) -> None:
                 continue
 
             line = line.rstrip("\n")
+            if line:
+                LAST_LOG_ACTIVITY = time.time()
             if line and not line.startswith("[debug]"):
                 event, data = classify(line)
                 q.put({"event": event, "data": data})
@@ -220,7 +224,7 @@ def printer(q: queue.Queue, stop: threading.Event) -> None:
 
 
 def main() -> None:
-    global Spark_server, user_api_token, CONFIG_PATH, LAST_API_SEND
+    global Spark_server, user_api_token, CONFIG_PATH, LAST_API_SEND, LAST_LOG_ACTIVITY
 
     print(f"Started Spark for Cubyz v{CUBYZ_VERSION}.")
     #print(f"There may be compatibility issues if your server isn't running {CUBYZ_VERSION}.")
@@ -265,6 +269,9 @@ def main() -> None:
     try:
         while True:
             time.sleep(5)
+            if time.time() - LAST_LOG_ACTIVITY > 1130:
+                print("No log activity for 30 seconds; exiting.")
+                sys.exit()
             if time.time() - LAST_API_SEND > 3600:
                 print("No API update sent in over an hour, sending serverReady heartbeat.")
                 send_Spark_update("serverReady")
@@ -274,6 +281,7 @@ def main() -> None:
         t_printer.join()
         send_Spark_update("serverOff")
         print("Shutting Spark down...")
+
 
 
 if __name__ == "__main__":

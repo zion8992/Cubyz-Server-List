@@ -1,0 +1,45 @@
+{{ define "content" }}
+<div class="server-info-page">
+	<header class="server-header">
+		{{ if .User.ProfilePictureURL }}
+		<img src="{{ .ProfilePictureURL }}" alt="Server logo (Uncontrolled by the server list)" class="server-logo">
+		{{ else }}
+		<img src="/static/img/default_user.svg" alt="Default User profile picture" class="server-logo">
+		{{ end }}
+		<h1>{{ .User.Username }}</h1>
+		
+	</header>
+
+	<div class="server-body">
+		<section class="server-main">
+        <h2>Profile</h2>
+        <p><strong>Username</strong>: {{ .User.Username }}</p>
+        <p><strong>Joined</strong>: {{ .User.DateCreated }}</p>
+        {{ if .User.Pronouns }}<p><strong>Pronouns</strong>: {{ .User.Pronouns }}</p>{{ end }}
+        <!--{{if .User.Pubkey }}<p><strong>Cubyz Public Key</strong>: {{ .User.Pubkey }}</p> {{end}}-->
+        {{ if .User.PrivLevel }}<p><strong>Privilege Level</strong>: {{ .User.PrivLevel }}</p>{{ end }}
+        <br><br>
+
+        <h2>Servers</h2>
+        {{ if .Servers }}
+			<ul class="server-list">
+				{{ range .Servers }}
+				<li class="server-list-item">
+					{{ if .IconURL }}
+					<img src="{{ .IconURL }}" alt="Server logo" class="server-logo">
+					{{ else }}
+					<img src="/static/img/default_server.svg" alt="Default Server logo" class="server-logo">
+					{{ end }}
+					<a href="/servers/{{ .ID }}" class="server-list-name">{{ .Name }}</a>
+				</li>
+				{{ end }}
+			</ul>
+			{{ else }}
+			<p class="empty">User does not have any servers.</p>
+			{{ end }}
+		</section>
+
+	</div>
+</div>
+
+{{ end }}
