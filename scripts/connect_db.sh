@@ -3,11 +3,18 @@
 CONTAINER_NAME="cubyzListDB"
 MYSQL_ROOT_PASSWORD="H0EeLfLnO,xDEVELOPERSx4c!#%"
 
-# Check if container is running
-if [ ! "$(docker ps -q -f name=^/${CONTAINER_NAME}$)" ]; then
-    echo "Container is not running. Start it first."
+if [ -z "$(printenv mysqlpass)" ]; then
+    mysqlpass="$MYSQL_ROOT_PASSWORD"
+fi
+
+if ! docker info >/dev/null 2>&1; then
+    echo "Docker is not running or not installed."
     exit 1
 fi
 
-# Connect to MySQL root shell
-docker exec -it $CONTAINER_NAME mysql -u root -p$MYSQL_ROOT_PASSWORD
+if [ ! "$(docker ps -q -f name=^/${CONTAINER_NAME}$)" ]; then
+    echo "Container '$CONTAINER_NAME' is not running. Start it first."
+    exit 1
+fi
+
+docker exec -it "$CONTAINER_NAME" mysql -u root -p"$mysqlpass"

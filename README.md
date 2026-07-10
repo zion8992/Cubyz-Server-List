@@ -1,38 +1,61 @@
-## Ironite
-Open source server list for Cubyz made using Go.
+## Running
+To run Ironite, you can either use `run.sh` or a [prebuilt executable from the releases page](https://github.com/zion8992/ironite/releases).
 
-### Run
-Guide to setup the MySQL database can be found [here](https://github.com/zion8992/ironite/blob/main/database.md)
+Before running Ironite, you need to setup a MySQL database. You can use the existing scripts in the project source to run in docker or you can [set a MySQL database up yourself](https://dev.mysql.com/downloads/mysql/).
 
-#### Run using: Prebuilt Binaries
-Prebuilt executables can be found [here](https://github.com/zion8992/ironite/releases). And a database setup guide can be found [here](https://github.com/zion8992/ironite/blob/main/database.md).
+### Create/Run database in Docker
+1. Clone the repository
+2. `cd` into `scripts/`
+In the `scripts/` directory you can find various scripts, run `./start_db.sh` to create the database and to start it.
 
-#### Run using:  Script
+**WARNING**: If you are running `./start_db.sh` for **production** please change the root database password in the script.
 
-Requires Go `1.25` or later to run. You can download Go from [go.dev](https://go.dev).
-Runs on all platforms.
+3. Run `./connect_db.sh` to connect to the database 
+(If you changed the password in `start_db.sh`, change it here too)
+4. Paste the contents of `database.md` into the MySQL console.
+You can find `database.md` in the projects root directory.
+5. Your database is now setup, you can now run Ironite. Do not exit MySQL, leave it running since Ironite requires it to run.
+To stop the database you can use `./stop_db.sh`
+#### Run using Prebuilt Binary
+Download the Ironite executable for your platform from the [downloads page](https://github.com/zion8992/ironite/releases). Once downloaded, open your terminal and run:
 
-```bash
-./run.sh <arguments>
+**Linux**
+```sh
+chmod +x ironite-linux-arch # replace with your architecture
+./ironite-linux-arch # replace with your architecture
 ```
 
-#### Command Line Arugments
-`dbpass`: Password for the root account of your mysql database. <br>
-If you are running Ironite `1.0`, ironite auto assumes you are running MySQL on `127.0.0.1:3306`, Default: `H0EeLfLnO,xDEVELOPERSx4c!#%`. <br>
-`port`: Port to host http server, Default: `:8000`.
+**Windows**
+```sh
+.\ironite-windows-arch # replace with your architecture
+```
 
-### Build from source
-Requires Go `1.25` or later to build. You can download Go from [go.dev](https://go.dev).
-You can build for all platforms on any platform.
+ If you changed the root database password, see the **Command Line Flags** below to configure Ironite to support your change. If you used the default, don't change anything.
 
-```bash
-GOOS=linux GOARCH=amd64 go build -o ironite ./src/ # for linux amd64
-GOOS=windows GOARCH=amd64 go build -o ironite.exe ./src/ # for windows amd64
-GOOS=darwin GOARCH=amd64 go build -o ironite ./src/ # for macOS amd64
+#### Run using `run.sh`
+Make sure you have [Go](https://go.dev) `1.25` or later installed. That's all Ironite needs.
+
+```sh
+cd ../ # cd out of scripts if you were in scripts/
+go mod download
+./run.sh
+```
+
+ If you changed the root database password, see the **Command Line Flags** below to configure Ironite to support your change. If you used the default, don't change anything.
+
+#### Command Line Arguments
+`dbpass`: Password for the root account of your mysql database, Default: `H0EeLfLnO,xDEVELOPERSx4c!#%`. <br>
+`dburl`: URL of the database, Default: `127.0.0.1:3306`.<br>
+`port`: Port to host http server, Default: `:8000`. <br>
+#### Example Usage
+```
+./ironite-linux-amd64 -dbpass "my password" -dburl "my url"
 ```
 
 ### Spark
+Spark is a python client for server admins to set server status on the server list. **Not required to run the server list**.
 Instructions to setup and run Spark can be found [here](https://github.com/zion8992/ironite/blob/main/spark/Spark_Setup.md)
 
 ### Fusion
-Instructions to setup and run Fusion can be found [here](https://github.com/zion8992/ironite/blob/main/fusion/Fusion_Setup.m)
+Fusion is GUI app that allows server admins to create announcements for their servers. **Not required for ironite to run**.
+Instructions to setup and run Fusion can be found [here](https://github.com/zion8992/ironite/blob/main/fusion/Fusion_Setup.md)

@@ -1,5 +1,7 @@
 #!/bin/bash
 
+echo "DELETING DATABASE..."
+
 CONTAINER_NAME="cubyzListDB"
 VOLUME_NAME="cubyzListDB"
 
@@ -20,3 +22,5 @@ if [ "$(docker volume ls -q -f name=^${VOLUME_NAME}$)" ]; then
     echo "Removing volume..."
     docker volume rm $VOLUME_NAME
 fi
+
+echo "Your Ironite database just got deleted :)"

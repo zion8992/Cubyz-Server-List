@@ -699,7 +699,7 @@ class AnnouncementApp:
         self.colors = self.THEMES[self.theme_name][self.mode].copy()
 
         self.announcements = [
-            {"name": "Welcome to Fusion", "content": "Welcome to fusion!\n\nInstructions on how to use Fusion can be found [here](https://github.com/zion8992/ironite/blob/main/fusion/Fusion_Setup.m)\n\nYou can change the size of the preview to make it larger if needed.",
+            {"name": "Welcome to Fusion", "content": "Welcome to fusion!\n\nInstructions on how to use Fusion can be found [here](https://github.com/zion8992/ironite/blob/main/fusion/Fusion_Setup.md)\n\nYou can change the size of the preview to make it larger if needed.",
              "date": go_format_now()},  # >>> added date field
         ]
 
