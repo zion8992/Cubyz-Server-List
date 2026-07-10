@@ -50,7 +50,7 @@
 		<aside class="server-sidebar">
 			<h3>Details</h3>
 			<ul>
-				<li><strong>Owner:</strong> {{ .User.Username }}</li>
+				<li><strong>Owner:</strong> <a href="/user/{{ .User.ID }}">{{ .User.Username }}</a></li>
 				{{ if .Server.IP }}<li><strong>IP:</strong> {{ .Server.IP }}</li>{{ end }}
 				{{ if .Server.Version }}<li><strong>Version:</strong> {{ .Server.Version }}</li>{{ end }}
 				{{ if .Server.Gamemodes }}<li><strong>Gamemodes:</strong> {{ .Server.Gamemodes }}</li>{{ end }}

@@ -268,17 +268,6 @@ func (a *App) AccountPOST(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	_, err = a.GetUserIDByUsername(r.FormValue("username"))
-	if err != nil && err != sql.ErrNoRows {
-		a.Error(w, r, "Failed to check user: "+err.Error())
-		return
-	}
-
-	if err == nil {
-		a.Error(w, r, "Username is taken")
-		return
-	}
-
 	uid, err := a.GetUIDFromToken(getSessionCookie(r))
 	if err != nil {
 		a.Error(w, r, "Failed to identify user: "+err.Error())
@@ -290,6 +279,17 @@ func (a *App) AccountPOST(w http.ResponseWriter, r *http.Request) {
 	user, err := a.GetUser(uid)
 	if err != nil {
 		a.Error(w, r, "Failed to load user: "+err.Error())
+		return
+	}
+
+	_, err = a.GetUserIDByUsername(r.FormValue("username"))
+	if err != nil && err != sql.ErrNoRows {
+		a.Error(w, r, "Failed to check user: "+err.Error())
+		return
+	}
+
+	if err == nil && strings.TrimSpace(r.FormValue("username")) != user.Username {
+		a.Error(w, r, "Username is taken")
 		return
 	}
 
@@ -614,6 +614,39 @@ func (a *App) ServerInfo(w http.ResponseWriter, r *http.Request) {
 	}
 
 	a.render(w, r, http.StatusOK, "server_info.html", data)
+}
+
+func (a *App) UserInfo(w http.ResponseWriter, r *http.Request) {
+	idStr := r.PathValue("id")
+	id, err := strconv.ParseUint(idStr, 10, 64)
+	if err != nil {
+		a.Return404(w, r)
+		return
+	}
+
+	user, err := a.GetUser(id)
+	if err != nil {
+		a.Error(w, r, "Failed to load owner user profile"+err.Error())
+		return
+	}
+
+	servers, err := a.GetServersByUser(id)
+	if err != nil {
+		a.Error(w, r, "Failed to load users servers: "+err.Error())
+		return
+	}
+
+	data := struct {
+		Page
+		*User   // user on the page
+		Servers []Server
+	}{
+		Page:    Page{IsLoggedIn: a.HasSessionToken(r)},
+		User:    user,
+		Servers: servers,
+	}
+
+	a.render(w, r, http.StatusOK, "user_info.html", data)
 }
 
 func (a *App) ServerEditGET(w http.ResponseWriter, r *http.Request) {

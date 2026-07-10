@@ -19,13 +19,14 @@
 	<section class="account-content">
 		<div class="tab-panel active" id="tab-account">
 			<h2>Account Settings</h2>
+			<a href="/user/{{ .ID }}" class="button">View Profile</a><br><br>
 			<form method="POST" action="/account">
 				<input type="hidden" name="csrf_token" value="{{ .Page.CSRFToken}}">
 				<label for="username">Username</label>
 				<input type="text" id="username" name="username" value="{{ .Username }}" required>
 
 				<label for="email">Email</label>
-				<input type="email" id="email" name="email" value="{{ .Email }}" required>
+				<input type="text" id="email" name="email" value="{{ .Email }}" required>
 
 				<label for="profile_picture_url">Profile Picture URL</label>
 				<input type="url" id="profile_picture_url" name="profile_picture_url" value="{{ .ProfilePictureURL }}" placeholder="https://example.com/avatar.png">

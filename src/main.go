@@ -72,6 +72,9 @@ func main() {
 	mux.HandleFunc("POST /api/v1/create-token", app.ApiCreateTokenHandler)
 	mux.HandleFunc("POST /api/v1/delete-token", app.ApiDeleteTokenHandler)
 
+	// user info
+	mux.HandleFunc("GET /user/{id}", app.UserInfo)
+
 	// admin panel
 	mux.HandleFunc("GET /admin/panel", app.AdminPanel)
 
