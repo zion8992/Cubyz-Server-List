@@ -46,7 +46,7 @@ docker run -d \
 
 
 echo "Database setup complete."
-echo "Run ./scripts/connect_db.sh and paste in the"
+echo "Run 'mysqlpass=\"$mysqlpass\" ./scripts/connect_db.sh and paste in the"
 echo "contents of database_setup.sql into the MySQL console"
 echo ""
 echo "Run Ironite with:"

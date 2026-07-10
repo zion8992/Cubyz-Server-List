@@ -5,17 +5,11 @@ Before running Ironite, you need to setup a MySQL database. You can use the exis
 
 ### Create/Run database in Docker
 1. Clone the repository
-2. `cd` into `scripts/`
-In the `scripts/` directory you can find various scripts, run `./start_db.sh` to create the database and to start it.
+2. Run `./setup.sh`
+3. Run `mysqlpass="YOUR MYSQL PASSWORD" ./scripts/connect_db.sh" 
+4. Paste the contents of `database_setup.sql` (located in the project root) into the MySQL console.
 
-**WARNING**: If you are running `./start_db.sh` for **production** please change the root database password in the script.
 
-3. Run `./connect_db.sh` to connect to the database 
-(If you changed the password in `start_db.sh`, change it here too)
-4. Paste the contents of `database.md` into the MySQL console.
-You can find `database.md` in the projects root directory.
-5. Your database is now setup, you can now run Ironite. Do not exit MySQL, leave it running since Ironite requires it to run.
-To stop the database you can use `./stop_db.sh`
 #### Run using Prebuilt Binary
 Download the Ironite executable for your platform from the [downloads page](https://github.com/zion8992/ironite/releases). Once downloaded, open your terminal and run:
 
