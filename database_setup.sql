@@ -39,7 +39,7 @@ CREATE TABLE servers (
   chat_url TEXT,
   icon_url TEXT,
   ip VARCHAR(255) NOT NULL DEFAULT '',
-  last_spark TIMESTAMP NULL       
+  last_spark TIMESTAMP NULL,
   FOREIGN KEY (owner_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
