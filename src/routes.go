@@ -188,6 +188,17 @@ func (a *App) LoginPOST(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Block suspended accounts from logging in.
+	suspended, err := a.IsUserSuspended(id)
+	if err != nil {
+		a.Error(w, r, "Failed to check account status: "+err.Error())
+		return
+	}
+	if suspended {
+		a.Error(w, r, "This account has been suspended by an administrator.")
+		return
+	}
+
 	var token string
 	token, err = a.GenerateSessionToken()
 	if err != nil {
@@ -599,6 +610,17 @@ func (a *App) ServerInfo(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Show error if server owner account was suspended
+	suspended, err := a.IsUserSuspended(server.OwnerID)
+	if err != nil {
+		a.Error(w, r, "Failed to check account status: "+err.Error())
+		return
+	}
+	if suspended {
+		a.Error(w, r, "The owner of the server you are trying to view was suspended by an administrator.")
+		return
+	}
+
 	data := struct {
 		Page
 		Server
@@ -617,6 +639,8 @@ func (a *App) ServerInfo(w http.ResponseWriter, r *http.Request) {
 }
 
 func (a *App) UserInfo(w http.ResponseWriter, r *http.Request) {
+	// user trying to view
+
 	idStr := r.PathValue("id")
 	id, err := strconv.ParseUint(idStr, 10, 64)
 	if err != nil {
@@ -627,6 +651,17 @@ func (a *App) UserInfo(w http.ResponseWriter, r *http.Request) {
 	user, err := a.GetUser(id)
 	if err != nil {
 		a.Error(w, r, "Failed to load owner user profile"+err.Error())
+		return
+	}
+
+	// Block suspended accounts from showing up.
+	suspended, err := a.IsUserSuspended(id)
+	if err != nil {
+		a.Error(w, r, "Failed to check account status: "+err.Error())
+		return
+	}
+	if suspended {
+		a.Error(w, r, "The account profile you are trying to view was supended by an administrator.")
 		return
 	}
 

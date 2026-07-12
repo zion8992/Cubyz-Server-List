@@ -72,11 +72,12 @@ func main() {
 	mux.HandleFunc("POST /api/v1/create-token", app.ApiCreateTokenHandler)
 	mux.HandleFunc("POST /api/v1/delete-token", app.ApiDeleteTokenHandler)
 
-	// user info
+	// user profiles
 	mux.HandleFunc("GET /user/{id}", app.UserInfo)
 
 	// admin panel
 	mux.HandleFunc("GET /admin/panel", app.AdminPanel)
+	mux.HandleFunc("POST /admin/suspend", app.AdminSuspendUser)
 
 	// list
 	mux.HandleFunc("GET /list", app.ServerListGET)
@@ -98,19 +99,19 @@ func NewApp() *App {
 
 	db, err := sql.Open("mysql", dsn)
 	if err != nil {
-		fmt.Printf("%s\n", "Failed to connect to database!")
-		panic(err)
+		fmt.Printf("Failed to connect to the database: %s\n", err.Error())
+		os.Exit(0)
 	}
 
 	if err := db.Ping(); err != nil {
-		fmt.Printf("%s\n", "Failed to ping to database!")
-		panic(err)
+		fmt.Printf("Failed to ping database: %s\n", err.Error())
+		os.Exit(0)
 	}
 
 	templateCache, err := newEmbedTemplateCache()
 	if err != nil {
-		fmt.Printf("%s\n", "Failed to create template cache!")
-		panic(err)
+		fmt.Printf("Failed to load templates from exe: %s\n", err.Error())
+		os.Exit(0)
 	}
 
 	a := &App{
@@ -121,7 +122,8 @@ func NewApp() *App {
 	}
 
 	if err := a.LoadBannedWords(); err != nil {
-		panic(err)
+		fmt.Printf("Failed to load banned words file: %s\n", err.Error())
+		os.Exit(0)
 	}
 
 	return a

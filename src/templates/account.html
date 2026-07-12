@@ -11,6 +11,11 @@
 			<button class="sidebar-tab" data-tab="verify">Verify Account</button>
 			{{ end }}
 			<button class="sidebar-tab" data-tab="api">API & Tokens</button>
+
+			{{ if eq .PrivLevel "admin" }}
+			<a href="/admin/panel" class="sidebar-tab button">Admin Panel</a>
+			{{ end }}
+			<!-- hidden tabs -->
 			<button class="sidebar-tab" data-tab="verified" style="display: none;">Verified Account</button>
 			<a href="/logout" class="button">Logout</a>
 		</nav>

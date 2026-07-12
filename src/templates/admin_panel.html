@@ -1,24 +1,113 @@
 {{ define "content" }}
-
 <div class="account-layout">
 	<aside class="account-sidebar">
 		<nav>
 			<button class="sidebar-tab active" data-tab="users">Users</button>
 			<button class="sidebar-tab" data-tab="servers">Servers</button>
+			<button class="sidebar-tab" data-tab="tokens">API Tokens</button>
+			<a href="/account" class="button">Back to Account</a>
 		</nav>
 	</aside>
 
-	<section class="account-users">
+	<section class="account-content">
 		<div class="tab-panel active" id="tab-users">
 			<h2>Users</h2>
+
+			<form method="GET" action="/admin/panel" class="admin-filters">
+				<input type="text" name="search" value="{{ .Filter.Search }}" placeholder="Search by username...">
+				<select name="sort">
+					<option value="players" {{ if eq .Filter.Sort "players" }}selected{{ end }}>Most online players</option>
+					<option value="servers" {{ if eq .Filter.Sort "servers" }}selected{{ end }}>Most servers</option>
+					<option value="tokens" {{ if eq .Filter.Sort "tokens" }}selected{{ end }}>Most API tokens</option>
+					<option value="newest" {{ if eq .Filter.Sort "newest" }}selected{{ end }}>Newest first</option>
+					<option value="oldest" {{ if eq .Filter.Sort "oldest" }}selected{{ end }}>Oldest first</option>
+					<option value="username" {{ if eq .Filter.Sort "username" }}selected{{ end }}>Username (A-Z)</option>
+					<option value="suspended" {{ if eq .Filter.Sort "suspended" }}selected{{ end }}>Suspended first</option>
+				</select>
+				<button type="submit">Apply</button>
+			</form>
+
+			<p class="empty">{{ .TotalUsers }} user(s) found.</p>
+
+			{{ if .Users }}
+			<table>
+				<thead>
+					<tr>
+						<th>ID</th>
+						<th>Username</th>
+						<th>Email</th>
+						<th>Servers</th>
+						<th>Online players</th>
+						<th>API tokens</th>
+						<th>Created</th>
+						<th>Role</th>
+						<th>Status</th>
+						<th>Action</th>
+					</tr>
+				</thead>
+				<tbody>
+					{{ range .Users }}
+						<tr>
+							<td>{{ .ID }}</td>
+							<td>{{ .Username }}</td>
+							<td>{{ .Email }}</td>
+							<td>{{ .ServerCount }}</td>
+							<td>{{ .OnlinePlayers }}</td>
+							<td>{{ .TokenCount }}</td>
+							<td>{{ .DateCreated.Format "2006-01-02" }}</td>
+							<td>{{ if eq .PrivLevel "admin" }}Admin{{ else }}User{{ end }}</td>
+							<td>
+								{{ if .Suspended }}
+								<span class="badge-suspended">Suspended</span>
+								{{ else }}
+								<span class="badge-active">Active</span>
+								{{ end }}
+							</td>
+							<td>
+								<div class="server-list-actions">
+									<a href="/user/{{ .ID }}" class="button">View</a>
+									<form method="POST" action="/admin/suspend" style="display:inline"
+										onsubmit="return confirm('{{ if .Suspended }}Unsuspend{{ else }}Suspend{{ end }} {{ .Username }}?');">
+										<input type="hidden" name="csrf_token" value="{{ $.Page.CSRFToken }}">
+										<input type="hidden" name="user_id" value="{{ .ID }}">
+										<input type="hidden" name="suspend" value="{{ if .Suspended }}false{{ else }}true{{ end }}">
+										<input type="hidden" name="return" value="/admin/panel?search={{ $.Filter.Search | urlquery }}&sort={{ $.Filter.Sort | urlquery }}&page={{ $.CurrentPage }}">
+										<button type="submit" class="button {{ if not .Suspended }}danger{{ end }}">
+											{{ if .Suspended }}Unsuspend{{ else }}Suspend{{ end }}
+										</button>
+									</form>
+								</div>
+							</td>
+						</tr>
+						{{ end }}
+				</tbody>
+			</table>
+
+			<div class="pagination">
+				{{ if .HasPrev }}
+				<a class="button" href="/admin/panel?search={{ .Filter.Search | urlquery }}&sort={{ .Filter.Sort | urlquery }}&page={{ .PrevPage }}">Previous</a>
+				{{ end }}
+				<span>Page {{ .CurrentPage }} of {{ .TotalPages }}</span>
+				{{ if .HasNext }}
+				<a class="button" href="/admin/panel?search={{ .Filter.Search | urlquery }}&sort={{ .Filter.Sort | urlquery }}&page={{ .NextPage }}">Next</a>
+				{{ end }}
+			</div>
+			{{ else }}
+			<p class="empty">No users found.</p>
+			{{ end }}
 		</div>
 
 		<div class="tab-panel" id="tab-servers">
 			<h2>Servers</h2>
+			<p class="empty">Coming soon.</p>
+		</div>
+
+		<div class="tab-panel" id="tab-tokens">
+			<h2>API Tokens</h2>
+			<p class="empty">Coming soon.</p>
 		</div>
 	</section>
 </div>
-
 
 <script src="/static/js/sidebar.js"></script>
 {{ end }}

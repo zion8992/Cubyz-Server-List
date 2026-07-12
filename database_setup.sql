@@ -17,7 +17,8 @@ CREATE TABLE users (
   description TEXT NULL,
   pubkey TEXT NULL,
   priv_level TEXT NULL,
-  pronouns VARCHAR(50) NULL                    
+  pronouns VARCHAR(50) NULL,
+  account_suspended BOOL NOT NULL DEFAULT FALSE                
 );
 
 /** SERVERS **/

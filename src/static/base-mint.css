@@ -898,3 +898,50 @@ table caption {
     font-size: 14px;
     font-style: italic;
 }
+
+/* --- ADMIN PANEL --- */
+
+.admin-filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    align-items: center;
+    background: none;
+    border: none;
+    padding: 0;
+    margin: 0 0 20px 0;
+    max-width: none;
+    box-shadow: none;
+}
+
+.admin-filters input,
+.admin-filters select {
+    margin: 0;
+    width: auto;
+}
+
+.pagination {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+    margin-top: 25px;
+}
+
+.pagination span {
+    color: var(--color-secondary);
+    font-size: 14px;
+}
+
+.badge-suspended {
+    color: #fff;
+    background: var(--color-danger, #c0392b);
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+}
+
+.badge-active {
+    color: var(--color-secondary);
+    font-size: 12px;
+}

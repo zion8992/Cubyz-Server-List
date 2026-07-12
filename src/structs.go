@@ -29,6 +29,7 @@ type User struct {
 	Pronouns            string
 	Pubkey              string
 	PrivLevel           string
+	AccountSuspended    bool
 }
 
 type Server struct {
@@ -81,4 +82,24 @@ type ServerFilter struct {
 	RequiresMods bool
 	Status       string
 	Sort         string
+}
+
+// UserFilter holds the query params for the admin users tab
+type UserFilter struct {
+	Search string // matches username
+	Sort   string // players | servers | tokens | newest | oldest | username
+	Page   int    // 1-based
+}
+
+// AdminUserRow is one row in the admin users table, with aggregated stats
+type AdminUserRow struct {
+	ID            uint64
+	Username      string
+	Email         string
+	DateCreated   time.Time
+	PrivLevel     string
+	ServerCount   uint64
+	TokenCount    uint64
+	OnlinePlayers uint64
+	Suspended     bool
 }

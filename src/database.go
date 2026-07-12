@@ -5,11 +5,14 @@ import (
 	"database/sql"
 	"encoding/hex"
 	"errors"
+	"fmt"
 	"golang.org/x/crypto/bcrypt"
 	"strconv"
 	"strings"
 	"time"
 )
+
+const AdminUsersPerPage = 20
 
 /**
 This file contains:
@@ -58,10 +61,12 @@ func (a *App) CreateUser(u User) (int64, error) {
 func (a *App) GetUser(id uint64) (*User, error) {
 	var u User
 	var profilePictureURL, description, pronouns, pubkey, privLevel sql.NullString
+	var sessionToken sql.NullString
+	var sessionTokenExpires sql.NullTime
 
 	err := a.DB.QueryRow(
 		`SELECT id,username,email,password,date_created,session_token,session_token_expires,
-		        profile_picture_url, description, pronouns, pubkey, priv_level
+			profile_picture_url, description, pronouns, pubkey, priv_level, account_suspended
 		 FROM users WHERE id=?`,
 		id,
 	).Scan(
@@ -70,15 +75,18 @@ func (a *App) GetUser(id uint64) (*User, error) {
 		&u.Email,
 		&u.Password,
 		&u.DateCreated,
-		&u.SessionToken,
-		&u.SessionTokenExpires,
+		&sessionToken,
+		&sessionTokenExpires,
 		&profilePictureURL,
 		&description,
 		&pronouns,
 		&pubkey,
 		&privLevel,
+		&u.AccountSuspended,
 	)
 
+	u.SessionToken = sessionToken.String
+	u.SessionTokenExpires = sessionTokenExpires.Time
 	u.ProfilePictureURL = profilePictureURL.String
 	u.Description = description.String
 	u.Pronouns = pronouns.String
@@ -223,23 +231,22 @@ func (a *App) SetSessionToken(userID uint64, token string, expires time.Time) er
 }
 
 func (a *App) CheckSessionToken(userID uint64, token string) (bool, error) {
-	var stored string
-	var expires time.Time
+	var stored sql.NullString
+	var expires sql.NullTime
 
 	err := a.DB.QueryRow(
 		"SELECT session_token, session_token_expires FROM users WHERE id=?",
 		userID,
 	).Scan(&stored, &expires)
-
 	if err != nil {
 		return false, err
 	}
 
-	if stored != token {
+	if !stored.Valid || stored.String != token {
 		return false, nil
 	}
 
-	return time.Now().Before(expires), nil
+	return expires.Valid && time.Now().Before(expires.Time), nil
 }
 
 func (a *App) GetUIDFromToken(sessionToken string) (uint64, error) {
@@ -402,45 +409,47 @@ func (a *App) DeleteServer(id, ownerID uint64) error {
 }
 
 func (a *App) ListServers(f ServerFilter) ([]Server, error) {
-	query := `SELECT id FROM servers WHERE 1=1`
+	query := `SELECT s.id FROM servers s
+		JOIN users u ON u.id = s.owner_id
+		WHERE u.account_suspended = FALSE`
 	var args []any // someone put 'interface{}' here like it's 2012
 
 	if f.Search != "" {
-		query += " AND (name LIKE ? OR description LIKE ?)"
+		query += " AND (s.name LIKE ? OR s.description LIKE ?)"
 		args = append(args, "%"+f.Search+"%", "%"+f.Search+"%")
 	}
 	if f.Version != "" && f.Version != "Any" {
-		query += " AND version = ?"
+		query += " AND s.version = ?"
 		args = append(args, f.Version)
 	}
 	if f.MinPlayers > 0 {
-		query += " AND playercount >= ?"
+		query += " AND s.playercount >= ?"
 		args = append(args, f.MinPlayers)
 	}
 	if f.MaxPlayers > 0 {
-		query += " AND playercount <= ?"
+		query += " AND s.playercount <= ?"
 		args = append(args, f.MaxPlayers)
 	}
 
 	for _, gm := range f.Gamemodes {
-		query += " AND gamemodes LIKE ?"
+		query += " AND s.gamemodes LIKE ?"
 		args = append(args, "%"+strings.TrimSpace(gm)+"%")
 	}
 	for _, lang := range f.Languages {
-		query += " AND languages LIKE ?"
+		query += " AND s.languages LIKE ?"
 		args = append(args, "%"+strings.TrimSpace(lang)+"%")
 	}
 	if f.RequiresMods {
-		query += " AND requires_mods = 1"
+		query += " AND s.requires_mods = 1"
 	}
 
 	switch f.Sort {
 	case "newest":
-		query += " ORDER BY id DESC"
+		query += " ORDER BY s.id DESC"
 	case "name":
-		query += " ORDER BY name ASC"
+		query += " ORDER BY s.name ASC"
 	default:
-		query += " ORDER BY playercount DESC"
+		query += " ORDER BY s.playercount DESC"
 	}
 
 	rows, err := a.DB.Query(query, args...)
@@ -496,4 +505,128 @@ func (a *App) IsUserAdmin(uid uint64) (bool, error) {
 	}
 
 	return isAdmin, nil
+}
+
+// ListUsersAdmin returns one page of users with aggregated stats, plus the
+// total number of users matching the search (for pagination).
+func (a *App) ListUsersAdmin(f UserFilter, perPage int) ([]AdminUserRow, int, error) {
+	// Whitelist sort columns to avoid SQL injection.
+	orderBy := "online_players DESC"
+	switch f.Sort {
+	case "servers":
+		orderBy = "server_count DESC"
+	case "tokens":
+		orderBy = "token_count DESC"
+	case "newest":
+		orderBy = "u.date_created DESC"
+	case "oldest":
+		orderBy = "u.date_created ASC"
+	case "username":
+		orderBy = "u.username ASC"
+	case "players", "":
+		orderBy = "online_players DESC"
+	case "suspended":
+		orderBy = "u.account_suspended DESC"
+	}
+	// Deterministic tie-breaker so paging is stable.
+	orderBy += ", u.id ASC"
+
+	if perPage < 1 {
+		perPage = AdminUsersPerPage
+	}
+	if f.Page < 1 {
+		f.Page = 1
+	}
+	offset := (f.Page - 1) * perPage
+
+	search := "%" + f.Search + "%"
+
+	// Total count (for pagination) matching the same search filter.
+	var total int
+	if err := a.DB.QueryRow(
+		"SELECT COUNT(*) FROM users WHERE username LIKE ?",
+		search,
+	).Scan(&total); err != nil {
+		return nil, 0, err
+	}
+
+	query := fmt.Sprintf(`
+	SELECT
+		u.id,
+		u.username,
+		u.email,
+		u.date_created,
+		u.priv_level,
+		u.account_suspended,
+		COUNT(DISTINCT s.id) AS server_count,
+		CAST(COALESCE(SUM(
+			CASE WHEN s.last_spark >= (NOW() - INTERVAL 1 HOUR)
+			     THEN s.playercount ELSE 0 END
+		), 0) AS UNSIGNED) AS online_players,
+		(SELECT COUNT(*) FROM api_tokens t WHERE t.owner_id = u.id) AS token_count
+	FROM users u
+	LEFT JOIN servers s ON s.owner_id = u.id
+	WHERE u.username LIKE ?
+	GROUP BY u.id, u.username, u.email, u.date_created, u.priv_level, u.account_suspended
+	ORDER BY %s
+	LIMIT ? OFFSET ?`, orderBy)
+
+	rows, err := a.DB.Query(query, search, perPage, offset)
+	if err != nil {
+		return nil, 0, err
+	}
+	defer rows.Close()
+
+	var users []AdminUserRow
+	for rows.Next() {
+		var row AdminUserRow
+		var privLevel sql.NullString
+		if err := rows.Scan(
+			&row.ID,
+			&row.Username,
+			&row.Email,
+			&row.DateCreated,
+			&privLevel,
+			&row.Suspended,
+			&row.ServerCount,
+			&row.OnlinePlayers,
+			&row.TokenCount,
+		); err != nil {
+			return nil, 0, err
+		}
+		row.PrivLevel = privLevel.String
+		users = append(users, row)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, 0, err
+	}
+
+	return users, total, nil
+}
+
+// SetUserSuspended sets a user's suspension status. Suspending also clears
+// their session token so any active session is terminated immediately.
+func (a *App) SetUserSuspended(id uint64, suspended bool) error {
+	if suspended {
+		_, err := a.DB.Exec(
+			`UPDATE users SET account_suspended = TRUE, session_token = NULL WHERE id = ?`,
+			id,
+		)
+		return err
+	}
+	_, err := a.DB.Exec(
+		`UPDATE users SET account_suspended = FALSE WHERE id = ?`,
+		id,
+	)
+	return err
+}
+
+// IsUserSuspended reports whether the given user account is suspended.
+func (a *App) IsUserSuspended(id uint64) (bool, error) {
+	var suspended bool
+	err := a.DB.QueryRow(
+		`SELECT account_suspended FROM users WHERE id = ?`,
+		id,
+	).Scan(&suspended)
+	return suspended, err
 }
