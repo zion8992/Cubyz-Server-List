@@ -12,105 +12,61 @@ import urllib.parse
 import urllib.request
 import urllib.error
 
-Spark_server = None
-user_api_token = None
-LAST_API_SEND = 0
-LAST_LOG_ACTIVITY = 0.0
+# --- Globals (seeded in main() before the monitor loop starts) ---
+Spark_server: str = ""
+user_api_token: str = ""
+LAST_API_SEND: float = 0.0
+LAST_LOG_ACTIVITY: float = 0.0
+
+# --- Constants ---
+CONFIG_PATH = Path("sparkConfig.ini")
+CUBYZ_VERSION = "0.3.0"
+HEARTBEAT_INTERVAL = 3600      # seconds (1 hour)
+LOG_INACTIVITY_TIMEOUT = 30    # seconds
+MONITOR_TICK = 5               # seconds between monitor-loop checks
+
+DEFAULTS: Dict[str, str] = {
+    "user_api_token": "ENTER YOUR TOKEN HERE PLEASE",
+    "cubyz_log": "logs/latest.log",
+    "Spark_server": "https://servers.ashframe.net",
+}
+
+PATTERNS: List[Tuple[str, re.Pattern, Callable[[re.Match], Dict]]] = [
+    ("serverReady", re.compile(r"\[info\]: Finished world assets"), lambda m: {}),
+    ("join", re.compile(r"User (?P<user>.+?) joined using version (?P<version>.+)"), lambda m: m.groupdict()),
+    ("leave", re.compile(r"\[chat\]: (?P<user>.+?) left"), lambda m: m.groupdict()),
+    ("death", re.compile(r"\[chat\]: (?P<user>.+?) died of fall damage"), lambda m: m.groupdict()),
+    ("lag", re.compile(r"\[warning\]: The server is lagging behind by (?P<lagtime>.+)"), lambda m: m.groupdict()),
+]
+
+
+def build_url(server: str, path: str) -> str:
+    """Ensure the configured server has a scheme so urllib accepts it."""
+    if not re.match(r"^https?://", server):
+        server = "https://" + server
+    return server.rstrip("/") + path
+
 
 def send_Spark_update(update: str) -> None:
-    global Spark_server, user_api_token, LAST_API_SEND
+    global LAST_API_SEND
 
-    error_pattern = re.compile(r"^\[(?P<code>[^]]+)\]")
-
-    url = f"{Spark_server}/api/v1/sparkUpdate"
+    url = build_url(Spark_server, "/api/v1/sparkUpdate")
     data = urllib.parse.urlencode(
         {"token": user_api_token, "update": update}
     ).encode("utf-8")
     req = urllib.request.Request(url, data=data, method="POST")
+
     try:
         urllib.request.urlopen(req, timeout=10)
-        LAST_API_SEND = time.time()
     except urllib.error.HTTPError as e:
         body = e.read().decode("utf-8", errors="replace")
-        print(f"HTTP error {e.code}: {body}", flush=True)
-
-        m = error_pattern.match(body)
-        code = m.group("code") if m else None
-
-        match code:
-            case "0":
-                print("Server failed to parse form sent from this Spark client. Please ensure Spark or Server list are up-to-date. If the issue persists, please contact the server list's support.")
-                sys.exit()
-            case "1":
-                print("Server couldn't check if your API token is valid. Try again, if the issue persists, please contact the server list's support.")
-                sys.exit()
-            case "2":
-                print("Invalid API token.")
-                sys.exit()
-            case "3":
-                print("Server couldn't get the server that corresponds to your API token. Try again, if the issue persists, please contact the server list's support.")
-                sys.exit()
-            case "4":
-                print("Invalid data sent to server (specifically the update type). Try updating Spark.")
-                sys.exit()
-            case "5":
-                print("Server couldn't update your server. Try again, if the issue persists, please contact the server list's support.")
-                sys.exit()
-            case "6":
-                print("Your server's playercount is negative.")
-                sys.exit()
-            case _:
-                print(f"Unknown error code in response: {body}")
-        sys.exit()
-
+        print(f"API error: HTTP {e.code}: {body}", flush=True)
+        os._exit(1)          # os._exit so it terminates even from a worker thread
     except Exception as e:
-        print(f"Failed to send update: {e}", flush=True)
-        m = error_pattern.match(str(e))
-        code = m.group("code") if m else None
-        match code:
-            case "0" | "1" | "2" | "3" | "4" | "5":
-                print(f"Error code {code} detected in exception message.")
-            case _:
-                print("No recognized error code in exception message.")
+        print(f"API error: failed to send update: {e}", flush=True)
+        os._exit(1)
 
-
-
-CONFIG_PATH = Path("sparkConfig.ini")
-CUBYZ_VERSION = "0.3.0"
-
-DEFAULTS: Dict[str, str] = {
-    "user_api_token": "",
-    "cubyz_log": "test-server/logs/latest.log",
-    "Spark_server": "servers.ashframe.net",
-}
-
-PATTERNS: List[Tuple[str, re.Pattern, Callable[[re.Match], Dict]]] = [
-    (
-        "serverReady",
-        re.compile(r"\[info\]: Finished world assets"),
-        lambda m: {},
-    ),
-    (
-        "join",
-        re.compile(r"User (?P<user>.+?) joined using version (?P<version>.+)"),
-        lambda m: m.groupdict(),
-    ),
-    (
-        "leave",
-        re.compile(r"\[chat\]: (?P<user>.+?) left"),
-        lambda m: m.groupdict(),
-    ),
-    (
-        "death",
-        re.compile(r"\[chat\]: (?P<user>.+?) died of fall damage"),
-        lambda m: m.groupdict(),
-    ),
-    (
-        "lag",
-        re.compile(r"\[warning\]: The server is lagging behind by (?P<lagtime>.+)"),
-        lambda m: m.groupdict(),
-    ),
-]
+    LAST_API_SEND = time.time()
 
 
 def ensure_config(path: Path) -> configparser.ConfigParser:
@@ -152,7 +108,7 @@ def reader(log_path: str, q: queue.Queue, stop: threading.Event) -> None:
             if not line:
                 try:
                     size = path.stat().st_size
-                    if f.tell() > size:
+                    if f.tell() > size:      # file was truncated/rotated
                         f.seek(0, os.SEEK_END)
                 except OSError:
                     f.close()
@@ -192,10 +148,7 @@ def printer(q: queue.Queue, stop: threading.Event) -> None:
                 send_Spark_update("serverReady")
 
             case "join":
-                print(
-                    f"[{event}] {data['user']} joined using {data['version']}",
-                    flush=True,
-                )
+                print(f"[{event}] {data['user']} joined using {data['version']}", flush=True)
                 playercount += 1
                 server_version = data["version"]
                 print(f"Player count: {playercount}")
@@ -204,7 +157,7 @@ def printer(q: queue.Queue, stop: threading.Event) -> None:
 
             case "leave":
                 print(f"[{event}] {data['user']} left", flush=True)
-                playercount -= 1
+                playercount = max(0, playercount - 1)   # avoid going negative
                 print(f"Player count: {playercount}")
                 send_Spark_update("playerLeave")
 
@@ -213,9 +166,7 @@ def printer(q: queue.Queue, stop: threading.Event) -> None:
                 send_Spark_update("playerDeath")
 
             case "lag":
-                print(
-                    f"[{event}] The server is lagging behind by {data['lagtime']}"
-                )
+                print(f"[{event}] The server is lagging behind by {data['lagtime']}")
                 latest_lag = data["lagtime"]
                 send_Spark_update("serverLag")
 
@@ -224,22 +175,15 @@ def printer(q: queue.Queue, stop: threading.Event) -> None:
 
 
 def main() -> None:
-    global Spark_server, user_api_token, CONFIG_PATH, LAST_API_SEND, LAST_LOG_ACTIVITY
+    global Spark_server, user_api_token, LAST_API_SEND, LAST_LOG_ACTIVITY
 
     print(f"Started Spark for Cubyz v{CUBYZ_VERSION}.")
-    #print(f"There may be compatibility issues if your server isn't running {CUBYZ_VERSION}.")
 
     config = ensure_config(CONFIG_PATH)
 
-    log_path = config.get(
-        "settings", "cubyz_log", fallback=DEFAULTS["cubyz_log"]
-    )
-    user_api_token = config.get(
-        "settings", "user_api_token", fallback=DEFAULTS["user_api_token"]
-    )
-    Spark_server = config.get(
-        "settings", "Spark_server", fallback=DEFAULTS["Spark_server"]
-    )
+    log_path = config.get("settings", "cubyz_log", fallback=DEFAULTS["cubyz_log"])
+    user_api_token = config.get("settings", "user_api_token", fallback=DEFAULTS["user_api_token"])
+    Spark_server = config.get("settings", "Spark_server", fallback=DEFAULTS["Spark_server"])
 
     print(f"Spark host: {Spark_server}")
     print(f"Spark Cubyz log: {log_path}")
@@ -256,32 +200,36 @@ def main() -> None:
     q: queue.Queue = queue.Queue()
     stop = threading.Event()
 
-    t_reader = threading.Thread(
-        target=reader, args=(log_path, q, stop), daemon=True
-    )
-    t_printer = threading.Thread(
-        target=printer, args=(q, stop), daemon=True
-    )
+    # Seed timers with "now" BEFORE starting threads, so the inactivity timeout
+    # and heartbeat interval are measured from program start, not from epoch 0.
+    now = time.time()
+    LAST_LOG_ACTIVITY = now
+    LAST_API_SEND = now
+
+    t_reader = threading.Thread(target=reader, args=(log_path, q, stop), daemon=True)
+    t_printer = threading.Thread(target=printer, args=(q, stop), daemon=True)
 
     t_reader.start()
     t_printer.start()
 
     try:
         while True:
-            time.sleep(5)
-            if time.time() - LAST_LOG_ACTIVITY > 1130:
-                print("No log activity for 30 seconds; exiting.")
-                sys.exit()
-            if time.time() - LAST_API_SEND > 3600:
+            time.sleep(MONITOR_TICK)
+
+            if time.time() - LAST_LOG_ACTIVITY > LOG_INACTIVITY_TIMEOUT:
+                print(f"No log activity for {LOG_INACTIVITY_TIMEOUT} seconds; exiting.")
+                stop.set()
+                break
+
+            if time.time() - LAST_API_SEND > HEARTBEAT_INTERVAL:
                 print("No API update sent in over an hour, sending serverReady heartbeat.")
                 send_Spark_update("serverReady")
     except KeyboardInterrupt:
+        print("\nShutting Spark down...")
         stop.set()
         t_reader.join()
         t_printer.join()
         send_Spark_update("serverOff")
-        print("Shutting Spark down...")
-
 
 
 if __name__ == "__main__":
