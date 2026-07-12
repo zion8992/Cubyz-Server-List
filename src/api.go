@@ -27,6 +27,24 @@ func (a *App) SparkUpdatePOST(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	ownID, err := a.GetOwnerFromToken(token)
+	if err != nil {
+		a.ApiError(w, r, "[1] Failed to get the owner of the token: "+err.Error())
+		return
+	}
+
+	var isSuspended bool
+	isSuspended, err = a.IsUserSuspended(ownID)
+	if err != nil {
+		a.ApiError(w, r, "[1] Failed to check your account status: "+err.Error())
+		return
+	}
+
+	if isSuspended {
+		a.ApiError(w, r, "Your account has been suspended by an administrator.")
+		return
+	}
+
 	sid, err := a.GetServerFromToken(token)
 	if err != nil {
 		a.ApiError(w, r, "[3] Failed to get the server that corresponds to your token: "+err.Error())
