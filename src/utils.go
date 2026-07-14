@@ -9,6 +9,7 @@ import (
 	"regexp"
 	"strings"
 	"time"
+	"unicode/utf8"
 )
 
 func (a *App) Error(w http.ResponseWriter, r *http.Request, errs ...string) {
@@ -282,3 +283,22 @@ func (a *App) ValidateCSRFToken(r *http.Request) bool {
 	r.ParseForm()
 	return r.FormValue("csrf_token") == cookie.Value
 }
+
+const (
+	maxTinyLen   = 20
+	maxMediumLen = 52
+	maxPubkeyLen = 60
+	maxSmallLen  = 123
+	maxLargeLen  = 2011
+)
+
+// tooLong reports whether str's rune count reaches limit.
+func tooLong(str string, limit int) bool {
+	return utf8.RuneCountInString(str) >= limit
+}
+
+func (a *App) CheckTinyString(str string) bool   { return tooLong(str, maxTinyLen) }
+func (a *App) CheckMediumString(str string) bool { return tooLong(str, maxMediumLen) }
+func (a *App) CheckPubkeyString(str string) bool { return tooLong(str, maxPubkeyLen) }
+func (a *App) CheckSmallString(str string) bool  { return tooLong(str, maxSmallLen) }
+func (a *App) CheckLargeString(str string) bool  { return tooLong(str, maxLargeLen) }

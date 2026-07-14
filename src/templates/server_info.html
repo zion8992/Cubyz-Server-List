@@ -2,7 +2,7 @@
 <div class="server-info-page">
 	<header class="server-header">
 		{{ if .IconURL }}
-		<img src="{{ .IconURL }}" alt="Server logo (Uncontrolled by the server list)" class="server-logo">
+		<img src="{{ .IconURL }}" alt="Server Logo" class="server-logo">
 		{{ else }}
 		<img src="/static/img/default_server.svg" alt="Default Server logo" class="server-logo">
 		{{ end }}
@@ -24,7 +24,7 @@
 
 			<div class="tab-panel active" id="tab-description">
 				{{ if .Server.Description }}
-				<p>{{ .Server.Description }}</p>
+				<p style="white-space: pre-wrap;">{{ .Server.Description }}</p>
 				{{ else }}
 				<p class="empty">No description provided.</p>
 				{{ end }}

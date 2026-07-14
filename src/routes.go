@@ -118,6 +118,11 @@ func (a *App) RegisterPOST(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	if a.CheckTinyString(r.FormValue("username")) {
+		a.Error(w, r, "Username too long. Max characters is 20.")
+		return
+	}
+
 	_, err = a.GetUserIDByUsername(r.FormValue("username"))
 	if err != nil && err != sql.ErrNoRows {
 		a.Error(w, r, "Failed to check user: "+err.Error())
@@ -168,6 +173,11 @@ func (a *App) LoginPOST(w http.ResponseWriter, r *http.Request) {
 
 	if banned, word := a.CheckBanned(r.FormValue("username")); banned {
 		a.Error(w, r, "Username contains a banned word: "+word+" You will no longer be able to login into this acccount.")
+		return
+	}
+
+	if a.CheckTinyString(r.FormValue("username")) {
+		a.Error(w, r, "Username too long. Max characters is 20. You will no longer be able to login into this account.")
 		return
 	}
 
@@ -315,6 +325,32 @@ func (a *App) AccountPOST(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	/* check string sizes */
+	if a.CheckTinyString(user.Username) {
+		a.Error(w, r, "Username too long. Max characters is 20.")
+		return
+	}
+
+	if a.CheckTinyString(user.Email) {
+		a.Error(w, r, "Email too long. Max characters is 20.")
+		return
+	}
+
+	if a.CheckSmallString(user.Description) {
+		a.Error(w, r, "Description too long. Max characters is 123.")
+		return
+	}
+
+	if a.CheckTinyString(user.Pronouns) {
+		a.Error(w, r, "Pronouns too long. Max characters is 20.")
+		return
+	}
+
+	if a.CheckSmallString(user.ProfilePictureURL) {
+		a.Error(w, r, "Profile Picture URL too long. Max characters is 123.")
+		return
+	}
+
 	ok, err = a.ValidateFormFields(user.Username, user.Password, user.Email, false)
 	if !ok {
 		a.Error(w, r, "Form field validation failed: "+err.Error())
@@ -348,6 +384,11 @@ func (a *App) AccountVerifyPOST(w http.ResponseWriter, r *http.Request) {
 
 	if pubkey == "" {
 		a.Error(w, r, "Public Key is required.")
+		return
+	}
+
+	if a.CheckPubkeyString(pubkey) {
+		a.Error(w, r, "Public Key is too long. Max characters is 60.")
 		return
 	}
 
@@ -541,9 +582,19 @@ func (a *App) ServerCreatePOST(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	if a.CheckMediumString(name) {
+		a.Error(w, r, "Server name too long. Max characters is 52.")
+		return
+	}
+
 	ip := strings.TrimSpace(r.FormValue("ip"))
 	if ip == "" {
 		a.Error(w, r, "Server IP is required")
+		return
+	}
+
+	if a.CheckMediumString(ip) {
+		a.Error(w, r, "Server IP too long. Max characters is 52.")
 		return
 	}
 
@@ -552,7 +603,13 @@ func (a *App) ServerCreatePOST(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if banned, word := a.CheckBanned(strings.TrimSpace(r.FormValue("description"))); banned {
+	description := strings.TrimSpace(r.FormValue("description"))
+	if a.CheckSmallString(description) {
+		a.Error(w, r, "Description is too long. Max characters is 123.")
+		return
+	}
+
+	if banned, word := a.CheckBanned(description); banned {
 		a.Error(w, r, "Server description contains a banned word: "+word)
 		return
 	}
@@ -564,7 +621,7 @@ func (a *App) ServerCreatePOST(w http.ResponseWriter, r *http.Request) {
 
 	s := Server{
 		Name:        name,
-		Description: strings.TrimSpace(r.FormValue("description")),
+		Description: description,
 		IP:          ip,
 		OwnerID:     uid,
 	}
@@ -772,14 +829,22 @@ func (a *App) ServerEditPOST(w http.ResponseWriter, r *http.Request) {
 		a.Error(w, r, "Server name is required")
 		return
 	}
+	if a.CheckMediumString(name) {
+		a.Error(w, r, "Server Name is too long. Max characters is 52.")
+		return
+	}
 
 	ip := strings.TrimSpace(r.FormValue("ip"))
 	if ip == "" {
 		a.Error(w, r, "Server IP is required")
 		return
 	}
+	if a.CheckMediumString(ip) {
+		a.Error(w, r, "Server IP is too long. Max characters is 52.")
+		return
+	}
 
-	if banned, word := a.CheckBanned(r.FormValue("username")); banned {
+	if banned, word := a.CheckBanned(name); banned {
 		a.Error(w, r, "Server name contains a banned word: "+word)
 		return
 	}
@@ -802,6 +867,15 @@ func (a *App) ServerEditPOST(w http.ResponseWriter, r *http.Request) {
 	for _, f := range fields {
 		if banned, word := a.CheckBanned(f.value); banned {
 			a.Error(w, r, f.label+" contains a banned word: "+word)
+			return
+		}
+		if f.label == "Description" {
+			if a.CheckSmallString(f.value) {
+				a.Error(w, r, "Description is too long. Max characters is 123.")
+			}
+		}
+		if a.CheckMediumString(f.value) {
+			a.Error(w, r, fmt.Sprintf("%s is too long. Max characters is 52.", f.label))
 			return
 		}
 	}
@@ -912,6 +986,16 @@ func (a *App) ApiCreateTokenHandler(w http.ResponseWriter, r *http.Request) {
 	typ := r.FormValue("typ")
 	name := strings.TrimSpace(r.FormValue("name"))
 
+	if a.CheckMediumString(name) {
+		a.Error(w, r, "Token name is too long. Max characters is 52.")
+		return
+	}
+
+	if a.CheckMediumString(typ) {
+		a.Error(w, r, "Nice try :)")
+		return
+	}
+
 	if banned, word := a.CheckBanned(name); banned {
 		a.Error(w, r, "Token name contains a banned word: "+word)
 		return
@@ -927,7 +1011,7 @@ func (a *App) ApiCreateTokenHandler(w http.ResponseWriter, r *http.Request) {
 	case "spark":
 		// valid type, proceed
 	case "votifier":
-		a.Error(w, r, "Votifier tokens are not supported.")
+		a.Error(w, r, "Votifier tokens are yet not supported.")
 		return
 	default:
 		a.Error(w, r, "Invalid token type.")

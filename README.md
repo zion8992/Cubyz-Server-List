@@ -5,9 +5,9 @@ Before running Ironite, you need to setup a MySQL database. You can use the exis
 
 ### Create/Run database in Docker
 1. Clone the repository
-2. Run `./setup.sh`
-3. Run `mysqlpass="YOUR MYSQL PASSWORD" ./scripts/connect_db.sh" 
-4. Paste the contents of `database_setup.sql` (located in the project root) into the MySQL console.
+2. Run `./setup.sh`, this will create and start your database **and give you your database password**.
+3. Run `mysqlpass="YOUR DATABASE PASSWORD" ./scripts/connect_db.sh"
+4. Paste the contents of `database_setup.sql` (located in the project root) into the MySQL console (console from the command on `3.`).
 
 
 #### Run using Prebuilt Binary
@@ -20,18 +20,20 @@ chmod +x ironite-linux-arch # replace with your architecture
 ```
 
 **Windows**
-```sh
+```cmd
 .\ironite-windows-arch # replace with your architecture
 ```
 
- If you changed the root database password, see the **Command Line Flags** below to configure Ironite to support your change. If you used the default, don't change anything.
+If you changed the root database password or used `setup.sh` to set Ironite, see the **Command Line Flags** below to configure Ironite to support your change. If you used the default, don't change anything.
 
 #### Run using `run.sh`
 Make sure you have [Go](https://go.dev) `1.25` or later installed. That's all Ironite needs.
+If you changed the root database password or used `setup.sh` to set Ironite, paste the database password into `enter-env.sh` in the 'export mysqlpass="<pass>"' variable.
 
 ```sh
-cd ../ # cd out of scripts if you were in scripts/
+cd ../ # cd out of 'scripts/' if you were in 'scripts/'
 go mod download
+. enter-env.sh # enter the Ironite virtual env (this sets the 'mysqlpass' enviroment variable)
 ./run.sh
 ```
 

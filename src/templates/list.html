@@ -93,22 +93,10 @@
             <div class="info">
                 <h2>{{.Name}}</h2>
                 <p class="playerCount"><b>{{ .Status }}</b></p>
-                <p class="desc" data-max-lines="2">
+                <p class="desc" style="--max-lines: 4;">
                 {{ if .Description }}{{.Description}}{{else}}No Description{{end}}
                 </p>
                 <p class="gamemodes"><b>{{ .Gamemodes }}</b></p>
-
-                <script>
-                document.addEventListener('DOMContentLoaded', () => {
-                    document.querySelectorAll('.desc').forEach(el => {
-                        const max = parseInt(el.dataset.maxLines, 10) || 3;
-                        const lines = el.textContent.split('\n');
-                        if (lines.length > max) {
-                            el.textContent = lines.slice(0, max).join('\n') + '…';
-                        }
-                    });
-                });
-                </script>
                 <a href="/servers/{{.ID}}" class="button">View Server</a>
             </div>
         </div>
@@ -130,5 +118,15 @@ setTimeout(() => {
 }, REFRESH_INTERVAL_MS);
 
 </script>
+<style>
+.desc {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: var(--max-lines, 3);
+    line-clamp: var(--max-lines, 3);
+    overflow: hidden;
+    white-space: pre-line;
+}
+</style>
 
 {{ end }}
