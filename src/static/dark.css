@@ -1,28 +1,28 @@
-/* dark.css */
+/* dark.css - blue theme */
 :root {
-    --bg: #2e3436;
-    --bg-secondary: #3d4446;
-    --bg-hover: #4a5254;
-    --card-bg: #353c3e;
-    --header-color: #3d4446;
-    --header-gradient: #2e3436;
-    --color: #eeeeec;
-    --color-secondary: #9aa6a6;
-    --border-color: #4a5254;
-    --card-border: #4a5254;
-    --primary-brown: #6ba88e;
-    --accent: #87b09a;
-    --accent-soft: rgba(135, 176, 154, 0.25);
-    --link-color: #87b09a;
-    --link-hover: #a3c9b3;
-    --button-bg: #6ba88e;
-    --button-gradient: #5a927a;
-    --button-gradient-hover: #4d7d68;
-    --button-hover: #7bb89e;
+    --bg: #0d1b2a;
+    --bg-secondary: #1b263b;
+    --bg-hover: #26334d;
+    --card-bg: #152238;
+    --header-color: #1b263b;
+    --header-gradient: #0d1b2a;
+    --color: #e0e6f0;
+    --color-secondary: #8da2c0;
+    --border-color: #2c3e5c;
+    --card-border: #2c3e5c;
+    --primary-brown: #3a86ff;
+    --accent: #4a90e2;
+    --accent-soft: rgba(74, 144, 226, 0.25);
+    --link-color: #4a90e2;
+    --link-hover: #6ba8ff;
+    --button-bg: #3a86ff;
+    --button-gradient: #2f6fd6;
+    --button-gradient-hover: #2860bd;
+    --button-hover: #4d94ff;
     --button-text: #ffffff;
-    --button-border: #5a927a;
-    --button-shadow: #4d7d68;
-    --players-color: #87b09a;
-    --event-bg: #6ba88e;
+    --button-border: #2f6fd6;
+    --button-shadow: #2860bd;
+    --players-color: #4a90e2;
+    --event-bg: #3a86ff;
     --event-text: #ffffff;
 }

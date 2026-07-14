@@ -11,11 +11,11 @@ You can download `fusion.py` from the [Ironite Github Releases Page](https://git
 #### Requirements
 
 - `python3.14` or later.
-- `tkinter`
-- `markdown`
-- `tkinterweb`
+- `tkinter` python library
+- `markdown` python library
+- `tkinterweb` python library
 
-Requirements can be installed with:
+Requirements (excluding `python`) can be installed with:
 ```sh
 pip install tkinter markdown tkinterweb
 ```
@@ -30,6 +30,7 @@ python3 fusion.py
 
 ## Configuring
 FILE: `fusion.ini`<br>
+The configuration file is managed by Fusion. You can change the configuration settings inside of Fusion.
 
 ```ini
 [Settings]
