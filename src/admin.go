@@ -134,6 +134,16 @@ func (a *App) AdminSuspendUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	suspendedUser := User {
+		ID: targetID,
+	}
+
+	err = a.LogoutUser(suspendedUser)
+	if err != nil {
+		a.Error(w, r, "Failed to log the suspended user out: "+err.Error())
+		return
+	}
+
 	// Return to the same filtered/paged view the admin came from.
 	redirect := "/admin/panel"
 	if ret := strings.TrimSpace(r.FormValue("return")); ret != "" &&
