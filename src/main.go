@@ -71,6 +71,7 @@ func main() {
 	mux.HandleFunc("POST /api/v1/sparkUpdate", app.SparkUpdatePOST)
 	mux.HandleFunc("POST /api/v1/create-token", app.ApiCreateTokenHandler)
 	mux.HandleFunc("POST /api/v1/delete-token", app.ApiDeleteTokenHandler)
+	mux.HandleFunc("GET /api/v1/listServers", app.ApiListServers)
 
 	// user profiles
 	mux.HandleFunc("GET /user/{id}", app.UserInfo)
