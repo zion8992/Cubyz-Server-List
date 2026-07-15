@@ -103,6 +103,19 @@
         {{else}}
         <p>No servers match your filters.</p>
         {{end}}
+        {{ if gt .TotalPages 1 }}
+        <div class="pagination">
+            {{ if .HasPrev }}
+            <a href="{{ .PrevURL }}"><button type="button">&laquo; Prev</button></a>
+            {{ end }}
+
+            <span>Page {{ .CurrentPage }} of {{ .TotalPages }}</span>
+
+            {{ if .HasNext }}
+            <a href="{{ .NextURL }}"><button type="button">Next &raquo;</button></a>
+            {{ end }}
+        </div>
+        {{ end }}
     </div>
 </div>
 

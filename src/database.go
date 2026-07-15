@@ -13,6 +13,8 @@ import (
 )
 
 const AdminUsersPerPage = 20
+const ServersPerPage = 5
+
 
 /**
 This file contains:

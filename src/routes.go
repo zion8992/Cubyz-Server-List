@@ -24,6 +24,12 @@ type Page struct {
 }
 
 func (a *App) SlashHandler(w http.ResponseWriter, r *http.Request) {
+	ok, err := a.CheckReqSessionTok(r)
+	if err != nil || ok {
+		http.Redirect(w, r, "/list", http.StatusSeeOther)
+		return
+	}
+
 	page := strings.TrimPrefix(r.URL.Path, "/")
 	if page == "" {
 		page = "home"
@@ -869,16 +875,21 @@ func (a *App) ServerEditPOST(w http.ResponseWriter, r *http.Request) {
 			a.Error(w, r, f.label+" contains a banned word: "+word)
 			return
 		}
+
 		if f.label == "Description" {
 			if a.CheckSmallString(f.value) {
 				a.Error(w, r, "Description is too long. Max characters is 123.")
+				return
 			}
+			continue // skip the 52-char check
 		}
+
 		if a.CheckMediumString(f.value) {
 			a.Error(w, r, fmt.Sprintf("%s is too long. Max characters is 52.", f.label))
 			return
 		}
 	}
+
 
 	s := Server{
 		ID:           id,
@@ -1101,6 +1112,43 @@ func (a *App) ServerListGET(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// --- Pagination (max ServersPerPage shown at a time) ---
+	page := 1
+	if p, err := strconv.Atoi(q.Get("page")); err == nil && p > 0 {
+		page = p
+	}
+
+	total := len(servers)
+	totalPages := (total + ServersPerPage - 1) / ServersPerPage
+	if totalPages < 1 {
+		totalPages = 1
+	}
+	if page > totalPages {
+		page = totalPages
+	}
+
+	start := (page - 1) * ServersPerPage
+	if start > total {
+		start = total
+	}
+	end := start + ServersPerPage
+	if end > total {
+		end = total
+	}
+	servers = servers[start:end]
+
+	// Build page URLs that preserve the current filters.
+	pq := r.URL.Query()
+	pq.Del("page")
+	base := pq.Encode()
+	pageURL := func(p int) string {
+		if base == "" {
+			return fmt.Sprintf("/list?page=%d", p)
+		}
+		return fmt.Sprintf("/list?%s&page=%d", base, p)
+	}
+	// -------------------------------------------------------
+
 	for i := range servers {
 		if a.IsServerOnline(servers[i].ID) {
 			servers[i].Status = "Online"
@@ -1124,12 +1172,24 @@ func (a *App) ServerListGET(w http.ResponseWriter, r *http.Request) {
 		Filter         ServerFilter
 		GamemodeChecks map[string]bool
 		LanguageChecks map[string]bool
+		CurrentPage    int
+		TotalPages     int
+		HasPrev        bool
+		HasNext        bool
+		PrevURL        string
+		NextURL        string
 	}{
 		Page:           Page{IsLoggedIn: a.HasSessionToken(r)},
 		Servers:        servers,
 		Filter:         f,
 		GamemodeChecks: gmChecks,
 		LanguageChecks: langChecks,
+		CurrentPage:    page,
+		TotalPages:     totalPages,
+		HasPrev:        page > 1,
+		HasNext:        page < totalPages,
+		PrevURL:        pageURL(page - 1),
+		NextURL:        pageURL(page + 1),
 	}
 
 	a.render(w, r, http.StatusOK, "list.html", data)
