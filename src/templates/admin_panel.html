@@ -2,19 +2,20 @@
 <div class="account-layout">
 	<aside class="account-sidebar">
 		<nav>
-			<button class="sidebar-tab active" data-tab="users">Users</button>
-			<button class="sidebar-tab" data-tab="servers">Servers</button>
-			<button class="sidebar-tab" data-tab="tokens">API Tokens</button>
-			<button class="sidebar-tab" data-tab="actions">Actions</button>
+			<button class="sidebar-tab{{ if eq .ActiveTab "users" }} active{{ end }}" data-tab="users">Users</button>
+			<button class="sidebar-tab{{ if eq .ActiveTab "servers" }} active{{ end }}" data-tab="servers">Servers</button>
+			<button class="sidebar-tab{{ if eq .ActiveTab "tokens" }} active{{ end }}" data-tab="tokens">API Tokens</button>
+			<button class="sidebar-tab{{ if eq .ActiveTab "actions" }} active{{ end }}" data-tab="actions">Actions</button>
 			<a href="/account" class="button">Back to Account</a>
 		</nav>
 	</aside>
 
 	<section class="account-content">
-		<div class="tab-panel active" id="tab-users">
+		<div class="tab-panel{{ if eq .ActiveTab "users" }} active{{ end }}" id="tab-users">
 			<h2>Users</h2>
 
 			<form method="GET" action="/admin/panel" class="admin-filters">
+				<input type="hidden" name="tab" value="users">
 				<input type="text" name="search" value="{{ .Filter.Search }}" placeholder="Search by username...">
 				<select name="sort">
 					<option value="players" {{ if eq .Filter.Sort "players" }}selected{{ end }}>Most online players</option>
@@ -48,49 +49,49 @@
 				</thead>
 				<tbody>
 					{{ range .Users }}
-						<tr>
-							<td>{{ .ID }}</td>
-							<td>{{ .Username }}</td>
-							<td>{{ .Email }}</td>
-							<td>{{ .ServerCount }}</td>
-							<td>{{ .OnlinePlayers }}</td>
-							<td>{{ .TokenCount }}</td>
-							<td>{{ .DateCreated.Format "2006-01-02" }}</td>
-							<td>{{ if eq .PrivLevel "admin" }}Admin{{ else }}User{{ end }}</td>
-							<td>
-								{{ if .Suspended }}
-								<span class="badge-suspended">Suspended</span>
-								{{ else }}
-								<span class="badge-active">Active</span>
-								{{ end }}
-							</td>
-							<td>
-								<div class="server-list-actions">
-									<a href="/user/{{ .ID }}" class="button">View</a>
-									<form method="POST" action="/admin/suspend" style="display:inline"
-										onsubmit="return confirm('{{ if .Suspended }}Unsuspend{{ else }}Suspend{{ end }} {{ .Username }}?');">
-										<input type="hidden" name="csrf_token" value="{{ $.Page.CSRFToken }}">
-										<input type="hidden" name="user_id" value="{{ .ID }}">
-										<input type="hidden" name="suspend" value="{{ if .Suspended }}false{{ else }}true{{ end }}">
-										<input type="hidden" name="return" value="/admin/panel?search={{ $.Filter.Search | urlquery }}&sort={{ $.Filter.Sort | urlquery }}&page={{ $.CurrentPage }}">
-										<button type="submit" class="button {{ if not .Suspended }}danger{{ end }}">
-											{{ if .Suspended }}Unsuspend{{ else }}Suspend{{ end }}
-										</button>
-									</form>
-								</div>
-							</td>
-						</tr>
-						{{ end }}
+					<tr>
+						<td>{{ .ID }}</td>
+						<td>{{ .Username }}</td>
+						<td>{{ .Email }}</td>
+						<td>{{ .ServerCount }}</td>
+						<td>{{ .OnlinePlayers }}</td>
+						<td>{{ .TokenCount }}</td>
+						<td>{{ .DateCreated.Format "2006-01-02" }}</td>
+						<td>{{ if eq .PrivLevel "admin" }}Admin{{ else }}User{{ end }}</td>
+						<td>
+							{{ if .Suspended }}
+							<span class="badge-suspended">Suspended</span>
+							{{ else }}
+							<span class="badge-active">Active</span>
+							{{ end }}
+						</td>
+						<td>
+							<div class="server-list-actions">
+								<a href="/user/{{ .ID }}" class="button">View</a>
+								<form method="POST" action="/admin/suspend" style="display:inline"
+									onsubmit="return confirm('{{ if .Suspended }}Unsuspend{{ else }}Suspend{{ end }} {{ .Username }}?');">
+									<input type="hidden" name="csrf_token" value="{{ $.Page.CSRFToken }}">
+									<input type="hidden" name="user_id" value="{{ .ID }}">
+									<input type="hidden" name="suspend" value="{{ if .Suspended }}false{{ else }}true{{ end }}">
+									<input type="hidden" name="return" value="/admin/panel?tab=users&search={{ $.Filter.Search | urlquery }}&sort={{ $.Filter.Sort | urlquery }}&page={{ $.CurrentPage }}">
+									<button type="submit" class="button {{ if not .Suspended }}danger{{ end }}">
+										{{ if .Suspended }}Unsuspend{{ else }}Suspend{{ end }}
+									</button>
+								</form>
+							</div>
+						</td>
+					</tr>
+					{{ end }}
 				</tbody>
 			</table>
 
 			<div class="pagination">
 				{{ if .HasPrev }}
-				<a class="button" href="/admin/panel?search={{ .Filter.Search | urlquery }}&sort={{ .Filter.Sort | urlquery }}&page={{ .PrevPage }}">Previous</a>
+				<a class="button" href="/admin/panel?tab=users&search={{ .Filter.Search | urlquery }}&sort={{ .Filter.Sort | urlquery }}&page={{ .PrevPage }}">Previous</a>
 				{{ end }}
 				<span>Page {{ .CurrentPage }} of {{ .TotalPages }}</span>
 				{{ if .HasNext }}
-				<a class="button" href="/admin/panel?search={{ .Filter.Search | urlquery }}&sort={{ .Filter.Sort | urlquery }}&page={{ .NextPage }}">Next</a>
+				<a class="button" href="/admin/panel?tab=users&search={{ .Filter.Search | urlquery }}&sort={{ .Filter.Sort | urlquery }}&page={{ .NextPage }}">Next</a>
 				{{ end }}
 			</div>
 			{{ else }}
@@ -98,22 +99,86 @@
 			{{ end }}
 		</div>
 
-		<div class="tab-panel" id="tab-servers">
+		<div class="tab-panel{{ if eq .ActiveTab "servers" }} active{{ end }}" id="tab-servers">
 			<h2>Servers</h2>
-			<p class="empty">Coming soon.</p>
+
+			<form method="GET" action="/admin/panel" class="admin-filters">
+				<input type="hidden" name="tab" value="servers">
+				<input type="text" name="s_search" value="{{ .SFilter.Search }}" placeholder="Search by name or description...">
+				<select name="s_sort">
+					<option value="players" {{ if eq .SFilter.Sort "players" }}selected{{ end }}>Most players</option>
+					<option value="name" {{ if eq .SFilter.Sort "name" }}selected{{ end }}>Alphabetical (A-Z)</option>
+				</select>
+				<select name="s_status">
+					<option value="" {{ if eq .SFilter.Status "" }}selected{{ end }}>All servers</option>
+					<option value="online" {{ if eq .SFilter.Status "online" }}selected{{ end }}>Online only</option>
+				</select>
+				<button type="submit">Apply</button>
+			</form>
+
+			<p class="empty">{{ .STotalCount }} server(s) found.</p>
+
+			{{ if .Servers }}
+			<table>
+				<thead>
+					<tr>
+						<th>ID</th>
+						<th>Name</th>
+						<th>IP</th>
+						<th>Players</th>
+						<th>Status</th>
+						<th>Action</th>
+					</tr>
+				</thead>
+				<tbody>
+					{{ range .Servers }}
+					<tr>
+						<td>{{ .ID }}</td>
+						<td>{{ .Name }}</td>
+						<td>{{ .IP }}</td>
+						<td>{{ .PlayerCount }}</td>
+						<td>
+							{{ if eq .Status "Online" }}
+							<span class="badge-active">Online</span>
+							{{ else }}
+							<span class="badge-suspended">Offline</span>
+							{{ end }}
+						</td>
+						<td>
+							<div class="server-list-actions">
+								<a href="/servers/{{ .ID }}" class="button">View</a>
+							</div>
+						</td>
+					</tr>
+					{{ end }}
+				</tbody>
+			</table>
+
+			<div class="pagination">
+				{{ if .SHasPrev }}
+				<a class="button" href="{{ .SPrevURL }}">Previous</a>
+				{{ end }}
+				<span>Page {{ .SCurrentPage }} of {{ .STotalPages }}</span>
+				{{ if .SHasNext }}
+				<a class="button" href="{{ .SNextURL }}">Next</a>
+				{{ end }}
+			</div>
+			{{ else }}
+			<p class="empty">No servers found.</p>
+			{{ end }}
 		</div>
 
-		<div class="tab-panel" id="tab-tokens">
+		<div class="tab-panel{{ if eq .ActiveTab "tokens" }} active{{ end }}" id="tab-tokens">
 			<h2>API Tokens</h2>
 			<p class="empty">Coming soon.</p>
 		</div>
 
-		<div class="tab-panel" id="tab-actions">
+		<div class="tab-panel{{ if eq .ActiveTab "actions" }} active{{ end }}" id="tab-actions">
 			<h2>Actions</h2>
 			<p class="empty">Coming soon.</p>
 		</div>
 	</section>
-</div>
 
-<script src="/static/js/sidebar.js"></script>
+	<script src="/static/js/sidebar.js"></script>
+</div>
 {{ end }}

@@ -2,9 +2,11 @@ package main
 
 import (
 	"net/http"
+	"net/url"
 	"strconv"
 	"strings"
 )
+
 
 func (a *App) AdminPanel(w http.ResponseWriter, r *http.Request) {
 	ok, err := a.CheckReqSessionTok(r)
@@ -31,9 +33,18 @@ func (a *App) AdminPanel(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// --- users tab: filters + paging ---
 	q := r.URL.Query()
 
+	// Which tab should be shown on load (defaults to users).
+	activeTab := q.Get("tab")
+	switch activeTab {
+	case "users", "servers", "tokens", "actions":
+		// valid
+	default:
+		activeTab = "users"
+	}
+
+	// --- users tab: filters + paging ---
 	f := UserFilter{
 		Search: strings.TrimSpace(q.Get("search")),
 		Sort:   q.Get("sort"),
@@ -63,8 +74,84 @@ func (a *App) AdminPanel(w http.ResponseWriter, r *http.Request) {
 		f.Page = totalPages
 	}
 
+	// --- servers tab: filters + paging ---
+	sf := ServerFilter{
+		Search: strings.TrimSpace(q.Get("s_search")),
+		Sort:   q.Get("s_sort"),
+		Status: q.Get("s_status"), // "" (all) or "online"
+	}
+	if sf.Sort == "" {
+		sf.Sort = "players" // default: most players
+	}
+
+	sPage, _ := strconv.Atoi(q.Get("s_page"))
+	if sPage < 1 {
+		sPage = 1
+	}
+
+	allServers, err := a.ListServersAdmin(sf)
+	if err != nil {
+		a.Error(w, r, "Failed to load servers: "+err.Error())
+		return
+	}
+
+	// Resolve online status and apply the "online only" filter in Go.
+	filtered := make([]Server, 0, len(allServers))
+	for i := range allServers {
+		online := a.IsServerOnline(allServers[i].ID)
+		if online {
+			allServers[i].Status = "Online"
+		} else {
+			allServers[i].Status = "Offline"
+		}
+		if sf.Status == "online" && !online {
+			continue
+		}
+		filtered = append(filtered, allServers[i])
+	}
+
+	sTotal := len(filtered)
+	sTotalPages := (sTotal + AdminServersPerPage - 1) / AdminServersPerPage
+	if sTotalPages < 1 {
+		sTotalPages = 1
+	}
+	if sPage > sTotalPages {
+		sPage = sTotalPages
+	}
+
+	start := (sPage - 1) * AdminServersPerPage
+	if start > sTotal {
+		start = sTotal
+	}
+	end := start + AdminServersPerPage
+	if end > sTotal {
+		end = sTotal
+	}
+	servers := filtered[start:end]
+
+	// Build server-tab page URLs that preserve the current filters and keep
+	// the servers tab open.
+	serverPageURL := func(p int) string {
+		v := url.Values{}
+		v.Set("tab", "servers")
+		if sf.Search != "" {
+			v.Set("s_search", sf.Search)
+		}
+		if sf.Sort != "" {
+			v.Set("s_sort", sf.Sort)
+		}
+		if sf.Status != "" {
+			v.Set("s_status", sf.Status)
+		}
+		v.Set("s_page", strconv.Itoa(p))
+		return "/admin/panel?" + v.Encode()
+	}
+
 	data := struct {
 		Page
+		ActiveTab string
+
+		// Users tab
 		Users       []AdminUserRow
 		Filter      UserFilter
 		CurrentPage int
@@ -74,8 +161,21 @@ func (a *App) AdminPanel(w http.ResponseWriter, r *http.Request) {
 		HasNext     bool
 		PrevPage    int
 		NextPage    int
+
+		// Servers tab
+		Servers      []Server
+		SFilter      ServerFilter
+		SCurrentPage int
+		STotalPages  int
+		STotalCount  int
+		SHasPrev     bool
+		SHasNext     bool
+		SPrevURL     string
+		SNextURL     string
 	}{
-		Page:        Page{IsLoggedIn: true, CSRFToken: a.GetCSRFTokenFromRequest(r)},
+		Page:      Page{IsLoggedIn: true, CSRFToken: a.GetCSRFTokenFromRequest(r)},
+		ActiveTab: activeTab,
+
 		Users:       users,
 		Filter:      f,
 		CurrentPage: f.Page,
@@ -85,10 +185,21 @@ func (a *App) AdminPanel(w http.ResponseWriter, r *http.Request) {
 		HasNext:     f.Page < totalPages,
 		PrevPage:    f.Page - 1,
 		NextPage:    f.Page + 1,
+
+		Servers:      servers,
+		SFilter:      sf,
+		SCurrentPage: sPage,
+		STotalPages:  sTotalPages,
+		STotalCount:  sTotal,
+		SHasPrev:     sPage > 1,
+		SHasNext:     sPage < sTotalPages,
+		SPrevURL:     serverPageURL(sPage - 1),
+		SNextURL:     serverPageURL(sPage + 1),
 	}
 
 	a.render(w, r, http.StatusOK, "admin_panel.html", data)
 }
+
 
 func (a *App) AdminSuspendUser(w http.ResponseWriter, r *http.Request) {
 	ok, err := a.CheckReqSessionTok(r)

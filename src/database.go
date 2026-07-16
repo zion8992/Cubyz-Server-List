@@ -14,6 +14,7 @@ import (
 
 const AdminUsersPerPage = 20
 const ServersPerPage = 5
+const AdminServersPerPage = 20
 
 
 /**
@@ -631,4 +632,55 @@ func (a *App) IsUserSuspended(id uint64) (bool, error) {
 		id,
 	).Scan(&suspended)
 	return suspended, err
+}
+
+// ListServersAdmin returns every server matching the filter, for the admin
+// panel. Unlike ListServers it does NOT exclude servers owned by suspended
+// users, so admins retain full visibility. Sort/search happen in SQL; the
+// online/offline status filter is applied by the caller via IsServerOnline.
+func (a *App) ListServersAdmin(f ServerFilter) ([]Server, error) {
+	query := `SELECT id FROM servers`
+	var args []any
+
+	if f.Search != "" {
+		query += " WHERE (name LIKE ? OR description LIKE ?)"
+		args = append(args, "%"+f.Search+"%", "%"+f.Search+"%")
+	}
+
+	switch f.Sort {
+	case "name":
+		query += " ORDER BY name ASC"
+	default: // "players" and anything unrecognised
+		query += " ORDER BY playercount DESC"
+	}
+	// Deterministic tie-breaker so paging is stable.
+	query += ", id ASC"
+
+	rows, err := a.DB.Query(query, args...)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var ids []uint64
+	for rows.Next() {
+		var id uint64
+		if err := rows.Scan(&id); err != nil {
+			return nil, err
+		}
+		ids = append(ids, id)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+
+	var servers []Server
+	for _, id := range ids {
+		s, err := a.GetServer(id)
+		if err != nil {
+			return nil, err
+		}
+		servers = append(servers, *s)
+	}
+	return servers, nil
 }
