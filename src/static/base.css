@@ -1,4 +1,5 @@
-@import url('https://fonts.googleapis.com/css2?family=Source%20Code%20Pro:wght@100;200;300;400;500;600;700;800;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Figtree:wght@300;400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Source%20Code%20Pro:wght@300;400;500;600;700&display=swap');
 
 /** LIGHT/DARK MODE IMPORTS **/
 @import url('/static/dark.css') (prefers-color-scheme: dark);
@@ -9,44 +10,43 @@
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    /* Keep textures/sprites crisp instead of smoothing them */
-    image-rendering: pixelated;
-    image-rendering: crisp-edges;
 }
 
 /** ROOT VARIABLES **/
 :root {
-    /* Pixel-art / voxel: hard square corners, no rounding */
-    --border-radius: 0px;
-    --pixel-edge: 2px;
-    --font-size: 16px;
-    /* Chunky, blur-free block shadows (voxel dropped on a grid) */
-    --box-shadow-soft: 4px 4px 0 rgba(0, 0, 0, 0.35);
-    --box-shadow-hover: 6px 6px 0 rgba(0, 0, 0, 0.45);
-    --box-shadow-inset: inset 3px 3px 0 rgba(0, 0, 0, 0.28);
-}
+    /* midnight-style rounded corners */
+    --radius-lg: 16px;   /* cards, panels, forms, hero, tables */
+    --radius-md: 12px;   /* medium elements */
+    --radius-sm: 8px;    /* buttons, inputs, tabs, badges */
+    --border-radius: var(--radius-lg); /* legacy alias */
 
-/** FONTS **/
-@font-face {
-  font-family: "Unscii 16 Full";
-  src: url("/static/fonts/unscii-16-full.ttf") format("truetype");
+    /* borders & spacing (midnight conventions) */
+    --border-thickness: 1px;
+    --gap: 12px;
+    --font-size: 16px;
+
+    /* smooth transitions (like midnight) */
+    --transition: 0.2s ease;
+    --border-hover-transition: 0.2s ease;
+
+    /* soft, blurred shadows */
+    --box-shadow-soft: 0 4px 16px rgba(0, 0, 0, 0.25);
+    --box-shadow-hover: 0 8px 28px rgba(0, 0, 0, 0.35);
+    --box-shadow-inset: inset 0 0 0 1px var(--border-color);
 }
 
 /** GENERAL ELEMENTS **/
-
-/* Available fonts are "Google Sans Code" and "Unscii 16 Full" (cubyz) */
 body {
-    font-family: "Source Code Pro", monospace;
+    font-family: 'Figtree', sans-serif;
     background-color: var(--bg);
     color: var(--color);
     text-align: center;
     font-size: var(--font-size);
+    font-weight: 400;
     background-image: none;
-    /* Crisp, un-smoothed type to match the pixel aesthetic */
-    image-rendering: pixelated;
-    -webkit-font-smoothing: none;
+    -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    letter-spacing: 0.5px;
+    letter-spacing: 0;
 }
 
 /* --- HEADER --- */
@@ -55,20 +55,18 @@ header {
     align-items: center;
     justify-content: space-between;
     padding: 0.75rem 2rem;
-    background: linear-gradient(180deg, var(--header-color) 0%, var(--header-gradient) 100%);
+    background: var(--header-color);
     height: 64px;
-    border-bottom: var(--pixel-edge) solid var(--border-color);
-    box-shadow: 0 4px 0 rgba(0, 0, 0, 0.35);
-    border-radius: var(--border-radius);
+    border-bottom: var(--border-thickness) solid var(--border-color);
+    box-shadow: var(--box-shadow-soft);
 }
 
 header .name h1 {
-    font-size: 28px;
-    font-family: "Unscii 16 Full", monospace;
+    font-size: 26px;
+    font-family: 'Figtree', sans-serif;
     color: var(--color);
-    text-shadow: 2px 2px 0 rgba(0, 0, 0, 0.5);
-    letter-spacing: 1px;
-    font-weight: 600;
+    letter-spacing: -0.5px;
+    font-weight: 700;
 }
 
 header nav {
@@ -79,18 +77,17 @@ header nav {
 header nav a {
     font-size: 15px;
     text-decoration: none;
-    color: var(--color);
+    color: var(--color-secondary);
     padding: 8px 16px;
-    transition: none;
-    font-family: "Unscii 16 Full", monospace;
-    border-radius: var(--border-radius);
+    transition: var(--transition);
+    font-family: 'Figtree', sans-serif;
+    font-weight: 500;
+    border-radius: var(--radius-sm);
 }
 
 header nav a:hover {
-    color: var(--accent);
+    color: var(--color);
     background-color: var(--bg-hover);
-    box-shadow: inset 0 0 0 var(--pixel-edge) var(--accent);
-    text-shadow: none;
 }
 
 main {
@@ -104,9 +101,8 @@ main {
 main h1, main h2, main h3 {
     color: var(--color);
     margin-bottom: 20px;
-    text-shadow: 2px 2px 0 rgba(0, 0, 0, 0.5);
-    letter-spacing: 0.5px;
-    font-weight: 600;
+    letter-spacing: -0.3px;
+    font-weight: 700;
 }
 
 footer {
@@ -115,9 +111,9 @@ footer {
     padding: 12px;
     text-align: center;
     background-color: var(--header-color);
-    border-top: var(--pixel-edge) solid var(--border-color);
+    border-top: var(--border-thickness) solid var(--border-color);
     width: 100%;
-    color: var(--color);
+    color: var(--color-secondary);
     font-size: 13px;
 }
 
@@ -126,7 +122,7 @@ footer {
 a {
     color: var(--link-color);
     text-decoration: none;
-    transition: none;
+    transition: var(--transition);
 }
 
 a:hover {
@@ -135,22 +131,22 @@ a:hover {
 }
 
 code {
-    font-family: 'Source Code Pro', sans-serif;
+    font-family: 'Source Code Pro', monospace;
     padding: 3px 7px;
     background-color: var(--bg-secondary);
     color: var(--accent);
-    border: var(--pixel-edge) solid var(--border-color);
-    border-radius: 0;
+    border: var(--border-thickness) solid var(--border-color);
+    border-radius: var(--radius-sm);
 }
 
 pre {
     background-color: var(--bg-secondary);
-    padding: 15px;
-    border: var(--pixel-edge) solid var(--border-color);
+    padding: 16px;
+    border: var(--border-thickness) solid var(--border-color);
     text-align: left;
     overflow-x: auto;
-    border-radius: var(--border-radius);
-    box-shadow: var(--box-shadow-inset);
+    border-radius: var(--radius-md);
+    box-shadow: none;
 }
 
 pre code {
@@ -163,14 +159,14 @@ input, select, textarea {
     padding: 10px 12px;
     font-size: 15px;
     background-color: var(--bg-secondary);
-    border: var(--pixel-edge) solid var(--border-color);
-    font-family: "Unscii 16 Full", monospace;
+    border: var(--border-thickness) solid var(--border-color);
+    font-family: 'Figtree', sans-serif;
     color: var(--color);
-    transition: none;
+    transition: var(--transition);
     width: 100%;
     max-width: 300px;
-    border-radius: var(--border-radius);
-    box-shadow: var(--box-shadow-inset);
+    border-radius: var(--radius-sm);
+    box-shadow: none;
 }
 
 textarea {
@@ -186,7 +182,7 @@ input:focus, select:focus, textarea:focus {
     border-color: var(--accent);
     outline: none;
     background-color: var(--card-bg);
-    box-shadow: 0 0 0 var(--pixel-edge) var(--accent-soft);
+    box-shadow: 0 0 0 3px var(--accent-soft);
 }
 
 label {
@@ -198,29 +194,28 @@ label {
 
 button {
     padding: 10px 20px;
-    background: linear-gradient(180deg, var(--button-bg) 0%, var(--button-gradient) 100%);
+    background: var(--button-bg);
     color: var(--button-text);
-    border: var(--pixel-edge) solid var(--button-border);
-    font-family: "Unscii 16 Full", monospace;
+    border: var(--border-thickness) solid var(--button-border);
+    font-family: 'Figtree', sans-serif;
     font-size: 15px;
+    font-weight: 600;
     cursor: pointer;
-    transition: none;
+    transition: var(--transition);
     text-transform: none;
-    letter-spacing: 0.5px;
-    box-shadow: var(--box-shadow-soft);
-    transform: translate(0, 0);
-    position: relative;
-    border-radius: var(--border-radius);
+    letter-spacing: 0;
+    box-shadow: none;
+    border-radius: var(--radius-sm);
 }
 
 button:hover:not(:disabled) {
-    background: linear-gradient(180deg, var(--button-hover) 0%, var(--button-gradient-hover) 100%);
-    transform: translate(-2px, -2px);
-    box-shadow: var(--box-shadow-hover);
+    background: var(--button-hover);
+    box-shadow: var(--box-shadow-soft);
 }
 
 button:active:not(:disabled) {
-    transform: translate(2px, 2px);
+    background: var(--button-gradient-hover);
+    transform: translateY(1px);
     box-shadow: none;
 }
 
@@ -232,29 +227,28 @@ button:disabled {
     box-shadow: none;
 }
 
-button:focus {
-    outline: var(--pixel-edge) solid var(--accent);
+button:focus-visible {
+    outline: 2px solid var(--accent);
     outline-offset: 2px;
 }
 
 form {
     background-color: var(--card-bg);
-    border: var(--pixel-edge) solid var(--border-color);
+    border: var(--border-thickness) solid var(--card-border);
     padding: 28px;
     max-width: 500px;
     margin: 20px auto;
     display: flex;
     flex-direction: column;
     gap: 15px;
-    border-radius: var(--border-radius);
+    border-radius: var(--radius-lg);
     box-shadow: var(--box-shadow-soft);
 }
 
 form h2 {
     color: var(--color);
     margin-bottom: 20px;
-    text-shadow: 2px 2px 0 rgba(0, 0, 0, 0.5);
-    letter-spacing: 0.5px;
+    letter-spacing: -0.3px;
 }
 
 form p {
@@ -269,19 +263,20 @@ form p a {
 /** CLASSES AND IDs **/
 
 .special-font {
-    font-family: "Unscii 16 Full";
+    font-family: 'Figtree', sans-serif;
+    font-weight: 700;
 }
 
 .server {
     background-color: var(--card-bg);
-    border: var(--pixel-edge) solid var(--card-border);
+    border: var(--border-thickness) solid var(--card-border);
     padding: 20px;
     display: flex;
     flex-direction: row;
     max-width: 700px;
     margin: 20px auto;
-    transition: none;
-    border-radius: var(--border-radius);
+    transition: var(--border-hover-transition);
+    border-radius: var(--radius-lg);
     box-shadow: var(--box-shadow-soft);
 }
 
@@ -295,12 +290,12 @@ form p a {
 }
 
 .server h2 {
-    font-family: "Unscii 16 Full", monospace;
+    font-family: 'Figtree', sans-serif;
     font-size: 22px;
     color: var(--color);
-    text-shadow: 2px 2px 0 rgba(0, 0, 0, 0.5);
     margin: 0;
-    letter-spacing: 0.5px;
+    letter-spacing: -0.3px;
+    font-weight: 700;
 }
 
 .server img {
@@ -308,11 +303,10 @@ form p a {
     max-height: 160px;
     width: 160px;
     height: 160px;
-    border: var(--pixel-edge) solid var(--border-color);
+    border: var(--border-thickness) solid var(--border-color);
     object-fit: cover;
     flex: 0 0 auto;
-    border-radius: var(--border-radius);
-    image-rendering: pixelated;
+    border-radius: var(--radius-md);
 }
 
 .server .info {
@@ -349,10 +343,10 @@ form p a {
     max-width: 30%;
     min-width: 240px;
     background-color: var(--card-bg);
-    border: var(--pixel-edge) solid var(--card-border);
+    border: var(--border-thickness) solid var(--card-border);
     padding: 20px;
     box-sizing: border-box;
-    border-radius: var(--border-radius);
+    border-radius: var(--radius-lg);
     box-shadow: var(--box-shadow-soft);
 }
 
@@ -364,8 +358,7 @@ form p a {
 .filters h2 {
     color: var(--color);
     margin-bottom: 20px;
-    text-shadow: 2px 2px 0 rgba(0, 0, 0, 0.5);
-    letter-spacing: 0.5px;
+    letter-spacing: -0.3px;
 }
 
 .filters p {
@@ -385,10 +378,10 @@ form p a {
     display: inline-block;
     font-weight: 600;
     text-transform: uppercase;
-    letter-spacing: 0.5px;
+    letter-spacing: 0.3px;
     margin: 5px 0;
-    border-radius: 0;
-    border: var(--pixel-edge) solid rgba(0, 0, 0, 0.35);
+    border-radius: var(--radius-sm);
+    border: none;
     font-size: 13px;
 }
 
@@ -400,18 +393,17 @@ form p a {
     flex-direction: column;
     text-align: center;
     background-color: var(--card-bg);
-    border: var(--pixel-edge) solid var(--border-color);
+    border: var(--border-thickness) solid var(--border-color);
     margin: 20px auto;
     max-width: 600px;
     padding: 30px;
-    border-radius: var(--border-radius);
+    border-radius: var(--radius-lg);
     box-shadow: var(--box-shadow-soft);
 }
 
 .center-me-pls h3 {
     color: var(--color);
     margin-bottom: 15px;
-    text-shadow: 2px 2px 0 rgba(0, 0, 0, 0.5);
 }
 
 .account-layout {
@@ -426,9 +418,9 @@ form p a {
 .account-sidebar {
     flex: 0 0 200px;
     background-color: var(--card-bg);
-    border: var(--pixel-edge) solid var(--card-border);
+    border: var(--border-thickness) solid var(--card-border);
     padding: 20px;
-    border-radius: var(--border-radius);
+    border-radius: var(--radius-lg);
     box-shadow: var(--box-shadow-soft);
 }
 
@@ -441,34 +433,35 @@ form p a {
 .sidebar-tab {
     width: 100%;
     text-align: left;
-    background-color: var(--bg-secondary);
-    border: var(--pixel-edge) solid var(--border-color);
-    color: var(--color);
+    background-color: transparent;
+    border: var(--border-thickness) solid transparent;
+    color: var(--color-secondary);
     box-shadow: none;
     text-transform: none;
     padding: 10px 14px;
-    border-radius: var(--border-radius);
+    border-radius: var(--radius-sm);
 }
 
 .sidebar-tab:hover {
     background-color: var(--bg-hover);
+    color: var(--color);
     transform: none;
     box-shadow: none;
 }
 
 .sidebar-tab.active {
-    background: linear-gradient(180deg, var(--button-bg) 0%, var(--button-gradient) 100%);
-    color: var(--button-text);
-    border-color: var(--button-border);
+    background: var(--accent-soft);
+    color: var(--accent);
+    border-color: transparent;
 }
 
 .account-content {
     flex: 1;
     background-color: var(--card-bg);
-    border: var(--pixel-edge) solid var(--card-border);
+    border: var(--border-thickness) solid var(--card-border);
     padding: 28px;
     min-width: 0;
-    border-radius: var(--border-radius);
+    border-radius: var(--radius-lg);
     box-shadow: var(--box-shadow-soft);
 }
 
@@ -491,10 +484,10 @@ form p a {
 
 .hero {
     background-color: var(--card-bg);
-    border: var(--pixel-edge) solid var(--card-border);
+    border: var(--border-thickness) solid var(--card-border);
     padding: 50px 30px;
     margin-bottom: 40px;
-    border-radius: var(--border-radius);
+    border-radius: var(--radius-lg);
     box-shadow: var(--box-shadow-soft);
 }
 
@@ -502,12 +495,12 @@ form p a {
     max-width: 400px;
     margin-bottom: 25px;
     width: 352px;
-    image-rendering: pixelated;
 }
 
 .hero h1 {
     font-size: 36px;
     margin-bottom: 15px;
+    letter-spacing: -0.5px;
 }
 
 .hero-subtitle {
@@ -529,23 +522,23 @@ form p a {
 a.button {
     display: inline-block;
     padding: 10px 20px;
-    background: linear-gradient(180deg, var(--button-bg) 0%, var(--button-gradient) 100%);
+    background: var(--button-bg);
     color: var(--button-text);
-    border: var(--pixel-edge) solid var(--button-border);
-    font-family: "Unscii 16 Full", monospace;
+    border: var(--border-thickness) solid var(--button-border);
+    font-family: 'Figtree', sans-serif;
     font-size: 15px;
+    font-weight: 600;
     text-decoration: none;
     text-transform: none;
-    letter-spacing: 0.5px;
-    box-shadow: var(--box-shadow-soft);
-    transition: none;
-    border-radius: var(--border-radius);
+    letter-spacing: 0;
+    box-shadow: none;
+    transition: var(--transition);
+    border-radius: var(--radius-sm);
 }
 
 a.button:hover {
-    background: linear-gradient(180deg, var(--button-hover) 0%, var(--button-gradient-hover) 100%);
-    transform: translate(-2px, -2px);
-    box-shadow: var(--box-shadow-hover);
+    background: var(--button-hover);
+    box-shadow: var(--box-shadow-soft);
     text-decoration: none;
 }
 
@@ -553,11 +546,11 @@ a.button.secondary {
     background: var(--bg-secondary);
     color: var(--color);
     border-color: var(--border-color);
-    box-shadow: var(--box-shadow-soft);
+    box-shadow: none;
 }
 
 a.button.secondary:hover {
-    background-color: var(--card-bg);
+    background-color: var(--bg-hover);
 }
 
 /* Features grid */
@@ -571,11 +564,11 @@ a.button.secondary:hover {
 
 .feature {
     background-color: var(--card-bg);
-    border: var(--pixel-edge) solid var(--card-border);
+    border: var(--border-thickness) solid var(--card-border);
     padding: 25px;
     text-align: center;
-    transition: none;
-    border-radius: var(--border-radius);
+    transition: var(--border-hover-transition);
+    border-radius: var(--radius-lg);
     box-shadow: var(--box-shadow-soft);
 }
 
@@ -588,10 +581,9 @@ a.button.secondary:hover {
     width: 80px;
     height: 80px;
     margin-bottom: 15px;
-    border: var(--pixel-edge) solid var(--border-color);
+    border: var(--border-thickness) solid var(--border-color);
     object-fit: cover;
-    border-radius: var(--border-radius);
-    image-rendering: pixelated;
+    border-radius: var(--radius-md);
 }
 
 .feature h2 {
@@ -608,9 +600,9 @@ a.button.secondary:hover {
 
 .cta {
     background-color: var(--card-bg);
-    border: var(--pixel-edge) solid var(--card-border);
+    border: var(--border-thickness) solid var(--card-border);
     padding: 40px 30px;
-    border-radius: var(--border-radius);
+    border-radius: var(--radius-lg);
     box-shadow: var(--box-shadow-soft);
 }
 
@@ -632,10 +624,10 @@ a.button.secondary:hover {
     justify-content: space-between;
     gap: 20px;
     background-color: var(--card-bg);
-    border: var(--pixel-edge) solid var(--card-border);
+    border: var(--border-thickness) solid var(--card-border);
     padding: 25px 30px;
     margin-bottom: 30px;
-    border-radius: var(--border-radius);
+    border-radius: var(--radius-lg);
     box-shadow: var(--box-shadow-soft);
 }
 
@@ -643,9 +635,8 @@ a.button.secondary:hover {
     width: 80px;
     height: 80px;
     object-fit: cover;
-    border: var(--pixel-edge) solid var(--border-color);
-    border-radius: var(--border-radius);
-    image-rendering: pixelated;
+    border: var(--border-thickness) solid var(--border-color);
+    border-radius: var(--radius-md);
 }
 
 .server-header h1 {
@@ -653,6 +644,7 @@ a.button.secondary:hover {
     text-align: center;
     margin: 0;
     font-size: 32px;
+    letter-spacing: -0.5px;
 }
 
 .server-header-actions {
@@ -674,27 +666,28 @@ a.button.secondary:hover {
 .server-main {
     flex: 2;
     background-color: var(--card-bg);
-    border: var(--pixel-edge) solid var(--card-border);
+    border: var(--border-thickness) solid var(--card-border);
     min-width: 0;
-    border-radius: var(--border-radius);
+    border-radius: var(--radius-lg);
     box-shadow: var(--box-shadow-soft);
+    overflow: hidden;
 }
 
 .server-tabs {
     display: flex;
-    border-bottom: var(--pixel-edge) solid var(--border-color);
+    border-bottom: var(--border-thickness) solid var(--border-color);
 }
 
 .server-tab {
     flex: 1;
-    background-color: var(--bg-secondary);
+    background-color: transparent;
     border: none;
-    border-right: var(--pixel-edge) solid var(--border-color);
-    color: var(--color);
+    border-right: var(--border-thickness) solid var(--border-color);
+    color: var(--color-secondary);
     box-shadow: none;
     text-transform: none;
     padding: 12px 18px;
-    border-radius: var(--border-radius);
+    border-radius: 0;
 }
 
 .server-tab:last-child {
@@ -703,13 +696,14 @@ a.button.secondary:hover {
 
 .server-tab:hover {
     background-color: var(--bg-hover);
+    color: var(--color);
     transform: none;
     box-shadow: none;
 }
 
 .server-tab.active {
-    background: linear-gradient(180deg, var(--button-bg) 0%, var(--button-gradient) 100%);
-    color: var(--button-text);
+    background: var(--accent-soft);
+    color: var(--accent);
 }
 
 .server-main .tab-panel {
@@ -719,10 +713,10 @@ a.button.secondary:hover {
 .server-sidebar {
     flex: 1;
     background-color: var(--card-bg);
-    border: var(--pixel-edge) solid var(--card-border);
+    border: var(--border-thickness) solid var(--card-border);
     padding: 25px;
     min-width: 240px;
-    border-radius: var(--border-radius);
+    border-radius: var(--radius-lg);
     box-shadow: var(--box-shadow-soft);
 }
 
@@ -738,7 +732,9 @@ a.button.secondary:hover {
 
 .server-sidebar li {
     padding: 8px 0;
-    border-bottom: var(--pixel-edge) solid var(--border-color);
+    border-bottom: var(--border-thickness) solid var(--border-color);
+    display: flex;
+    flex-direction: column;
 }
 
 .server-sidebar li:last-child {
@@ -754,7 +750,7 @@ a.button.secondary:hover {
     flex: 1;
     text-align: center;
     font-size: 32px;
-    font-weight: 600;
+    font-weight: 700;
     padding: 10px;
     margin: 0 20px;
 }
@@ -770,11 +766,6 @@ a.button.secondary:hover {
 .server-main textarea {
     min-height: 200px;
     resize: vertical;
-}
-
-.server-sidebar li {
-    display: flex;
-    flex-direction: column;
 }
 
 .server-sidebar input[type="checkbox"] {
@@ -804,19 +795,23 @@ a.button.secondary:hover {
     gap: 15px;
     padding: 15px;
     background-color: var(--card-bg);
-    border: var(--pixel-edge) solid var(--card-border);
+    border: var(--border-thickness) solid var(--card-border);
     margin-bottom: 15px;
-    border-radius: var(--border-radius);
+    border-radius: var(--radius-lg);
     box-shadow: var(--box-shadow-soft);
+    transition: var(--border-hover-transition);
+}
+
+.server-list-item:hover {
+    border-color: var(--accent);
 }
 
 .server-list-icon {
     width: 48px;
     height: 48px;
     object-fit: cover;
-    border: var(--pixel-edge) solid var(--border-color);
-    border-radius: var(--border-radius);
-    image-rendering: pixelated;
+    border: var(--border-thickness) solid var(--border-color);
+    border-radius: var(--radius-sm);
 }
 
 .server-list-name {
@@ -841,12 +836,13 @@ a.button.secondary:hover {
 }
 
 .button.danger {
-    background: linear-gradient(180deg, #c0392b 0%, #a93226 100%);
+    background: var(--red-2, #bf616a);
     color: #fff;
+    border-color: transparent;
 }
 
 .button.danger:hover {
-    background: linear-gradient(180deg, #a93226 0%, #922b21 100%);
+    background: var(--red-4, #b5535c);
 }
 
 /* --- TABLES --- */
@@ -856,15 +852,15 @@ table {
     border-collapse: separate;
     border-spacing: 0;
     background-color: var(--card-bg);
-    border: var(--pixel-edge) solid var(--card-border);
-    border-radius: var(--border-radius);
+    border: var(--border-thickness) solid var(--card-border);
+    border-radius: var(--radius-lg);
     overflow: hidden;
     box-shadow: var(--box-shadow-soft);
     text-align: left;
 }
 
 table thead {
-    background: linear-gradient(180deg, var(--header-color) 0%, var(--header-gradient) 100%);
+    background: var(--header-color);
 }
 
 table thead th {
@@ -872,36 +868,20 @@ table thead th {
     color: var(--color);
     font-weight: 600;
     font-size: 14px;
-    letter-spacing: 0.3px;
-    border-bottom: var(--pixel-edge) solid var(--border-color);
+    letter-spacing: 0;
+    border-bottom: var(--border-thickness) solid var(--border-color);
     white-space: nowrap;
-}
-
-table thead th:first-child {
-    border-top-left-radius: var(--border-radius);
-}
-
-table thead th:last-child {
-    border-top-right-radius: var(--border-radius);
 }
 
 table tbody td {
     padding: 12px 16px;
     color: var(--color);
-    border-bottom: var(--pixel-edge) solid var(--border-color);
-    transition: none;
+    border-bottom: var(--border-thickness) solid var(--border-color);
+    transition: var(--transition);
 }
 
 table tbody tr:last-child td {
     border-bottom: none;
-}
-
-table tbody tr:last-child td:first-child {
-    border-bottom-left-radius: var(--border-radius);
-}
-
-table tbody tr:last-child td:last-child {
-    border-bottom-right-radius: var(--border-radius);
 }
 
 table tbody tr:hover td {
@@ -953,10 +933,10 @@ table caption {
 
 .badge-suspended {
     color: #fff;
-    background: var(--color-danger, #c0392b);
+    background: var(--red-2, #bf616a);
     padding: 2px 8px;
-    border-radius: 0;
-    border: var(--pixel-edge) solid rgba(0, 0, 0, 0.35);
+    border-radius: var(--radius-sm);
+    border: none;
     font-size: 12px;
 }
 

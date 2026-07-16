@@ -1,28 +1,32 @@
-/* dark.css - blue theme */
+/* dark.css - blue theme (midnight-refactored) */
 :root {
     --bg: #0d1b2a;
     --bg-secondary: #1b263b;
-    --bg-hover: #26334d;
+    --bg-hover: rgba(74, 144, 226, 0.10);   /* subtle translucent hover, midnight-style */
     --card-bg: #152238;
     --header-color: #1b263b;
-    --header-gradient: #0d1b2a;
+    --header-gradient: #0d1b2a;             /* kept for compatibility */
     --color: #e0e6f0;
     --color-secondary: #8da2c0;
-    --border-color: #2c3e5c;
-    --card-border: #2c3e5c;
+    --border-color: rgba(141, 162, 192, 0.14);  /* soft translucent border */
+    --card-border: rgba(141, 162, 192, 0.14);
     --primary-brown: #3a86ff;
     --accent: #4a90e2;
-    --accent-soft: rgba(74, 144, 226, 0.25);
-    --link-color: #4a90e2;
-    --link-hover: #6ba8ff;
+    --accent-soft: rgba(74, 144, 226, 0.18);
+    --link-color: #6ba8ff;
+    --link-hover: #8fc0ff;
     --button-bg: #3a86ff;
-    --button-gradient: #2f6fd6;
+    --button-gradient: #2f6fd6;             /* kept for compatibility */
     --button-gradient-hover: #2860bd;
     --button-hover: #4d94ff;
     --button-text: #ffffff;
-    --button-border: #2f6fd6;
-    --button-shadow: #2860bd;
-    --players-color: #4a90e2;
+    --button-border: transparent;
+    --button-shadow: rgba(0, 0, 0, 0.25);
+    --players-color: #6ba8ff;
     --event-bg: #3a86ff;
     --event-text: #ffffff;
+
+    /* danger / status helpers (Nord-inspired, referenced by main CSS) */
+    --red-2: #bf616a;
+    --red-4: #b5535c;
 }
