@@ -1194,3 +1194,39 @@ func (a *App) ServerListGET(w http.ResponseWriter, r *http.Request) {
 
 	a.render(w, r, http.StatusOK, "list.html", data)
 }
+
+// ToggleTheme toggles the "light-mode" cookie on every request.
+// - empty/unset -> "true"
+// - "true"      -> "false"
+// - "false"     -> "true"
+func (a *App) ToggleTheme(w http.ResponseWriter, r *http.Request) {
+	// Default value when the cookie is missing or empty.
+	next := "true"
+
+	if cookie, err := r.Cookie("light-mode"); err == nil {
+		switch cookie.Value {
+		case "true":
+			next = "false"
+		case "false":
+			next = "true"
+		default:
+			// Any other/empty value falls back to "true".
+			next = "true"
+		}
+	}
+
+	http.SetCookie(w, &http.Cookie{
+		Name:     "light-mode",
+		Value:    next,
+		Path:     "/",
+		HttpOnly: false, // must be readable by client-side JS (getCookie)
+		SameSite: http.SameSiteLaxMode,
+	})
+
+	// Send the user back where they came from, or to home.
+	referer := r.Header.Get("Referer")
+	if referer == "" {
+		referer = "/"
+	}
+	http.Redirect(w, r, referer, http.StatusSeeOther)
+}

@@ -83,6 +83,9 @@ func main() {
 	// list
 	mux.HandleFunc("GET /list", app.ServerListGET)
 
+	// theme toggler
+	mux.HandleFunc("/theme", app.ToggleTheme)
+
 	app.Log.Info(fmt.Sprintf("Listening on port %s", *port))
 	err = http.ListenAndServe(*port, handler)
 	if err != nil {

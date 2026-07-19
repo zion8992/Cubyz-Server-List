@@ -37,7 +37,7 @@
 
 /** GENERAL ELEMENTS **/
 body {
-    font-family: 'Figtree', sans-serif;
+    font-family: 'Source Code Pro', sans-serif;
     background-color: var(--bg);
     color: var(--color);
     text-align: center;
