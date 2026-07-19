@@ -30,6 +30,7 @@ type User struct {
 	Pubkey              string
 	PrivLevel           string
 	AccountSuspended    bool
+	TOTPSecret          string
 }
 
 type Server struct {

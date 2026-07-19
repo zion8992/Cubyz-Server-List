@@ -2,8 +2,14 @@ package main
 
 import (
 	"bufio"
+	"bytes" // required for TOTP
+	"database/sql"
+	"encoding/base64" // required for TOTP
 	"errors"
 	"fmt"
+	"github.com/pquerna/otp/totp" // required for TOTP
+	"html/template"
+	"image/png" // required for TOTP
 	"io"
 	"net/http"
 	"regexp"
@@ -302,3 +308,68 @@ func (a *App) CheckMediumString(str string) bool { return tooLong(str, maxMedium
 func (a *App) CheckPubkeyString(str string) bool { return tooLong(str, maxPubkeyLen) }
 func (a *App) CheckSmallString(str string) bool  { return tooLong(str, maxSmallLen) }
 func (a *App) CheckLargeString(str string) bool  { return tooLong(str, maxLargeLen) }
+
+// 'PageData2FA' holds what to show on the 2fa activation page
+type PageData2FA struct {
+	Secret    string       // the manual-entry key (copy/paste) for nerds
+	QRDataURI template.URL // a ready-to-use <img src="..."> value
+}
+
+// GenerateTOTP creates a new TOTP key for the user, persists the secret,
+// and returns the secret string + a base64 PNG QR code data URI.
+func (a *App) GenerateTOTP(userID uint64, userEmail string) (*PageData2FA, error) {
+	// 1. Generate the key.
+	key, err := totp.Generate(totp.GenerateOpts{
+		Issuer:      "Ironite - Cubyz Server List", // shown in the authenticator app
+		AccountName: userEmail,                     // shown under the issuer
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	// 2. Persist the secret in the DB (raw base32, not hashed).
+	if err := a.SaveTOTPSecret(userID, key.Secret()); err != nil {
+		return nil, err
+	}
+
+	// 3. Build a PNG QR code and encode it as a data URI for the browser.
+	img, err := key.Image(256, 256)
+	if err != nil {
+		return nil, err
+	}
+
+	var buf bytes.Buffer
+	if err := png.Encode(&buf, img); err != nil {
+		return nil, err
+	}
+	dataURI := "data:image/png;base64," +
+		base64.StdEncoding.EncodeToString(buf.Bytes())
+
+	return &PageData2FA{
+		Secret:    key.Secret(), // for the "type it in manually" folks
+		QRDataURI: template.URL(dataURI),
+	}, nil
+}
+
+// VerifyTOTP loads the user's stored secret and checks the submitted code.
+func (a *App) VerifyTOTP(userID uint64, code string) (bool, error) {
+	// 1. Load the stored secret.
+	var secret string
+	err := a.DB.QueryRow(
+		`SELECT totp_secret FROM users WHERE id = ?`,
+		userID,
+	).Scan(&secret)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return false, nil // no user
+		}
+		return false, err
+	}
+	if secret == "" {
+		return false, nil // user hasn't set up 2FA
+	}
+
+	// 2. Validate the code against the secret.
+	valid := totp.Validate(code, secret)
+	return valid, nil
+}

@@ -18,6 +18,7 @@ CREATE TABLE users (
   pubkey TEXT NULL,
   priv_level TEXT NULL,
   pronouns VARCHAR(50) NULL,
+  totp_secret VARCHAR(64) NULL,
   account_suspended BOOL NOT NULL DEFAULT FALSE                
 );
 

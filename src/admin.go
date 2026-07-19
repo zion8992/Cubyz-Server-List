@@ -7,7 +7,6 @@ import (
 	"strings"
 )
 
-
 func (a *App) AdminPanel(w http.ResponseWriter, r *http.Request) {
 	ok, err := a.CheckReqSessionTok(r)
 	if err != nil || !ok {
@@ -200,7 +199,6 @@ func (a *App) AdminPanel(w http.ResponseWriter, r *http.Request) {
 	a.render(w, r, http.StatusOK, "admin_panel.html", data)
 }
 
-
 func (a *App) AdminSuspendUser(w http.ResponseWriter, r *http.Request) {
 	ok, err := a.CheckReqSessionTok(r)
 	if err != nil || !ok {
@@ -245,7 +243,7 @@ func (a *App) AdminSuspendUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	suspendedUser := User {
+	suspendedUser := User{
 		ID: targetID,
 	}
 

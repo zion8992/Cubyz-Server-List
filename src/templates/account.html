@@ -81,15 +81,19 @@
 
 		<div class="tab-panel" id="tab-security">
 			<h2>Security</h2>
-			<h4>Change Password</h4><br><br>
+			<h4>Change Password</h4><br>
 			<form method="POST" action="/account-changepass">
 				<input type="hidden" name="csrf_token" value="{{ .Page.CSRFToken}}">
 				<input type="text" name="oldPass" placeholder="Old Password" required />
 				<input type="text" name="newPass" placeholder="New Password" required />
 				<button type="submit">Change Password</button>
 			</form><br><br>
-			<h4>Setup 2FA</h4>
-			<p>Work in Progress!</p>
+			<h4>Setup 2FA</h4><br>
+			{{ if .TOTPSecret }}
+			<p>2FA has already been setup on this account.</p>
+			{{ else }}
+			<a href="/account-2fa" class="button">Setup 2FA</a>
+			{{ end }}
 		</div>
 
 		<div class="tab-panel" id="tab-verify">

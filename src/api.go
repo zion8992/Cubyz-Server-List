@@ -1,11 +1,11 @@
 package main
 
 import (
+	"encoding/json"
 	"errors"
 	"github.com/go-sql-driver/mysql"
 	"net/http"
 	"strconv"
-	"encoding/json"
 )
 
 // Max servers returned per page by the public API.

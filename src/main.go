@@ -55,6 +55,7 @@ func main() {
 	mux.HandleFunc("POST /account-delete-forever-and-ever", app.DeleteAccountPOST)
 	mux.HandleFunc("GET /api/v1/create-token-ui", app.CreateTokenUI)
 	mux.HandleFunc("POST /account-changepass", app.AccountChangePassPOST)
+	mux.HandleFunc("GET /account-2fa", app.Enable2faGET)
 
 	// semi-static pages
 	mux.HandleFunc("/", app.SlashHandler)

@@ -1,0 +1,7 @@
+{{ define "content" }}
+<p>Scan this with your authenticator app:</p><br><br>
+<img src="{{ .PageData2FA.QRDataURI }}" alt="2FA QR code" width="256" height="256">
+
+<p>Or enter this key manually:</p><br><br>
+<code>{{ .PageData2FA.Secret }}</code>
+{{ end }}

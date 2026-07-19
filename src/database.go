@@ -16,7 +16,6 @@ const AdminUsersPerPage = 20
 const ServersPerPage = 5
 const AdminServersPerPage = 20
 
-
 /**
 This file contains:
 
@@ -63,13 +62,13 @@ func (a *App) CreateUser(u User) (int64, error) {
 
 func (a *App) GetUser(id uint64) (*User, error) {
 	var u User
-	var profilePictureURL, description, pronouns, pubkey, privLevel sql.NullString
+	var profilePictureURL, description, pronouns, pubkey, privLevel, totpSecret sql.NullString
 	var sessionToken sql.NullString
 	var sessionTokenExpires sql.NullTime
 
 	err := a.DB.QueryRow(
 		`SELECT id,username,email,password,date_created,session_token,session_token_expires,
-			profile_picture_url, description, pronouns, pubkey, priv_level, account_suspended
+			profile_picture_url, description, pronouns, pubkey, priv_level, account_suspended, totp_secret
 		 FROM users WHERE id=?`,
 		id,
 	).Scan(
@@ -86,6 +85,7 @@ func (a *App) GetUser(id uint64) (*User, error) {
 		&pubkey,
 		&privLevel,
 		&u.AccountSuspended,
+		&totpSecret,
 	)
 
 	u.SessionToken = sessionToken.String
@@ -95,6 +95,7 @@ func (a *App) GetUser(id uint64) (*User, error) {
 	u.Pronouns = pronouns.String
 	u.Pubkey = pubkey.String
 	u.PrivLevel = privLevel.String
+	u.TOTPSecret = totpSecret.String
 
 	return &u, err
 }
@@ -683,4 +684,34 @@ func (a *App) ListServersAdmin(f ServerFilter) ([]Server, error) {
 		servers = append(servers, *s)
 	}
 	return servers, nil
+}
+
+// saves the secret against the user row.
+func (a *App) SaveTOTPSecret(userID uint64, secret string) error {
+	_, err := a.DB.Exec(
+		`UPDATE users SET totp_secret = ? WHERE id = ?`,
+		secret, userID,
+	)
+	return err
+}
+
+// DoesUserHave2FA reports whether the given user has a TOTP secret stored
+// (i.e. 2FA has been set up). Returns true if the secret exists and
+// is non-empty, false otherwise.
+func (a *App) DoesUserHave2FA(userID uint64) (bool, error) {
+	var secret sql.NullString
+	err := a.DB.QueryRow(
+		`SELECT totp_secret FROM users WHERE id = ?`,
+		userID,
+	).Scan(&secret)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return false, nil // no such user
+		}
+		return false, err
+	}
+
+	// Valid == false means the column was NULL.
+	// Also treat an empty string as "not set".
+	return secret.Valid && secret.String != "", nil
 }

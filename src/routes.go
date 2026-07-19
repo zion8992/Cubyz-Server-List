@@ -215,6 +215,27 @@ func (a *App) LoginPOST(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Check if user has 2FA enabled
+	ok, err = a.DoesUserHave2FA(id)
+	if err != nil {
+		a.Error(w, r, "Failed to check if 2FA is enabled for this user: "+err.Error())
+		return
+	}
+	if ok {
+		// Verify code since 2FA IS ENABLED
+		code := r.FormValue("sixDigit")
+		ok, err = a.VerifyTOTP(id, code)
+		if err != nil {
+			a.Error(w, r, "Failed to verify your TOTP code: "+err.Error())
+			return
+		}
+
+		if !ok {
+			a.Error(w, r, "Invalid 2FA code. Try again, if the issue persists contact the server list support.")
+			return
+		}
+	}
+
 	var token string
 	token, err = a.GenerateSessionToken()
 	if err != nil {
@@ -281,6 +302,42 @@ func (a *App) AccountGET(w http.ResponseWriter, r *http.Request) {
 	}
 
 	a.render(w, r, http.StatusOK, "account.html", data)
+}
+
+func (a *App) Enable2faGET(w http.ResponseWriter, r *http.Request) {
+	ok, err := a.CheckReqSessionTok(r)
+	if err != nil || !ok {
+		http.Redirect(w, r, "/login", http.StatusSeeOther)
+		return
+	}
+
+	uid, err := a.GetUIDFromToken(getSessionCookie(r))
+	if err != nil {
+		a.Error(w, r, "Failed to identify user: "+err.Error())
+		return
+	}
+
+	user, err := a.GetUser(uid)
+	if err != nil {
+		a.Error(w, r, "Failed to load user: "+err.Error())
+		return
+	}
+
+	pg, err := a.GenerateTOTP(uid, user.Email)
+	if err != nil {
+		a.Error(w, r, "Failed to setup 2FA for your account: "+err.Error())
+		return
+	}
+
+	data := struct {
+		Page
+		PageData2FA
+	}{
+		Page:        Page{IsLoggedIn: true, CSRFToken: a.GetCSRFTokenFromRequest(r)},
+		PageData2FA: *pg,
+	}
+
+	a.render(w, r, http.StatusOK, "activate-2fa.html", data)
 }
 
 func (a *App) AccountPOST(w http.ResponseWriter, r *http.Request) {
@@ -889,7 +946,6 @@ func (a *App) ServerEditPOST(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	}
-
 
 	s := Server{
 		ID:           id,
