@@ -323,6 +323,44 @@ func (a *App) Enable2faGET(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	data := struct {
+		Page
+		User
+	}{
+		Page:        Page{IsLoggedIn: true, CSRFToken: a.GetCSRFTokenFromRequest(r)},
+		User: *user,
+	}
+
+	a.render(w, r, http.StatusOK, "enable-2fa.html", data)
+}
+
+func (a *App) Enable2faPOST(w http.ResponseWriter, r *http.Request) {
+	ok, err := a.CheckReqSessionTok(r)
+	if err != nil || !ok {
+		http.Redirect(w, r, "/login", http.StatusSeeOther)
+		return
+	}
+
+	uid, err := a.GetUIDFromToken(getSessionCookie(r))
+	if err != nil {
+		a.Error(w, r, "Failed to identify user: "+err.Error())
+		return
+	}
+
+	r.ParseForm()
+	password := r.FormValue("password")
+
+	user, err := a.GetUser(uid)
+	if err != nil {
+		a.Error(w, r, "Failed to load user: "+err.Error())
+		return
+	}
+
+	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password)); err != nil {
+		a.Error(w, r, "Invalid Password.")
+		return
+	}
+
 	pg, err := a.GenerateTOTP(uid, user.Email)
 	if err != nil {
 		a.Error(w, r, "Failed to setup 2FA for your account: "+err.Error())
@@ -337,7 +375,7 @@ func (a *App) Enable2faGET(w http.ResponseWriter, r *http.Request) {
 		PageData2FA: *pg,
 	}
 
-	a.render(w, r, http.StatusOK, "activate-2fa.html", data)
+	a.render(w, r, http.StatusOK, "2fa-secret.html", data)
 }
 
 func (a *App) AccountPOST(w http.ResponseWriter, r *http.Request) {
@@ -1050,6 +1088,9 @@ func (a *App) ApiCreateTokenHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	owned, err := a.IsServerOwnedByUser(serverID, uid) // ensure the user is creating a token for a server they own
+	if err != nil || !owned { a.Error(w, r, "Server not found."); return }
+
 	typ := r.FormValue("typ")
 	name := strings.TrimSpace(r.FormValue("name"))
 
@@ -1068,7 +1109,7 @@ func (a *App) ApiCreateTokenHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	tokenHash, err := generateToken(15)
+	tokenHash, err := generateToken(32)
 	if err != nil {
 		a.Error(w, r, "Failed to generate token hash: "+err.Error())
 		return

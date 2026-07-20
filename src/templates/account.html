@@ -90,14 +90,22 @@
 			</form><br><br>
 			<h4>Setup 2FA</h4><br>
 			{{ if .TOTPSecret }}
-			<p>2FA has already been setup on this account.</p>
+			<p>2FA has already been setup on this account.</p><br>
+			<a href="/account-2fa" class="button">Reset 2FA</a>
+			<!--
+			<a href="/account-2fa-disable" class="button danger">Disable 2FA</a>
+			-->
 			{{ else }}
 			<a href="/account-2fa" class="button">Setup 2FA</a>
 			{{ end }}
 		</div>
 
 		<div class="tab-panel" id="tab-verify">
+			{{ if .Pubkey }}
+			<h2>Public Key</h2>
+			{{ else }}
 			<h2>Verify Account</h2>
+			{{ end }}
 			<form method="POST" action="/account-verify">
 				<input type="hidden" name="csrf_token" value="{{ .Page.CSRFToken}}">
 				<p>To verify your account, enter your Cubyz public key in the textarea below. <br> You can find your public key in <b>Settings</b> -> <b>Social</b> -> <b>Copy Public Key</b></p>
@@ -145,7 +153,7 @@
 				{{ end }}
 			</ul>
 			{{ else }}
-			<p class="empty">You don't have any servers yet.</p>
+			<p class="empty">You don't have any tokens yet.</p>
 			{{ end }}
 		</div>
 	</section>

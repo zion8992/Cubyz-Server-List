@@ -715,3 +715,15 @@ func (a *App) DoesUserHave2FA(userID uint64) (bool, error) {
 	// Also treat an empty string as "not set".
 	return secret.Valid && secret.String != "", nil
 }
+
+func (a *App) IsServerOwnedByUser(serverID uint64, uid uint64) (bool, error) {
+	var owned bool
+	err := a.DB.QueryRow(
+		"SELECT EXISTS(SELECT 1 FROM servers WHERE id = ? AND owner_id = ?)",
+		serverID, uid,
+	).Scan(&owned)
+	if err != nil {
+		return false, err
+	}
+	return owned, nil
+}

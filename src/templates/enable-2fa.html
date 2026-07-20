@@ -1,0 +1,13 @@
+{{ define "content" }}
+<h2>Enable 2FA</h2>
+<p>Get your Authenticator app ready.</p><br>
+{{ if .User.TOTPSecret }}
+<h3>WARNING! 2FA is already enabled on this account, ensure you update your 2FA on all authenticators.</h3>
+{{ end }}
+<form action="/account-2fa-enable" method="POST">
+    <input type="password" placeholder="Password" name="password" required />
+    <input type="hidden" name="csrf_token" value="{{.CSRFToken}}">
+    <button type="submit">Reset 2FA</button> 
+    <a href="/account" class="button">Cancel</a>
+</form>
+{{ end }}
