@@ -109,7 +109,7 @@ func (a *App) ApiServerOn(serverID uint64) error {
 
 func (a *App) ApiServerOff(serverID uint64) error {
 	_, err := a.DB.Exec(
-		"UPDATE servers SET last_spark = CURRENT_TIMESTAMP WHERE id = ?",
+		"UPDATE servers SET last_spark = NULL, playercount = 0 WHERE id = ?",
 		serverID,
 	)
 	return err

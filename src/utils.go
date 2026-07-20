@@ -101,14 +101,15 @@ func (a *App) ValidateFormFields(username, password, email string, validatePassw
 			return false, errors.New("invalid password format")
 		}
 
-		// Email:
-		// - no spaces or backslashes before @
-		// - simple <abc>@<whatever>.<domain>
-		emailRegex := regexp.MustCompile(`^[^\\\s@]+@[^@\s]+\.[^@\s]+$`)
+	}
 
-		if !emailRegex.MatchString(email) {
-			return false, errors.New("invalid email format")
-		}
+	// Email:
+	// - no spaces or backslashes before @
+	// - simple <abc>@<whatever>.<domain>
+	emailRegex := regexp.MustCompile(`^[^\\\s@]+@[^@\s]+\.[^@\s]+$`)
+
+	if !emailRegex.MatchString(email) {
+		return false, errors.New("invalid email format")
 	}
 
 	return true, nil
@@ -143,9 +144,14 @@ func (a *App) HasSessionToken(r *http.Request) bool {
 		return false
 	}
 
-	_, err = a.CheckReqSessionTok(r)
+	var ok bool
+	ok, err = a.CheckReqSessionTok(r)
 	if err != nil {
 		fmt.Printf("Failed to check users session token: %s\n", err.Error())
+		return false
+	}
+
+	if !ok {
 		return false
 	}
 

@@ -27,17 +27,6 @@ func main() {
 	staticFileServer := http.FileServer(http.FS(staticSubFS))
 	mux.Handle("/static/", http.StripPrefix("/static/", staticFileServer))
 
-	mux.HandleFunc("GET /debug/static", func(w http.ResponseWriter, r *http.Request) {
-		fs.WalkDir(staticFS, ".", func(path string, d fs.DirEntry, err error) error {
-			if err != nil {
-				fmt.Fprintln(w, "err:", err)
-				return nil
-			}
-			fmt.Fprintln(w, path)
-			return nil
-		})
-	})
-
 	// auth
 	mux.HandleFunc("GET /register", app.RegisterGET)
 	mux.HandleFunc("POST /register", app.RegisterPOST)

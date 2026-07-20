@@ -176,6 +176,10 @@ func (a *App) LoginPOST(w http.ResponseWriter, r *http.Request) {
 		a.Error(w, r, "Invalid credentials")
 		return
 	}
+	if err != nil {
+		a.Error(w, r, "Failed to check user: "+err.Error())
+		return
+	}
 
 	if banned, word := a.CheckBanned(r.FormValue("username")); banned {
 		a.Error(w, r, "Username contains a banned word: "+word+" You will no longer be able to login into this acccount.")
@@ -184,11 +188,6 @@ func (a *App) LoginPOST(w http.ResponseWriter, r *http.Request) {
 
 	if a.CheckTinyString(r.FormValue("username")) {
 		a.Error(w, r, "Username too long. Max characters is 20. You will no longer be able to login into this account.")
-		return
-	}
-
-	if err != nil {
-		a.Error(w, r, "Failed to check user: "+err.Error())
 		return
 	}
 
@@ -245,6 +244,10 @@ func (a *App) LoginPOST(w http.ResponseWriter, r *http.Request) {
 
 	expires := time.Now().Add(a.DefaultTokenExpiry)
 	err = a.SetSessionToken(id, token, expires)
+	if err != nil {
+		a.Error(w, r, "Failed to set your session token: "+err.Error())
+		return
+	}
 
 	c := http.Cookie{
 		Name:    "session_token",
@@ -327,7 +330,7 @@ func (a *App) Enable2faGET(w http.ResponseWriter, r *http.Request) {
 		Page
 		User
 	}{
-		Page:        Page{IsLoggedIn: true, CSRFToken: a.GetCSRFTokenFromRequest(r)},
+		Page: Page{IsLoggedIn: true, CSRFToken: a.GetCSRFTokenFromRequest(r)},
 		User: *user,
 	}
 
@@ -385,11 +388,6 @@ func (a *App) AccountPOST(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if banned, word := a.CheckBanned(r.FormValue("username")); banned {
-		a.Error(w, r, "Username contains a banned word: "+word+" You will no longer be able to login into this acccount.")
-		return
-	}
-
 	uid, err := a.GetUIDFromToken(getSessionCookie(r))
 	if err != nil {
 		a.Error(w, r, "Failed to identify user: "+err.Error())
@@ -407,6 +405,11 @@ func (a *App) AccountPOST(w http.ResponseWriter, r *http.Request) {
 	_, err = a.GetUserIDByUsername(r.FormValue("username"))
 	if err != nil && err != sql.ErrNoRows {
 		a.Error(w, r, "Failed to check user: "+err.Error())
+		return
+	}
+
+	if banned, word := a.CheckBanned(r.FormValue("username")); banned {
+		a.Error(w, r, "Username contains a banned word: "+word+" You will no longer be able to login into this acccount.")
 		return
 	}
 
@@ -432,8 +435,8 @@ func (a *App) AccountPOST(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if a.CheckTinyString(user.Email) {
-		a.Error(w, r, "Email too long. Max characters is 20.")
+	if a.CheckMediumString(user.Email) {
+		a.Error(w, r, "Email too long. Max characters is 52.")
 		return
 	}
 
@@ -612,6 +615,10 @@ func (a *App) DeleteAccountPOST(w http.ResponseWriter, r *http.Request) {
 
 	var servers []Server
 	servers, err = a.GetServersByUser(uid)
+	if err != nil {
+		a.Error(w, r, "Failed to get your servers: "+err.Error())
+		return
+	}
 	for _, s := range servers {
 		if err := a.DeleteServer(s.ID, uid); err != nil {
 			a.Log.Error("failed to delete server: ", err.Error())
@@ -621,6 +628,10 @@ func (a *App) DeleteAccountPOST(w http.ResponseWriter, r *http.Request) {
 
 	var tkns []Token
 	tkns, err = a.GetTokensFromUser(uid)
+	if err != nil {
+		a.Error(w, r, "Failed to get your tokens: "+err.Error())
+		return
+	}
 	for _, t := range tkns {
 		if err := a.ApiDeleteToken(t.ID); err != nil {
 			a.Log.Error("failed to delete token: ", err.Error())
@@ -1089,7 +1100,10 @@ func (a *App) ApiCreateTokenHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	owned, err := a.IsServerOwnedByUser(serverID, uid) // ensure the user is creating a token for a server they own
-	if err != nil || !owned { a.Error(w, r, "Server not found."); return }
+	if err != nil || !owned {
+		a.Error(w, r, "Server not found.")
+		return
+	}
 
 	typ := r.FormValue("typ")
 	name := strings.TrimSpace(r.FormValue("name"))
