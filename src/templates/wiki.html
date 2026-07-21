@@ -1,0 +1,33 @@
+{{ define "content" }}
+
+<div class="account-layout">
+	<aside class="account-sidebar">
+		<nav>
+			<button class="sidebar-tab active" data-tab="index">Index</button>
+			<button class="sidebar-tab" data-tab="sparkSetup">Setup Spark</button>
+            <button class="sidebar-tab" data-tab="fusionSetup">Setup Fusion</button>
+		</nav>
+	</aside>
+
+	<section class="account-content">
+		<div class="tab-panel active" id="tab-info">
+			<h2>Wiki</h2>
+			<p>Welcome to the Ironite wiki, a simple wiki with a bunch of guides on how to do Ironite-related things.</p>
+		</div>
+
+
+		<div class="tab-panel" id="tab-sparkSetup">
+			<h2>How to setup and run Spark</h2>
+		</div>
+
+
+		<div class="tab-panel" id="tab-fusionSetup">
+			<h2>How to Setup and Run Fusion</h2>
+
+			</div>
+	</section>
+</div>
+
+
+<script src="/static/js/sidebar.js"></script>
+{{ end }}
