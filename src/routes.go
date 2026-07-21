@@ -24,12 +24,6 @@ type Page struct {
 }
 
 func (a *App) SlashHandler(w http.ResponseWriter, r *http.Request) {
-	ok, err := a.CheckReqSessionTok(r)
-	if err != nil || ok {
-		http.Redirect(w, r, "/list", http.StatusSeeOther)
-		return
-	}
-
 	page := strings.TrimPrefix(r.URL.Path, "/")
 	if page == "" {
 		page = "home"
