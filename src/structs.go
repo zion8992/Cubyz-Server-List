@@ -13,6 +13,7 @@ type App struct {
 	BannedWords        map[string]struct{}
 	DefaultTokenExpiry time.Duration
 	TemplateCache      map[string]*template.Template
+	AppName string
 }
 
 type User struct {

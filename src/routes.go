@@ -15,6 +15,7 @@ type Page struct {
 	// Sessions
 	IsLoggedIn bool
 	CSRFToken  string
+	AppName string
 
 	// Theming
 	//Theme string // "light" or "dark"
@@ -36,6 +37,7 @@ func (a *App) SlashHandler(w http.ResponseWriter, r *http.Request) {
 
 	data := Page{
 		IsLoggedIn: a.HasSessionToken(r),
+		AppName: a.AppName,
 	}
 
 	a.render(w, r, http.StatusOK, page+".html", data)
@@ -91,7 +93,7 @@ func (a *App) LogoutHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	data := Page{IsLoggedIn: false}
+	data := Page{IsLoggedIn: false, AppName: a.AppName}
 	a.render(w, r, http.StatusOK, "loggedout.html", data)
 }
 
@@ -99,6 +101,7 @@ func (a *App) RegisterGET(w http.ResponseWriter, r *http.Request) {
 	data := Page{
 		IsLoggedIn: a.HasSessionToken(r),
 		CSRFToken:  a.GetCSRFTokenFromRequest(r),
+		AppName: a.AppName,
 	}
 
 	a.render(w, r, http.StatusOK, "register.html", data)
@@ -157,6 +160,7 @@ func (a *App) LoginGET(w http.ResponseWriter, r *http.Request) {
 	data := Page{
 		IsLoggedIn: a.HasSessionToken(r),
 		CSRFToken:  a.GetCSRFTokenFromRequest(r),
+		AppName: a.AppName,
 	}
 
 	a.render(w, r, http.StatusOK, "login.html", data)
@@ -292,7 +296,7 @@ func (a *App) AccountGET(w http.ResponseWriter, r *http.Request) {
 		Servers []Server
 		Tokens  []Token
 	}{
-		Page:    Page{IsLoggedIn: true, CSRFToken: a.GetCSRFTokenFromRequest(r)},
+		Page:    Page{IsLoggedIn: true, CSRFToken: a.GetCSRFTokenFromRequest(r), AppName: a.AppName},
 		User:    *user,
 		Servers: servers,
 		Tokens:  tokens,
@@ -324,7 +328,7 @@ func (a *App) Enable2faGET(w http.ResponseWriter, r *http.Request) {
 		Page
 		User
 	}{
-		Page: Page{IsLoggedIn: true, CSRFToken: a.GetCSRFTokenFromRequest(r)},
+		Page: Page{IsLoggedIn: true, CSRFToken: a.GetCSRFTokenFromRequest(r), AppName: a.AppName},
 		User: *user,
 	}
 
@@ -586,7 +590,7 @@ func (a *App) DeleteAccountGET(w http.ResponseWriter, r *http.Request) {
 		User
 		Servers []Server
 	}{
-		Page:    Page{IsLoggedIn: true, CSRFToken: a.GetCSRFTokenFromRequest(r)},
+		Page:    Page{IsLoggedIn: true, CSRFToken: a.GetCSRFTokenFromRequest(r), AppName: a.AppName},
 		User:    *user,
 		Servers: servers,
 	}
@@ -662,6 +666,7 @@ func (a *App) ServerCreateGET(w http.ResponseWriter, r *http.Request) {
 	data := Page{
 		IsLoggedIn: true,
 		CSRFToken:  a.GetCSRFTokenFromRequest(r),
+		AppName: a.AppName,
 	}
 
 	a.render(w, r, http.StatusOK, "server_create.html", data)
@@ -791,7 +796,7 @@ func (a *App) ServerInfo(w http.ResponseWriter, r *http.Request) {
 		IsOwner      bool
 		ServerStatus bool
 	}{
-		Page:         Page{IsLoggedIn: a.HasSessionToken(r)},
+		Page:         Page{IsLoggedIn: a.HasSessionToken(r), AppName: a.AppName},
 		Server:       *server,
 		User:         ownerUser,
 		IsOwner:      isOwner,
@@ -839,7 +844,7 @@ func (a *App) UserInfo(w http.ResponseWriter, r *http.Request) {
 		*User   // user on the page
 		Servers []Server
 	}{
-		Page:    Page{IsLoggedIn: a.HasSessionToken(r)},
+		Page:    Page{IsLoggedIn: a.HasSessionToken(r), AppName: a.AppName},
 		User:    user,
 		Servers: servers,
 	}
@@ -886,7 +891,7 @@ func (a *App) ServerEditGET(w http.ResponseWriter, r *http.Request) {
 		Page
 		Server
 	}{
-		Page:   Page{IsLoggedIn: true, CSRFToken: a.GetCSRFTokenFromRequest(r)},
+		Page:   Page{IsLoggedIn: true, CSRFToken: a.GetCSRFTokenFromRequest(r), AppName: a.AppName},
 		Server: *server,
 	}
 
@@ -1065,7 +1070,7 @@ func (a *App) CreateTokenUI(w http.ResponseWriter, r *http.Request) {
 		Page
 		Servers []Server
 	}{
-		Page:    Page{IsLoggedIn: a.HasSessionToken(r), CSRFToken: a.GetCSRFTokenFromRequest(r)},
+		Page:    Page{IsLoggedIn: a.HasSessionToken(r), CSRFToken: a.GetCSRFTokenFromRequest(r), AppName: a.AppName},
 		Servers: servers,
 	}
 
@@ -1144,7 +1149,7 @@ func (a *App) ApiCreateTokenHandler(w http.ResponseWriter, r *http.Request) {
 		Page
 		TokenHash string
 	}{
-		Page:      Page{IsLoggedIn: a.HasSessionToken(r)},
+		Page:      Page{IsLoggedIn: a.HasSessionToken(r), AppName: a.AppName},
 		TokenHash: tokenHash,
 	}
 
@@ -1284,7 +1289,7 @@ func (a *App) ServerListGET(w http.ResponseWriter, r *http.Request) {
 		PrevURL        string
 		NextURL        string
 	}{
-		Page:           Page{IsLoggedIn: a.HasSessionToken(r)},
+		Page:           Page{IsLoggedIn: a.HasSessionToken(r), AppName: a.AppName},
 		Servers:        servers,
 		Filter:         f,
 		GamemodeChecks: gmChecks,

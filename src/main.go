@@ -88,6 +88,8 @@ func main() {
 func NewApp() *App {
 	var DBPass = flag.String("dbpass", "H0EeLfLnO,xDEVELOPERSx4c!#%", "Root user's database password for MySQL")
 	var DBIP = flag.String("dburl", "127.0.0.1:3306", "IP and Port of the database")
+	var AppName = flag.String("appname", "Ironite Server List", "Name for the application")
+
 	flag.Parse()
 
 	dsn := fmt.Sprintf("root:%s@tcp(%s)/ironite?parseTime=true", *DBPass, *DBIP)
@@ -114,6 +116,7 @@ func NewApp() *App {
 		DB:                 db,
 		DefaultTokenExpiry: 4 * time.Hour,
 		TemplateCache:      templateCache,
+		AppName: *AppName,
 	}
 
 	if err := a.LoadBannedWords(); err != nil {

@@ -5,4 +5,4 @@ if [ -z "$(printenv mysqlpass)" ]; then
     mysqlpass="$MYSQL_ROOT_PASSWORD"
 fi
 
-go run ./src/ -dbpass "$mysqlpass" "$@"
+go run ./src/ -dbpass "$mysqlpass" -appname "Ashframe Server List" "$@"
