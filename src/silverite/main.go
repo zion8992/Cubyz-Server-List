@@ -1,11 +1,12 @@
 package main
 
 import (
+	// === GENERAL ===
 	"log/slog"
 	"net/http"
 	"os"
-	"time"
 
+	// === HTTP ===
 	"github.com/justinas/alice"
 )
 
@@ -18,13 +19,15 @@ func main() {
 		logger: slog.New(slog.NewTextHandler(os.Stdout, nil)),
 	}
 
-	chain := alice.New(app.requestLogger)
+	var port string = ":8000"
+
+	chain := alice.New(app.RequestLogger)
 
 	mux := http.NewServeMux()
 	mux.Handle("GET /", chain.ThenFunc(app.hello))
 
-	app.logger.Info("starting server", "addr", ":8080")
-	if err := http.ListenAndServe(":8080", mux); err != nil {
+	app.logger.Info("starting server", "addr", port)
+	if err := http.ListenAndServe(port, mux); err != nil {
 		app.logger.Error("server failed", "error", err)
 		os.Exit(1)
 	}

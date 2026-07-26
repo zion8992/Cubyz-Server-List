@@ -7,6 +7,7 @@ import (
 	"log/slog"
 	"os"
 	"path/filepath"
+	"time"
 
 	// === Static & HTML ===
 	"embed"
@@ -27,7 +28,12 @@ var serverTmpl = tmpl.Must(tmpl.ParseFS(staticFS, "static/base.html", "static/se
 
 func CreateApp() *App {
 	logger := slog.New(slog.NewTextHandler(os.Stdout, nil))
-	return &App{Log: logger}
+	now := time.Now()
+
+	return &App {
+		Log: logger,
+		Now: now.Format("January 2 2006 at 15:04:05 MST / -0700"),
+	}
 }
 
 func main() {
@@ -98,6 +104,7 @@ func (a *App) GenerateList(servers []Server, css []byte) error {
 	page := PageList{
 		Page: Page{
 			Style: tmpl.CSS(css),
+			GenerationDate: a.Now,
 		},
 		Servers: servers,
 	}
@@ -124,6 +131,7 @@ func (a *App) GenerateServerPages(servers []Server, css []byte) error {
 		page := PageServer{
 			Page: Page{
 				Style: tmpl.CSS(css),
+				GenerationDate: a.Now,
 			},
 			Server: s,
 		}

@@ -15,6 +15,7 @@ import (
 
 type App struct {
 	Log *slog.Logger
+	Now string
 }
 
 type Server struct {
@@ -37,6 +38,7 @@ func (s Server) Slug() string {
 // Page holds fields shared by every rendered page.
 type Page struct {
 	Style tmpl.CSS
+	GenerationDate string
 }
 
 type PageList struct {
