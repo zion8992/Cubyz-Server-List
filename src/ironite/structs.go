@@ -8,21 +8,23 @@ import (
 	// ==== PAGE SLUGS ====
 	"regexp"
 	"strings"
-
-	// ==== HTML ====
-	tmpl "html/template"
 )
 
 type App struct {
 	Log *slog.Logger
-	Now string
+	Now time.Time // raw time; formatted where needed
+
+	// === Config (from CLI flags) ===
+	OutputDir string
+	Pattern   string
+	BaseURL   string // empty disables sitemap generation
 }
 
 type Server struct {
 	// === Public Fields ===
-	Name        string
-	IP          string
-	DateCreated time.Time
+	Name        string    `json:"name"`
+	IP          string    `json:"ip"`
+	DateCreated time.Time `json:"date_created"`
 }
 
 var slugRe = regexp.MustCompile(`[^a-z0-9]+`)
@@ -33,11 +35,22 @@ func (s Server) Slug() string {
 	return strings.Trim(slug, "-")
 }
 
+// Created formats DateCreated for display, so templates never print the
+// raw time.Time string.
+func (s Server) Created() string {
+	if s.DateCreated.IsZero() {
+		return "unknown"
+	}
+	return s.DateCreated.Format("January 2, 2006")
+}
+
 // ===== PAGES =====
 
 // Page holds fields shared by every rendered page.
 type Page struct {
-	Style tmpl.CSS
+	// Root is the relative path prefix back to the site root
+	// ("" for index.html, "../../" for servers/<slug>/index.html).
+	Root           string
 	GenerationDate string
 }
 

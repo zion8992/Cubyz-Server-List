@@ -1,24 +1,10 @@
 {{define "title"}}{{.Server.Name}} - Server List{{end}}
 
 {{define "body"}}
-<!--
-<table>
-   <tr>
-      <th>Name</th>
-      <th>IP</th>
-      <th>Created</th>
-   </tr>
-   <tr>
-      <td>{{.Server.Name}}</td>
-      <td>{{.Server.IP}}</td>
-      <td>{{.Server.DateCreated}}</td>
-   </tr>
-</table>
--->
 <h2>{{.Server.Name}}</h2>
 <p><b>IP</b>: {{.Server.IP}}</p>
-<p><b>DateCreated</b>: {{.Server.DateCreated}}</p>
+<p><b>Created</b>: {{.Server.Created}}</p>
 <button class="copy-btn" data-ip="{{.Server.IP}}">Copy IP</button>
 <br><br>
-<a class="button" href="../index.html">&larr; Back to list</a>
+<a class="button" href="{{.Root}}index.html">&larr; Back to list</a>
 {{end}}

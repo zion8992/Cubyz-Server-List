@@ -1,5 +1,14 @@
 {{define "title"}}List - Server List{{end}}
 {{define "body"}}
+<div class="filter-bar">
+    <select id="search-field">
+        <option value="0" selected>Name</option>
+        <option value="1">IP</option>
+    </select>
+    <input type="text" name="search" placeholder="Ashframe" />
+    <input type="date" id="date-filter" />
+</div>
+<p id="no-results" style="display: none;">No servers found.</p>
 <table>
    <tr>
       <th>Name</th>
@@ -10,11 +19,11 @@
    </tr>
    {{range .Servers}}
    <tr>
-      <td><a href="/servers/{{.Slug}}.html">{{.Name}}</a></td>
+      <td><a href="servers/{{.Slug}}/">{{.Name}}</a></td>
       <td>{{.IP}}</td>
       <td>Playercount</td>
       <td>Version</td>
-      <td>{{.DateCreated}}</td>
+      <td>{{.Created}}</td>
    </tr>
    {{end}}
 </table>

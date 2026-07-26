@@ -4,6 +4,8 @@
     --primary: #e29c4c;
     --secondary: #bc884b;
     --sidebar-width: 220px;
+    --sulfur: #ddc763;
+    --background: white;
     --color: black;
 }
 
@@ -13,6 +15,7 @@ main, footer { margin-left: var(--sidebar-width); } /* use left: for the footer 
 body {
     font-family: "Roboto Mono", monospace;
     color: var(--color);
+    background-color: var(--background);
 }
 
 /* === NAV & FOOTER === */
@@ -131,6 +134,67 @@ td a {
 td a:hover {
     text-decoration: underline;
 }
+
+/* === FILTER BAR === */
+
+.filter-bar {
+    display: flex;
+    align-items: stretch;
+    margin-bottom: 15px;
+}
+
+/* Shared look for all three controls */
+.filter-bar select,
+.filter-bar input[type="text"],
+.filter-bar input[type="date"] {
+    font-family: "Roboto Mono", monospace;   /* inputs don't inherit body font by default */
+    font-size: 0.9rem;
+    color: var(--color);
+    background-color: white;
+    border: 1px solid var(--primary);
+    padding: 7px 10px;                        /* matches your button padding */
+    outline: none;
+}
+
+/* --- Dropdown: attached to the left of the search input --- */
+.filter-bar select {
+    border-radius: 5px 0 0 5px;
+    border-right: none;
+    background-color: var(--primary);         /* styled like your buttons */
+    color: white;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.filter-bar select:hover {
+    background-color: var(--secondary);
+}
+
+/* --- Search input --- */
+.filter-bar input[type="text"] {
+    border-radius: 0 5px 5px 0;
+    flex: 1;
+}
+
+.filter-bar input[type="text"]::placeholder {
+    color: var(--secondary);
+    opacity: 0.7;
+}
+
+/* --- Date picker: standalone, spaced from the search group --- */
+.filter-bar input[type="date"] {
+    border-radius: 5px;
+    margin-left: 10px;
+    cursor: pointer;
+}
+
+/* --- Focus feedback, consistent across all controls --- */
+.filter-bar select:focus,
+.filter-bar input:focus {
+    border-color: var(--secondary);
+    box-shadow: 0 0 0 2px color-mix(in srgb, var(--primary) 30%, transparent);
+}
+
 
 
 /* === HTML TAGS === */
