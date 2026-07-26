@@ -1,22 +1,11 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <title>{{ .Name }} - Server List</title>
-  <style>{{.Style}}</style>
-</head>
-<body>
-  <h1>Server List</h1>
-  <table>
-    <tr><th>Name</th><th>IP</th><th>Playercount</th><th>Version</th><th>Created</th></tr>
-    {{range .Servers}}
-    <tr>
-      <td><a href="/servers/{{ .AplhaName }}">{{ .Name }}</a></td>
-      <td>{{.IP}}</td>
-      <td>Playercount</td>
-      <td>Version</td>
-      <td>{{.DateCreated}}</td>
-    </tr>
-    {{end}}
-  </table>
-</body>
-</html>
+{{define "title"}}{{.Server.Name}} - Server List{{end}}
+
+{{define "body"}}
+<table>
+  <tr><th>Name</th><td>{{.Server.Name}}</td></tr>
+  <tr><th>IP</th><td>{{.Server.IP}}</td></tr>
+  <tr><th>Created</th><td>{{.Server.DateCreated}}</td></tr>
+</table>
+<br>
+<a class="button" href="../index.html">&larr; Back to list</a>
+{{end}}

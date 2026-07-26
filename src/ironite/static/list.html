@@ -1,6 +1,5 @@
 {{define "title"}}List - Server List{{end}}
 {{define "body"}}
-<h1>Server List</h1>
 <table>
    <tr>
       <th>Name</th>
@@ -11,7 +10,7 @@
    </tr>
    {{range .Servers}}
    <tr>
-      <td><a href="/servers/{{ .AplhaName }}">{{ .Name }}</a></td>
+      <td><a href="/servers/{{.Slug}}.html">{{.Name}}</a></td>
       <td>{{.IP}}</td>
       <td>Playercount</td>
       <td>Version</td>

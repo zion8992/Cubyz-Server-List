@@ -1,9 +1,13 @@
 package main
 
-import(
+import (
 	// ==== GENERAL ====
 	"log/slog"
 	"time"
+
+	// ==== PAGE SLUGS ====
+	"regexp"
+	"strings"
 
 	// ==== HTML ====
 	tmpl "html/template"
@@ -14,12 +18,33 @@ type App struct {
 }
 
 type Server struct {
-	Name string
-	IP string
+	// === Public Fields ===
+	Name        string
+	IP          string
 	DateCreated time.Time
 }
 
-type PageList struct {
+var slugRe = regexp.MustCompile(`[^a-z0-9]+`)
+
+// Slug returns a filesystem/URL-safe identifier for the server.
+func (s Server) Slug() string {
+	slug := slugRe.ReplaceAllString(strings.ToLower(s.Name), "-")
+	return strings.Trim(slug, "-")
+}
+
+// ===== PAGES =====
+
+// Page holds fields shared by every rendered page.
+type Page struct {
 	Style tmpl.CSS
+}
+
+type PageList struct {
+	Page
 	Servers []Server
+}
+
+type PageServer struct {
+	Page
+	Server Server
 }
