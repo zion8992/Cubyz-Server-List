@@ -2,35 +2,21 @@
 <html>
 <head>
     <title>{{block "title" .}}Untitled - Server List{{end}}</title>
-    <link rel="stylesheet" href="{{.Root}}static/style.css">
     <script>
-        // theme.js
-        const ROOT = '{{.Root}}';
-
-        function applyTheme() {
-            const isDark = localStorage.getItem('themeDark') === 'true';
-            const existing = document.getElementById('dark-theme');
-
-            if (isDark && !existing) {
-                const link = document.createElement('link');
-                link.id = 'dark-theme';
-                link.rel = 'stylesheet';
-                link.href = ROOT + 'static/dark.css';
-                document.head.appendChild(link);
-            } else if (!isDark && existing) {
-                existing.remove();
+        (function () {
+            try {
+                var stored = localStorage.getItem('themeDark');
+                var dark = stored === null
+                    ? window.matchMedia('(prefers-color-scheme: dark)').matches
+                    : stored === 'true';
+                document.documentElement.dataset.theme = dark ? 'dark' : 'light';
+            } catch (e) {
+                /* localStorage blocked (private mode / file://) — keep light */
             }
-        }
-
-        function toggleTheme() {
-            const isDark = localStorage.getItem('themeDark') === 'true';
-            localStorage.setItem('themeDark', String(!isDark));
-            applyTheme();
-        }
-
-        // Apply saved theme immediately on load
-        applyTheme();
+        })();
     </script>
+    <link rel="stylesheet" href="{{.Root}}static/style.css">
+    <link rel="stylesheet" href="{{.Root}}static/dark.css">
 </head>
 <body>
     <nav>
@@ -116,5 +102,22 @@
         searchField.addEventListener('change', applyFilters);
         dateFilter.addEventListener('change', applyFilters);
     }
+</script>
+<script>
+    function toggleTheme() {
+        var isDark = document.documentElement.dataset.theme === 'dark';
+        document.documentElement.dataset.theme = isDark ? 'light' : 'dark';
+        try {
+            localStorage.setItem('themeDark', String(!isDark));
+        } catch (e) { /* ignore */ }
+    }
+
+    // Follow the OS if the user has never pressed the toggle.
+    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function (e) {
+        try {
+            if (localStorage.getItem('themeDark') !== null) return;
+        } catch (err) { /* ignore */ }
+        document.documentElement.dataset.theme = e.matches ? 'dark' : 'light';
+    });
 </script>
 </html>
