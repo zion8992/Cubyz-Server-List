@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{{block "title" .}}Untitled - Server List{{end}}</title>
+    <script>
+        (function () {
+            try {
+                var stored = localStorage.getItem('themeDark');
+                var dark = stored === null
+                    ? window.matchMedia('(prefers-color-scheme: dark)').matches
+                    : stored === 'true';
+                document.documentElement.dataset.theme = dark ? 'dark' : 'light';
+            } catch (e) {
+                /* localStorage blocked (private mode / file://), Keep light mode on :( */
+            }
+        })();
+    </script>
+    <link rel="stylesheet" href="{{$.Root}}static/style.css">
+    <link rel="stylesheet" href="{{$.Root}}static/dark.css">
+</head>
+<body>
+    <nav>
+        <ul>
+            <li><h2>Server List Manager</h2></li>
+            <li><a href="{{.Root}}index.html">List</a></li>
+            <li><a id="theme-toggle" onclick="toggleTheme()" style="cursor: pointer;">Toggle Theme</a></li>
+            <li><a href="https://github.com/zion8992/Cubyz-Server-List" target="_blank">Source</a></li>
+        </ul>
+    </nav>
+
+    <main>
+    <h2>Server List</h2>
+    <hr>
+    {{block "body" .}}{{end}}
+    </main>
+
+    <footer>Silverite</footer>
+</body>
+<script>
+    document.querySelectorAll('.copy-btn').forEach(button => {
+        button.addEventListener('click', async () => {
+                const ip = button.dataset.ip; // reads the data-ip attribute
+
+                try {
+                        await navigator.clipboard.writeText(ip);
+
+                        // Optional: give visual feedback
+                        const originalText = button.textContent;
+                        button.textContent = 'Copied!';
+                        setTimeout(() => (button.textContent = originalText), 1500);
+                } catch (err) {
+                        console.error('Failed to copy:', err);
+                }
+        });
+    });
+</script>
+<script>
+    const searchInput = document.querySelector('input[name="search"]');
+    const searchField = document.getElementById('search-field');
+    const dateFilter = document.getElementById('date-filter');
+    const table = document.querySelector('table');
+    const noResults = document.getElementById('no-results');
+
+    // Only run the filter logic on pages that actually have the filter bar
+    // (the server detail pages share this base but have no table/search).
+    if (searchInput && searchField && dateFilter && table && noResults) {
+        // Column indexes: 0 = Name, 1 = IP, 4 = Created
+        const DATE_COLUMN = 4;
+
+        function applyFilters() {
+            const query = searchInput.value.trim().toLowerCase();
+            const column = parseInt(searchField.value, 10);
+            const selectedDate = dateFilter.value; // "YYYY-MM-DD" or ""
+            const rows = table.querySelectorAll('tr');
+
+            let visibleCount = 0;
+
+            rows.forEach(row => {
+                // Skip the header row
+                if (row.querySelector('th')) return;
+
+                // Text match on the selected column only
+                const cellText = row.cells[column].textContent.toLowerCase();
+                const textMatch = cellText.includes(query);
+
+                // Date match (skipped if no date selected)
+                let dateMatch = true;
+                if (selectedDate) {
+                    const rowDate = new Date(row.cells[DATE_COLUMN].textContent.trim());
+                    dateMatch = !isNaN(rowDate) &&
+                        rowDate.toISOString().slice(0, 10) === selectedDate;
+                }
+
+                const match = textMatch && dateMatch;
+                row.style.display = match ? '' : 'none';
+                if (match) visibleCount++;
+            });
+
+            noResults.style.display = visibleCount ? 'none' : '';
+        }
+
+        searchInput.addEventListener('input', applyFilters);
+        searchField.addEventListener('change', applyFilters);
+        dateFilter.addEventListener('change', applyFilters);
+    }
+</script>
+<script>
+    function toggleTheme() {
+        var isDark = document.documentElement.dataset.theme === 'dark';
+        document.documentElement.dataset.theme = isDark ? 'light' : 'dark';
+        try {
+            localStorage.setItem('themeDark', String(!isDark));
+        } catch (e) { /* ignore */ }
+    }
+
+    // Follow the OS if the user has never pressed the toggle.
+    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function (e) {
+        try {
+            if (localStorage.getItem('themeDark') !== null) return;
+        } catch (err) { /* ignore */ }
+        document.documentElement.dataset.theme = e.matches ? 'dark' : 'light';
+    });
+</script>
+</html>

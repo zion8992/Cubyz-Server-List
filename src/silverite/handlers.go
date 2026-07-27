@@ -4,6 +4,11 @@ import(
 	"net/http"
 )
 
-func (app *App) hello(w http.ResponseWriter, r *http.Request) {
-	w.Write([]byte("Hello, World!\n"))
+/* ========== HANDLER FUNCTION NAMING SPEC ============ */
+/* <METHOD><Path>                                       */
+/* Example:                                             */
+/* (app *App) GETSlash                                  */
+
+func (app *App) GETSlash(w http.ResponseWriter, r *http.Request) {
+	app.Render(w, r, http.StatusOK, "home.html", "Servers", nil)	
 }

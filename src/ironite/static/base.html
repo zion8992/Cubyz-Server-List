@@ -23,7 +23,8 @@
         <ul>
             <li><h2>Server List</h2></li>
             <li><a href="{{.Root}}index.html">List</a></li>
-            <li><button id="theme-toggle" onclick="toggleTheme()">Toggle Theme</button></li>
+            <li><a id="theme-toggle" onclick="toggleTheme()" style="cursor: pointer;">Toggle Theme</a></li>
+            <li><a href="https://github.com/zion8992/Cubyz-Server-List" target="_blank">Source</a></li>
         </ul>
     </nav>
 
@@ -52,56 +53,6 @@
                 }
         });
     });
-</script>
-<script>
-    const searchInput = document.querySelector('input[name="search"]');
-    const searchField = document.getElementById('search-field');
-    const dateFilter = document.getElementById('date-filter');
-    const table = document.querySelector('table');
-    const noResults = document.getElementById('no-results');
-
-    // Only run the filter logic on pages that actually have the filter bar
-    // (the server detail pages share this base but have no table/search).
-    if (searchInput && searchField && dateFilter && table && noResults) {
-        // Column indexes: 0 = Name, 1 = IP, 4 = Created
-        const DATE_COLUMN = 4;
-
-        function applyFilters() {
-            const query = searchInput.value.trim().toLowerCase();
-            const column = parseInt(searchField.value, 10);
-            const selectedDate = dateFilter.value; // "YYYY-MM-DD" or ""
-            const rows = table.querySelectorAll('tr');
-
-            let visibleCount = 0;
-
-            rows.forEach(row => {
-                // Skip the header row
-                if (row.querySelector('th')) return;
-
-                // Text match on the selected column only
-                const cellText = row.cells[column].textContent.toLowerCase();
-                const textMatch = cellText.includes(query);
-
-                // Date match (skipped if no date selected)
-                let dateMatch = true;
-                if (selectedDate) {
-                    const rowDate = new Date(row.cells[DATE_COLUMN].textContent.trim());
-                    dateMatch = !isNaN(rowDate) &&
-                        rowDate.toISOString().slice(0, 10) === selectedDate;
-                }
-
-                const match = textMatch && dateMatch;
-                row.style.display = match ? '' : 'none';
-                if (match) visibleCount++;
-            });
-
-            noResults.style.display = visibleCount ? 'none' : '';
-        }
-
-        searchInput.addEventListener('input', applyFilters);
-        searchField.addEventListener('change', applyFilters);
-        dateFilter.addEventListener('change', applyFilters);
-    }
 </script>
 <script>
     function toggleTheme() {

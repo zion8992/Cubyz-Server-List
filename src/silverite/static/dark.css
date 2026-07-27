@@ -1,0 +1,156 @@
+/* ==========================================================================
+   dark.css — dark theme overrides
+   Load AFTER your main stylesheet:
+     <link rel="stylesheet" href="style.css">
+     <link rel="stylesheet" href="dark.css">
+   Activate with: <html data-theme="dark">
+   ========================================================================== */
+
+html[data-theme="dark"] {
+    color-scheme: dark;            /* native scrollbars, date picker, form widgets */
+    accent-color: var(--primary);
+
+    /* --- palette ------------------------------------------------------- */
+    --primary:    #e0a55e;         /* slightly lighter amber: better on dark */
+    --secondary:  #7d5a33;         /* muted brown for hover/borders */
+    --sulfur:     #cbb75f;
+
+    --background: #14120f;         /* warm near-black, matches the amber accent */
+    --color:      #e9e4db;
+
+    /* surfaces & helpers (new, used only by this file) */
+    --surface:    #1c1915;         /* nav / footer */
+    --surface-2:  #24201a;         /* table head, inputs */
+    --border:     #3a322a;
+    --muted:      #a49a8c;         /* placeholders, secondary text */
+    --on-accent:  #1a1510;         /* text ON the amber accent (dark, for contrast) */
+
+    /* fallback vars your base CSS references */
+    --text:       var(--color);    /* thead th */
+    --accent:     var(--primary);  /* td a */
+}
+
+/* === NAV & FOOTER ======================================================= */
+
+html[data-theme="dark"] nav {
+    background-color: var(--surface);
+    border-right: 2px solid var(--border);
+    color: var(--color);
+}
+
+html[data-theme="dark"] nav ul li a,
+html[data-theme="dark"] nav ul li h2 {
+    color: var(--color);
+}
+
+html[data-theme="dark"] nav ul li a:hover {
+    background-color: var(--primary);
+    color: var(--on-accent);
+}
+
+html[data-theme="dark"] footer {
+    background-color: var(--surface);
+    border-top: 1px solid var(--border);
+    color: var(--color);
+}
+
+/* === LIST / TABLE ======================================================= */
+
+html[data-theme="dark"] thead th,
+html[data-theme="dark"] tr:first-child th {
+    background: var(--surface-2);
+    color: var(--primary);
+    border-bottom: 1px solid var(--border);
+}
+
+html[data-theme="dark"] td {
+    border-bottom: 1px solid var(--border);
+}
+
+/* zebra striping: tint with the accent instead of the brown */
+html[data-theme="dark"] tbody tr:nth-child(even),
+html[data-theme="dark"] tr:nth-child(even) {
+    background: color-mix(in srgb, var(--primary) 6%, transparent);
+}
+
+html[data-theme="dark"] tbody tr:hover,
+html[data-theme="dark"] tr:hover td {
+    background: color-mix(in srgb, var(--primary) 14%, transparent);
+}
+
+html[data-theme="dark"] td a {
+    color: var(--primary);
+}
+
+/* === FILTER BAR ========================================================= */
+
+html[data-theme="dark"] .filter-bar select,
+html[data-theme="dark"] .filter-bar input[type="text"],
+html[data-theme="dark"] .filter-bar input[type="date"] {
+    background-color: var(--surface-2);   /* was hardcoded white */
+    color: var(--color);
+    border: 1px solid var(--border);
+}
+
+html[data-theme="dark"] .filter-bar select {
+    background-color: var(--primary);
+    color: var(--on-accent);
+    border: 1px solid var(--primary);
+    border-right: none;                   /* keep it welded to the search input */
+}
+
+html[data-theme="dark"] .filter-bar select:hover {
+    background-color: var(--secondary);
+    border-color: var(--secondary);
+    border-right: none;
+    color: var(--color);
+}
+
+html[data-theme="dark"] .filter-bar input[type="text"]::placeholder {
+    color: var(--muted);
+    opacity: 0.8;
+}
+
+html[data-theme="dark"] .filter-bar select:focus,
+html[data-theme="dark"] .filter-bar input:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 2px color-mix(in srgb, var(--primary) 35%, transparent);
+}
+
+/* === BUTTONS & LINKS ==================================================== */
+
+html[data-theme="dark"] a {
+    color: var(--primary);
+}
+
+html[data-theme="dark"] .button,
+html[data-theme="dark"] button {
+    background-color: var(--primary);
+    border: 1px solid var(--primary);
+    color: var(--on-accent);
+}
+
+html[data-theme="dark"] .button:hover,
+html[data-theme="dark"] button:hover {
+    background-color: var(--secondary);
+    border: 1px solid var(--secondary);
+    color: var(--color);
+}
+
+/* === MISC =============================================================== */
+
+html[data-theme="dark"] ::selection {
+    background: color-mix(in srgb, var(--primary) 45%, transparent);
+    color: var(--color);
+}
+
+html[data-theme="dark"] hr {
+    border: none;
+    border-top: 1px solid var(--border);
+}
+
+html[data-theme="dark"] img,
+html[data-theme="dark"] video {
+    /* optional: takes the glare off bright media */
+    filter: brightness(0.92);
+}
