@@ -46,18 +46,47 @@ func NewApp(log *slog.Logger, cfg Config) *App {
 type Page struct {
 	Title   string
 	MOTD    string
-	Servers []Server
+	List  *netgliss.List
 }
 
 // === Static Site Generator ===
 
-func (a *App) Build() error {
-	// Delete and re-create the output directory
-	if err := os.RemoveAll(a.cfg.OutDir); err != nil {
-		return fmt.Errorf("clean output: %w", err)
-	}
+// keepInOut lists entries at the top level of OutDir that survive a clean.
+var keepInOut = map[string]bool{
+	".git": true, // don't delete any submodules
+	// "bad_file": false, ---> this will remove it
+}
+
+// cleanOutDir empties a.cfg.OutDir without removing the directory itself.
+func (a *App) cleanOutDir() error {
+	// Still needed for a first run, when public/ doesn't exist yet.
 	if err := os.MkdirAll(a.cfg.OutDir, 0o755); err != nil {
 		return fmt.Errorf("create output: %w", err)
+	}
+
+	entries, err := os.ReadDir(a.cfg.OutDir)
+	if err != nil {
+		return fmt.Errorf("read output: %w", err)
+	}
+
+	for _, e := range entries {
+		if keepInOut[e.Name()] {
+			a.log.Debug("keeping output entry", "name", e.Name())
+			continue
+		}
+		p := filepath.Join(a.cfg.OutDir, e.Name())
+		if err := os.RemoveAll(p); err != nil {
+			return fmt.Errorf("clean %s: %w", p, err)
+		}
+		a.log.Debug("removed output entry", "path", p)
+	}
+	return nil
+}
+
+
+func (a *App) Build(list *netgliss.List) error {
+	if err := a.cleanOutDir(); err != nil {
+		return err
 	}
 
 	// copy static files directly to output, "no questions asked"
@@ -68,7 +97,7 @@ func (a *App) Build() error {
 	data := &Page{
 		Title: "Servers",
 		MOTD:  randomMOTD(),
-		Servers: servers,
+		List: list,
 	}
 	if err := a.renderPages(data); err != nil {
 		return fmt.Errorf("render: %w", err)

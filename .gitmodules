@@ -1,0 +1,3 @@
+[submodule "src/ironite/public"]
+	path = src/ironite/public
+	url = https://github.com/zion8992/cubyz-servers

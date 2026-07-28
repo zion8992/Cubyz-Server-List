@@ -19,11 +19,11 @@
         <th>Gamemodes</th>
         <th>Description</th>
     </tr>
-    {{range .Servers}}
+    {{range .List.Servers}}
     <tr>
-        <td><a href="servers/{{.Slug}}/">{{.Name}}</a></td>
+        <td><a href="servers/">{{.Name}}</a></td>
         <td>{{.IP}}</td>
-        <td>{{.Created}}</td>
+        <td>{{.DateCreated}}</td>
         <td>{{.Version}}</td>
         <td>{{.Gamemodes}}</td>
         <td>{{.Description}}</td>
