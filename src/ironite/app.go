@@ -11,12 +11,14 @@ import (
 	"path/filepath"
 	"regexp"
 	"strings"
+	"github.com/zion8992/netgliss"
 )
 
-// layoutName is used as the entry point when it exists; pages then only
-// need to provide {{define "content"}}...{{end}}.
+// 'layoutName' is the name of the base template. Anything on this template is rendered every page
+// Page then only need to provide "{{define "content"}}...{{end}}"
 const layoutName = "_layout.html"
 
+// === Structs ===
 type Config struct {
 	BaseURL     string
 	TemplateDir string
@@ -47,20 +49,18 @@ type Page struct {
 	Servers []Server
 }
 
-// Server is one entry of the generated list.
-// TODO: load these from your servers file and fill Page.Servers below.
-type Server struct {
-	Name string
-	Addr string
-}
+// === Static Site Generator ===
 
 func (a *App) Build() error {
+	// Delete and re-create the output directory
 	if err := os.RemoveAll(a.cfg.OutDir); err != nil {
 		return fmt.Errorf("clean output: %w", err)
 	}
 	if err := os.MkdirAll(a.cfg.OutDir, 0o755); err != nil {
 		return fmt.Errorf("create output: %w", err)
 	}
+
+	// copy static files directly to output, "no questions asked"
 	if err := a.copyStatic(); err != nil {
 		return fmt.Errorf("copy static: %w", err)
 	}
@@ -68,7 +68,7 @@ func (a *App) Build() error {
 	data := &Page{
 		Title: "Servers",
 		MOTD:  randomMOTD(),
-		// Servers: loadServers(...),
+		Servers: servers,
 	}
 	if err := a.renderPages(data); err != nil {
 		return fmt.Errorf("render: %w", err)
@@ -84,7 +84,7 @@ func (a *App) copyStatic() error {
 		return nil
 	}
 	a.log.Debug("copying static files", "from", a.cfg.StaticDir, "to", a.cfg.OutDir)
-	return os.CopyFS(a.cfg.OutDir, os.DirFS(a.cfg.StaticDir))
+	return os.CopyFS(a.cfg.OutDir + "/static", os.DirFS(a.cfg.StaticDir))
 }
 
 func (a *App) renderPages(data *Page) error {
@@ -98,7 +98,7 @@ func (a *App) renderPages(data *Page) error {
 	}
 
 	for _, page := range pages {
-		if strings.HasPrefix(filepath.Base(page), "_") {
+		if strings.HasPrefix(filepath.Base(page), "_") { // partials start with '_'
 			continue
 		}
 		if err := a.renderPage(page, partials, data); err != nil {
@@ -144,9 +144,7 @@ func (a *App) URL(p string) string {
 
 var attrRe = regexp.MustCompile(`(?i)(\b(?:href|src|action|poster|formaction)\s*=\s*)(["'])([^"']*)(["'])`)
 
-// RewriteLinks prefixes every root-relative href/src/... in the rendered HTML
-// with the base URL, so templates can just write href="/page.html".
-// Absolute ("https://…"), protocol-relative ("//host"), relative and
+// RewriteLinks applies the 'a.baseURL' to every hyperlink tag ("<a>" tag) in the outputted HTML files
 // anchor/mailto links are left untouched.
 func (a *App) RewriteLinks(html []byte) []byte {
 	if a.baseURL == "" {
