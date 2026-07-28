@@ -1,0 +1,232 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto+Mono:ital,wght@0,100..700;1,100..700&display=swap');
+
+:root {
+    --primary: #e29c4c;
+    --secondary: #bc884b;
+    --sidebar-width: 220px;
+    --sulfur: #ddc763;
+    --background: white;
+    --color: black;
+}
+
+nav { width: var(--sidebar-width); }
+main, footer { margin-left: var(--sidebar-width); } /* use left: for the footer */
+
+body {
+    font-family: "Roboto Mono", monospace;
+    color: var(--color);
+    background-color: var(--background);
+}
+
+/* === NAV & FOOTER === */
+
+nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 220px;          /* sidebar width */
+    height: 100vh;         /* full viewport height */
+    background-color: var(--secondary);
+    padding-top: 20px;
+    text-align: left;      /* usually nicer in a sidebar than centered */
+    overflow-y: auto;      /* scrolls if you add many links */
+    border-right: 2px solid var(--primary);
+    color: white;
+}
+
+nav ul {
+    margin: 0;
+    padding: 0;
+}
+
+nav ul li {
+    list-style-type: none;
+}
+
+/* LINKS */
+nav ul li a {
+    display: block;        /* whole row is clickable, not just the text */
+    color: white;
+    padding: 10px 20px;
+}
+
+/* "Server List" TEXT */
+nav ul li h2 {
+    display: block;
+    color: white;
+    padding: 10px 20px;
+}
+
+nav ul li a:hover {
+    background-color: var(--primary);
+}
+
+/* Push everything else out from under the sidebar */
+main {
+    margin-left: 220px;
+    padding: 20px;
+}
+
+footer {
+    position: fixed;
+    bottom: 0;
+    text-align: center;
+    padding: 5px;
+    background-color: var(--secondary);
+    width: 100%;
+    color: white;
+}
+
+
+/* === LIST === */
+
+table {
+    width: 100%;
+    border-collapse: collapse;       /* merges cell borders into clean lines */
+    border-radius: 8px;
+    overflow: hidden;                /* keeps rounded corners on the table */
+    font-size: 0.95rem;
+}
+
+/* --- Header --- */
+thead th,
+tr:first-child th {
+    background: var(--secondary);
+    color: var(--text, #fff);
+    text-align: left;
+    padding: 10px 14px;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.8rem;
+    letter-spacing: 0.05em;
+}
+
+/* --- Rows --- */
+td {
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--secondary);
+}
+
+/* Zebra striping for readability */
+tbody tr:nth-child(even),
+tr:nth-child(even) {
+    background: color-mix(in srgb, var(--secondary) 12%, transparent);
+}
+
+/* Hover highlight — makes it feel interactive like a server browser */
+tbody tr:hover,
+tr:hover td {
+    background: color-mix(in srgb, var(--secondary) 25%, transparent);
+    cursor: default;
+}
+
+/* No border under the last row (table border handles it) */
+tr:last-child td {
+    border-bottom: none;
+}
+
+/* --- Server name links --- */
+td a {
+    color: var(--accent, inherit);
+    text-decoration: none;
+    font-weight: 600;
+}
+
+td a:hover {
+    text-decoration: underline;
+}
+
+/* === FILTER BAR === */
+
+.filter-bar {
+    display: flex;
+    align-items: stretch;
+    margin-bottom: 15px;
+}
+
+/* Shared look for all three controls */
+.filter-bar select,
+.filter-bar input[type="text"],
+.filter-bar input[type="date"] {
+    font-family: "Roboto Mono", monospace;   /* inputs don't inherit body font by default */
+    font-size: 0.9rem;
+    color: var(--color);
+    background-color: white;
+    border: 1px solid var(--primary);
+    padding: 7px 10px;                        /* matches your button padding */
+    outline: none;
+}
+
+/* --- Dropdown: attached to the left of the search input --- */
+.filter-bar select {
+    border-radius: 5px 0 0 5px;
+    border-right: none;
+    background-color: var(--primary);         /* styled like your buttons */
+    color: white;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.filter-bar select:hover {
+    background-color: var(--secondary);
+}
+
+/* --- Search input --- */
+.filter-bar input[type="text"] {
+    border-radius: 0 5px 5px 0;
+    flex: 1;
+}
+
+.filter-bar input[type="text"]::placeholder {
+    color: var(--secondary);
+    opacity: 0.7;
+}
+
+/* --- Date picker: standalone, spaced from the search group --- */
+.filter-bar input[type="date"] {
+    border-radius: 5px;
+    margin-left: 10px;
+    cursor: pointer;
+}
+
+/* --- Focus feedback, consistent across all controls --- */
+.filter-bar select:focus,
+.filter-bar input:focus {
+    border-color: var(--secondary);
+    box-shadow: 0 0 0 2px color-mix(in srgb, var(--primary) 30%, transparent);
+}
+
+
+
+/* === HTML TAGS === */
+
+a {
+    text-decoration: none;
+    color: var(--primary);
+}
+
+.button {
+    border: 1px solid var(--primary);
+    border-radius: 5px;
+    padding: 7px;
+    background-color: var(--primary);
+    color: white;
+}
+
+.button:hover {
+    background-color: var(--secondary);
+    border: 1px solid var(--secondary)
+}
+
+button {
+    border: 1px solid var(--primary);
+    border-radius: 5px;
+    padding: 7px;
+    background-color: var(--primary);
+    color: white;
+}
+
+button:hover {
+    background-color: var(--secondary);
+    border: 1px solid var(--secondary)
+}

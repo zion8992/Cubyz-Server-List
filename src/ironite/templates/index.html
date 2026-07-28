@@ -1,0 +1,12 @@
+{{ define "content" }}
+  <h1>Servers</h1>
+  {{ if .Servers }}
+    <ul class="servers">
+      {{ range .Servers }}
+        <li><strong>{{ .Name }}</strong> <code>{{ .Addr }}</code></li>
+      {{ end }}
+    </ul>
+  {{ else }}
+    <p>No servers defined yet.</p>
+  {{ end }}
+{{ end }}
