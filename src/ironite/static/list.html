@@ -1,70 +1,93 @@
-{{define "title"}}List - Server List{{end}}
-{{define "body"}}
+{{define "title"}}List - Server List{{end}} {{define "body"}}
 <div class="filter-bar">
     <select id="search-field">
-        <option value="0" selected>Name</option>
-        <option value="1">IP</option>
+        <option value="name" selected>Name</option>
+        <option value="ip">IP</option>
+        <option value="version">Version</option>
     </select>
-    <input type="text" name="search" placeholder="Ashframe" />
+    <input type="text" name="search" placeholder="Ashframe" aria-label="Search servers" />
+
     <input type="date" id="date-filter" />
 </div>
-<p id="no-results" style="display: none;">No servers found.</p>
+<p id="no-results" style="display: none">No servers found.</p>
 <table>
-   <tr>
-      <th>Name</th>
-      <th>IP</th>
-      <th>Added</th>
-      <th>Version</th>
-      <th>Gamemodes</th>
-      <th>Description</th>
-   </tr>
-   {{range .Servers}}
-   <tr>
-      <td><a href="servers/{{.Slug}}/">{{.Name}}</a></td>
-      <td>{{.IP}}</td>
-      <td>{{.Created}}</td>
-      <td>{{.Version}}</td>
-      <td>{{.Gamemodes}}</td>
-      <td>{{.Description}}</td>
-   </tr>
-   {{end}}
+    <tr>
+        <th>Name</th>
+        <th>IP</th>
+        <th>Added</th>
+        <th>Version</th>
+        <th>Gamemodes</th>
+        <th>Description</th>
+    </tr>
+    {{range .Servers}}
+    <tr>
+        <td><a href="servers/{{.Slug}}/">{{.Name}}</a></td>
+        <td>{{.IP}}</td>
+        <td>{{.Created}}</td>
+        <td>{{.Version}}</td>
+        <td>{{.Gamemodes}}</td>
+        <td>{{.Description}}</td>
+    </tr>
+    {{end}}
 </table>
-   <script>
+<script>
     const searchInput = document.querySelector('input[name="search"]');
     const searchField = document.getElementById('search-field');
-    const dateFilter = document.getElementById('date-filter');
-    const table = document.querySelector('table');
-    const noResults = document.getElementById('no-results');
+    const dateFilter  = document.getElementById('date-filter');
+    const table       = document.querySelector('table');
+    const noResults   = document.getElementById('no-results');
 
-    // Only run the filter logic on pages that actually have the filter bar
-    // (the server detail pages share this base but have no table/search).
     if (searchInput && searchField && dateFilter && table && noResults) {
-        // Column indexes: 0 = Name, 1 = IP, 4 = Created
-        const DATE_COLUMN = 4;
+        // Column indexes: 0 = Name, 1 = IP, 2 = Added, 3 = Version,
+        //                 4 = Gamemodes, 5 = Description
+        const COLUMNS = { name: 0, ip: 1, added: 2, version: 3, gamemodes: 4, description: 5 };
+        const DATE_COLUMN = 2;
+
+        const MONTHS = {
+            jan: 1, feb: 2, mar: 3, apr: 4, may: 5, jun: 6,
+            jul: 7, aug: 8, sep: 9, oct: 10, nov: 11, dec: 12
+        };
+
+        // Turns the server-rendered "Jan 15, 2024" into "2024-01-15".
+        // Returns '' if the cell doesn't seem to have a date at all.
+        function rowDateString(row) {
+            const cell = row.cells[DATE_COLUMN];
+            if (!cell) return '';
+            const raw = cell.textContent.trim();
+
+            // Don't convert the date if it is ISO formatted for some reason
+            const iso = raw.match(/^(\d{4}-\d{2}-\d{2})/);
+            if (iso) return iso[1];
+
+            const m = raw.match(/^([A-Za-z]+)\.?\s+(\d{1,2}),\s*(\d{4})/);
+            if (!m) return '';
+
+            const month = MONTHS[m[1].slice(0, 3).toLowerCase()];
+            if (!month) return '';
+
+            return m[3] + '-' +
+                   String(month).padStart(2, '0') + '-' +
+                   m[2].padStart(2, '0');
+        }
 
         function applyFilters() {
-            const query = searchInput.value.trim().toLowerCase();
-            const column = parseInt(searchField.value, 10);
+            const query        = searchInput.value.trim().toLowerCase();
+            const column = COLUMNS[searchField.value];
             const selectedDate = dateFilter.value; // "YYYY-MM-DD" or ""
-            const rows = table.querySelectorAll('tr');
+            const rows         = table.querySelectorAll('tr');
 
             let visibleCount = 0;
 
             rows.forEach(row => {
-                // Skip the header row
-                if (row.querySelector('th')) return;
+                if (row.querySelector('th')) return; // skip header
 
-                // Text match on the selected column only
-                const cellText = row.cells[column].textContent.toLowerCase();
-                const textMatch = cellText.includes(query);
+                const cell = row.cells[column];
+                const textMatch = cell
+                    ? cell.textContent.toLowerCase().includes(query)
+                    : false;
 
-                // Date match (skipped if no date selected)
-                let dateMatch = true;
-                if (selectedDate) {
-                    const rowDate = new Date(row.cells[DATE_COLUMN].textContent.trim());
-                    dateMatch = !isNaN(rowDate) &&
-                        rowDate.toISOString().slice(0, 10) === selectedDate;
-                }
+                const dateMatch = !selectedDate ||
+                                  rowDateString(row) === selectedDate;
 
                 const match = textMatch && dateMatch;
                 row.style.display = match ? '' : 'none';
@@ -77,6 +100,10 @@
         searchInput.addEventListener('input', applyFilters);
         searchField.addEventListener('change', applyFilters);
         dateFilter.addEventListener('change', applyFilters);
+
+        applyFilters(); // correct initial state
     }
 </script>
+
+
 {{end}}
