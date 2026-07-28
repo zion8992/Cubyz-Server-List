@@ -1,0 +1,22 @@
+[
+  {
+    "name": "Ashframe",
+    "ip": "cubyz.ashframe.net",
+    "date_created": "2026-07-26T17:30:00Z",
+    "version": "0.3.0",
+    "gamemodes": "survival",
+    "languages": "english",
+    "requires_mods": false,
+    "description": "Home of the largest Cubyz community."
+  },
+  {
+    "name": "OpenCubyz",
+    "ip": "opencubyz.net:47649",
+    "date_created": "2026-07-26T17:30:00Z",
+    "version": "0.2.0",
+    "gamemodes": "survival",
+    "languages": "english",
+    "requires_mods": false,
+    "description": "Survival server with custom fields."
+  }
+]
