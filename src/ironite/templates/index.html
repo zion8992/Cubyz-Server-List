@@ -1,4 +1,5 @@
-{{define "title"}}List - Server List{{end}} {{define "body"}}
+{{define "title"}}List{{end}} 
+{{define "body"}}
 <div class="filter-bar">
     <select id="search-field">
         <option value="name" selected>Name</option>
@@ -16,7 +17,7 @@
         <th>IP</th>
         <th>Added</th>
         <th>Version</th>
-        <th>Gamemodes</th>
+        <th>Tags</th>
         <th>Description</th>
     </tr>
     {{range .List.Servers}}
@@ -25,7 +26,7 @@
         <td>{{.IP}}</td>
         <td>{{.DateCreated}}</td>
         <td>{{.Version}}</td>
-        <td>{{.Gamemodes}}</td>
+        <td>{{.Tags}}</td>
         <td>{{.Description}}</td>
     </tr>
     {{end}}
