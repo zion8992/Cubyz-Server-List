@@ -16,17 +16,17 @@ func main() {
 	}
 
 	var results []netgliss.Server
-	results, err = list.SearchServers("*pvp*", "gamemodes")
+	results, err = list.SearchServers("*creative*", "tags")
 	if err != nil {
 		fmt.Printf("Error: %s\n", err)
 	}
 	if len(results) == 0 {
-		fmt.Printf("No results")
+		fmt.Printf("No results\n")
 		os.Exit(0)
 	}
 	for _, v := range results {
 		fmt.Printf("%s\n", v.Name)
-		fmt.Printf("%s\n", v.Gamemodes)
+		fmt.Printf("%s\n", v.Tags)
 		fmt.Printf("%s\n", v.Version)
 		fmt.Printf("---\n")
 	}

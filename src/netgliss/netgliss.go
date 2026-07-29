@@ -7,6 +7,7 @@ import(
 	"os"
 	"path"
 	"strconv"
+	"strings"
 )
 
 type List struct {
@@ -53,6 +54,7 @@ func (l *List) SearchServers(globPattern, field string) ([]Server, error) {
 	}
 
 	var results []Server
+
 	for _, server := range l.Servers {
 		var value string
 
@@ -65,8 +67,8 @@ func (l *List) SearchServers(globPattern, field string) ([]Server, error) {
 			value = server.Description
 		case "ip":
 			value = server.IP
-		case "gamemodes":
-			value = server.Gamemodes
+		case "tags":
+			value = strings.Join(server.Tags, ",") // convert []string to string
 		case "languages":
 			value = server.Languages
 		case "requiresMods":
