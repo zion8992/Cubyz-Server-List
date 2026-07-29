@@ -13,7 +13,7 @@ type Server struct {
 	// === Server-Provided Fields ===
 	Description string `json:"description"`
 	Version string `json:"version"`
-	Gamemodes string `json:"gamemodes"`
+	Tags []string `json:"tags"`
 	Languages string `json:"languages"`
 	RequiresMods bool `json:"requires_mods"`
 }

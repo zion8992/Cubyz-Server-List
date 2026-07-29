@@ -4,539 +4,665 @@
     "ip": "cubyz.ashframe.net",
     "date_created": "2026-07-26T17:30:00Z",
     "version": "0.3.0",
-    "gamemodes": "survival",
     "languages": "english",
     "requires_mods": false,
-    "description": "Home of the largest Cubyz community."
+    "description": "Home of the largest Cubyz community.",
+    "tags": [
+      "survival"
+    ]
   },
   {
     "name": "OpenCubyz",
     "ip": "opencubyz.net:47649",
     "date_created": "2026-07-26T17:30:00Z",
     "version": "0.2.0",
-    "gamemodes": "survival",
     "languages": "english",
     "requires_mods": false,
-    "description": "Survival server with custom fields."
+    "description": "Survival server with custom fields.",
+    "tags": [
+      "survival"
+    ]
   },
   {
     "name": "Voxel Vanguard",
     "ip": "play.voxelvanguard.gg",
     "date_created": "2026-01-04T09:15:00Z",
     "version": "0.3.0",
-    "gamemodes": "survival, pvp",
     "languages": "english",
     "requires_mods": false,
-    "description": "Faction warfare across a procedurally generated continent."
+    "description": "Faction warfare across a procedurally generated continent.",
+    "tags": [
+      "survival",
+      "pvp"
+    ]
   },
   {
     "name": "Stonebrook",
     "ip": "stonebrook.io:47649",
     "date_created": "2026-01-09T14:42:00Z",
     "version": "0.3.0",
-    "gamemodes": "survival",
     "languages": "english, german",
     "requires_mods": false,
-    "description": "Relaxed vanilla survival with a no-grief policy and monthly builds."
+    "description": "Relaxed vanilla survival with a no-grief policy and monthly builds.",
+    "tags": [
+      "survival"
+    ]
   },
   {
     "name": "Cragholm",
     "ip": "mc.cragholm.eu",
     "date_created": "2026-01-13T20:05:00Z",
     "version": "0.2.0",
-    "gamemodes": "survival, adventure",
     "languages": "german",
     "requires_mods": true,
-    "description": "Mountain fortress roleplay with custom ore progression."
+    "description": "Mountain fortress roleplay with custom ore progression.",
+    "tags": [
+      "survival",
+      "adventure"
+    ]
   },
   {
     "name": "LODLands",
     "ip": "lodlands.net:25599",
     "date_created": "2026-01-17T11:30:00Z",
     "version": "0.3.0",
-    "gamemodes": "creative",
     "languages": "english",
     "requires_mods": false,
-    "description": "Render distance showcase server. Build big, look far."
+    "description": "Render distance showcase server. Build big, look far.",
+    "tags": [
+      "creative"
+    ]
   },
   {
     "name": "Deepvein",
     "ip": "deepvein.host:47650",
     "date_created": "2026-01-22T08:00:00Z",
     "version": "0.3.0",
-    "gamemodes": "survival",
     "languages": "english, polish",
     "requires_mods": false,
-    "description": "Mining-focused economy server with player-run shops."
+    "description": "Mining-focused economy server with player-run shops.",
+    "tags": [
+      "survival"
+    ]
   },
   {
     "name": "Terraflux",
     "ip": "terraflux.gg",
     "date_created": "2026-01-26T16:18:00Z",
     "version": "0.2.0",
-    "gamemodes": "survival, creative",
     "languages": "english",
     "requires_mods": true,
-    "description": "Heavily modded tech world with automation addons."
+    "description": "Heavily modded tech world with automation addons.",
+    "tags": [
+      "survival",
+      "creative"
+    ]
   },
   {
     "name": "Cubehaven",
     "ip": "cubehaven.org:47649",
     "date_created": "2026-01-30T19:55:00Z",
     "version": "0.3.0",
-    "gamemodes": "survival",
     "languages": "english",
     "requires_mods": false,
-    "description": "Beginner friendly server with mentors online most evenings."
+    "description": "Beginner friendly server with mentors online most evenings.",
+    "tags": [
+      "survival"
+    ]
   },
   {
     "name": "Nightspire",
     "ip": "nightspire.mc.rocks",
     "date_created": "2026-02-02T13:12:00Z",
     "version": "0.3.0",
-    "gamemodes": "pvp",
     "languages": "english, russian",
     "requires_mods": false,
-    "description": "Hardcore PvP arena with weekly tournaments and a ranked ladder."
+    "description": "Hardcore PvP arena with weekly tournaments and a ranked ladder.",
+    "tags": [
+      "pvp"
+    ]
   },
   {
     "name": "Emberpeak",
     "ip": "emberpeak.fr:47649",
     "date_created": "2026-02-06T10:27:00Z",
     "version": "0.2.0",
-    "gamemodes": "survival, adventure",
     "languages": "french",
     "requires_mods": false,
-    "description": "Serveur francophone axe exploration et grandes constructions."
+    "description": "Serveur francophone axe exploration et grandes constructions.",
+    "tags": [
+      "survival",
+      "adventure"
+    ]
   },
   {
     "name": "Frostmarch",
     "ip": "frostmarch.se",
     "date_created": "2026-02-11T07:45:00Z",
     "version": "0.3.0",
-    "gamemodes": "survival",
     "languages": "swedish, english",
     "requires_mods": true,
-    "description": "Permanent winter world with temperature and hunger overhauls."
+    "description": "Permanent winter world with temperature and hunger overhauls.",
+    "tags": [
+      "survival"
+    ]
   },
   {
     "name": "Hollowgate",
     "ip": "hollowgate.net:47700",
     "date_created": "2026-02-14T22:03:00Z",
     "version": "0.3.0",
-    "gamemodes": "adventure",
     "languages": "english",
     "requires_mods": true,
-    "description": "Story-driven dungeon crawl with hand-built questlines."
+    "description": "Story-driven dungeon crawl with hand-built questlines.",
+    "tags": [
+      "adventure"
+    ]
   },
   {
     "name": "Aetherium",
     "ip": "aetherium.cloud:47649",
     "date_created": "2026-02-19T15:38:00Z",
     "version": "0.3.0",
-    "gamemodes": "creative, survival",
     "languages": "english, dutch",
     "requires_mods": false,
-    "description": "Sky island network connected by player-built bridges."
+    "description": "Sky island network connected by player-built bridges.",
+    "tags": [
+      "creative",
+      "survival"
+    ]
   },
   {
     "name": "Quarrystone",
     "ip": "quarrystone.co.uk",
     "date_created": "2026-02-23T09:09:00Z",
     "version": "0.1.1",
-    "gamemodes": "survival",
     "languages": "english",
     "requires_mods": false,
-    "description": "Long-running legacy world, kept on an older build by request."
+    "description": "Long-running legacy world, kept on an older build by request.",
+    "tags": [
+      "survival"
+    ]
   },
   {
     "name": "Verdantia",
     "ip": "verdantia.gg:47649",
     "date_created": "2026-02-27T18:21:00Z",
     "version": "0.3.0",
-    "gamemodes": "survival",
     "languages": "english, spanish",
     "requires_mods": false,
-    "description": "Farming and trading community with a shared central market."
+    "description": "Farming and trading community with a shared central market.",
+    "tags": [
+      "survival"
+    ]
   },
   {
     "name": "Ironroot",
     "ip": "ironroot.mc.de:47651",
     "date_created": "2026-03-02T12:00:00Z",
     "version": "0.2.0",
-    "gamemodes": "survival, pvp",
     "languages": "german, english",
     "requires_mods": false,
-    "description": "Clan-based survival with contested resource zones."
+    "description": "Clan-based survival with contested resource zones.",
+    "tags": [
+      "survival",
+      "pvp"
+    ]
   },
   {
     "name": "Skyshard",
     "ip": "skyshard.online",
     "date_created": "2026-03-06T21:44:00Z",
     "version": "0.3.0",
-    "gamemodes": "creative",
     "languages": "english",
     "requires_mods": false,
-    "description": "Free-build plots, no whitelist, instant creative on join."
+    "description": "Free-build plots, no whitelist, instant creative on join.",
+    "tags": [
+      "creative"
+    ]
   },
   {
     "name": "Chunkless",
     "ip": "chunkless.dev:47649",
     "date_created": "2026-03-10T08:33:00Z",
     "version": "0.3.0",
-    "gamemodes": "survival",
     "languages": "english",
     "requires_mods": true,
-    "description": "Experimental server testing addon APIs. Expect occasional resets."
+    "description": "Experimental server testing addon APIs. Expect occasional resets.",
+    "tags": [
+      "survival"
+    ]
   },
   {
     "name": "Mithrilhold",
     "ip": "mithrilhold.net:47649",
     "date_created": "2026-03-14T17:07:00Z",
     "version": "0.3.0",
-    "gamemodes": "survival, adventure",
     "languages": "english",
     "requires_mods": true,
-    "description": "Dwarven megaproject spanning fourteen underground levels."
+    "description": "Dwarven megaproject spanning fourteen underground levels.",
+    "tags": [
+      "survival",
+      "adventure"
+    ]
   },
   {
     "name": "Oakfall",
     "ip": "oakfall.world",
     "date_created": "2026-03-18T11:52:00Z",
     "version": "0.2.0",
-    "gamemodes": "survival",
     "languages": "english",
     "requires_mods": false,
-    "description": "Small friendly whitelist server for slow-paced play."
+    "description": "Small friendly whitelist server for slow-paced play.",
+    "tags": [
+      "survival"
+    ]
   },
   {
     "name": "Pixelforge",
     "ip": "pixelforge.gg:47649",
     "date_created": "2026-03-22T14:29:00Z",
     "version": "0.3.0",
-    "gamemodes": "creative",
     "languages": "english, portuguese",
     "requires_mods": false,
-    "description": "Build competitions every weekend with community voting."
+    "description": "Build competitions every weekend with community voting.",
+    "tags": [
+      "creative"
+    ]
   },
   {
     "name": "Sandloom",
     "ip": "sandloom.net:47649",
     "date_created": "2026-03-26T09:41:00Z",
     "version": "0.3.0",
-    "gamemodes": "survival",
     "languages": "english",
     "requires_mods": false,
-    "description": "Desert-only world generation. Water is the real currency here."
+    "description": "Desert-only world generation. Water is the real currency here.",
+    "tags": [
+      "survival"
+    ]
   },
   {
     "name": "Thundercliff",
     "ip": "thundercliff.io",
     "date_created": "2026-03-30T20:14:00Z",
     "version": "0.3.0",
-    "gamemodes": "pvp, survival",
     "languages": "english",
     "requires_mods": false,
-    "description": "Coastal siege server with cannons and destructible walls."
+    "description": "Coastal siege server with cannons and destructible walls.",
+    "tags": [
+      "pvp",
+      "survival"
+    ]
   },
   {
     "name": "Glimmercave",
     "ip": "glimmercave.eu:47649",
     "date_created": "2026-04-03T13:26:00Z",
     "version": "0.2.0",
-    "gamemodes": "survival",
     "languages": "czech, english",
     "requires_mods": false,
-    "description": "Cave-dwelling survival. Surface building is banned by rule."
+    "description": "Cave-dwelling survival. Surface building is banned by rule.",
+    "tags": [
+      "survival"
+    ]
   },
   {
     "name": "Runeforge",
     "ip": "runeforge.mc.gg:47660",
     "date_created": "2026-04-07T10:58:00Z",
     "version": "0.3.0",
-    "gamemodes": "adventure",
     "languages": "english",
     "requires_mods": true,
-    "description": "Custom magic system built entirely with procedural crafting."
+    "description": "Custom magic system built entirely with procedural crafting.",
+    "tags": [
+      "adventure"
+    ]
   },
   {
     "name": "Wanderlands",
     "ip": "wanderlands.net",
     "date_created": "2026-04-11T16:03:00Z",
     "version": "0.3.0",
-    "gamemodes": "survival, adventure",
     "languages": "english, italian",
     "requires_mods": false,
-    "description": "Nomad ruleset: no permanent bases, keep moving or lose your claim."
+    "description": "Nomad ruleset: no permanent bases, keep moving or lose your claim.",
+    "tags": [
+      "survival",
+      "adventure"
+    ]
   },
   {
     "name": "Bastion of Bricks",
     "ip": "bastion.build:47649",
     "date_created": "2026-04-15T08:47:00Z",
     "version": "0.3.0",
-    "gamemodes": "creative",
     "languages": "english",
     "requires_mods": false,
-    "description": "Architecture-focused server with curated city districts."
+    "description": "Architecture-focused server with curated city districts.",
+    "tags": [
+      "creative"
+    ]
   },
   {
     "name": "Cinderfell",
     "ip": "cinderfell.host:47649",
     "date_created": "2026-04-19T19:32:00Z",
     "version": "0.2.0",
-    "gamemodes": "survival",
     "languages": "english",
     "requires_mods": true,
-    "description": "Volcanic world with lava tides and heat-resistant gear tiers."
+    "description": "Volcanic world with lava tides and heat-resistant gear tiers.",
+    "tags": [
+      "survival"
+    ]
   },
   {
     "name": "Moonquarry",
     "ip": "moonquarry.space",
     "date_created": "2026-04-23T12:19:00Z",
     "version": "0.3.0",
-    "gamemodes": "survival",
     "languages": "english, japanese",
     "requires_mods": false,
-    "description": "Low-gravity mining colony with a shared oxygen budget."
+    "description": "Low-gravity mining colony with a shared oxygen budget.",
+    "tags": [
+      "survival"
+    ]
   },
   {
     "name": "Prismatic",
     "ip": "prismatic.gg:47649",
     "date_created": "2026-04-27T15:55:00Z",
     "version": "0.3.0",
-    "gamemodes": "creative, pvp",
     "languages": "english",
     "requires_mods": false,
-    "description": "Colour-coded team builds followed by weekly PvP showdowns."
+    "description": "Colour-coded team builds followed by weekly PvP showdowns.",
+    "tags": [
+      "creative",
+      "pvp"
+    ]
   },
   {
     "name": "Voidreach",
     "ip": "voidreach.net:47701",
     "date_created": "2026-05-01T09:04:00Z",
     "version": "0.3.0",
-    "gamemodes": "survival",
     "languages": "english, russian",
     "requires_mods": true,
-    "description": "Infinite depth challenge. Dig down as far as the chunks allow."
+    "description": "Infinite depth challenge. Dig down as far as the chunks allow.",
+    "tags": [
+      "survival"
+    ]
   },
   {
     "name": "Highvale",
     "ip": "highvale.co:47649",
     "date_created": "2026-05-05T18:38:00Z",
     "version": "0.2.0",
-    "gamemodes": "survival, adventure",
     "languages": "english",
     "requires_mods": false,
-    "description": "Medieval kingdom roleplay with elected rulers and taxes."
+    "description": "Medieval kingdom roleplay with elected rulers and taxes.",
+    "tags": [
+      "survival",
+      "adventure"
+    ]
   },
   {
     "name": "Coalcove",
     "ip": "coalcove.uk:47649",
     "date_created": "2026-05-09T11:11:00Z",
     "version": "0.3.0",
-    "gamemodes": "survival",
     "languages": "english",
     "requires_mods": false,
-    "description": "Industrial revolution theme with rail networks between towns."
+    "description": "Industrial revolution theme with rail networks between towns.",
+    "tags": [
+      "survival"
+    ]
   },
   {
     "name": "Everdusk",
     "ip": "everdusk.world:47649",
     "date_created": "2026-05-13T21:26:00Z",
     "version": "0.3.0",
-    "gamemodes": "survival, pvp",
     "languages": "english, turkish",
     "requires_mods": true,
-    "description": "Permanent night cycle. Mobs are stronger and light is precious."
+    "description": "Permanent night cycle. Mobs are stronger and light is precious.",
+    "tags": [
+      "survival",
+      "pvp"
+    ]
   },
   {
     "name": "Grimloch",
     "ip": "grimloch.net",
     "date_created": "2026-05-17T14:07:00Z",
     "version": "0.3.0",
-    "gamemodes": "survival",
     "languages": "english",
     "requires_mods": false,
-    "description": "Swamp survival with disease mechanics and herbal medicine."
+    "description": "Swamp survival with disease mechanics and herbal medicine.",
+    "tags": [
+      "survival"
+    ]
   },
   {
     "name": "Kaolin",
     "ip": "kaolin.cn:47649",
     "date_created": "2026-05-21T07:52:00Z",
     "version": "0.2.0",
-    "gamemodes": "creative",
     "languages": "chinese, english",
     "requires_mods": false,
-    "description": "Porcelain city project. Ceramic palette only."
+    "description": "Porcelain city project. Ceramic palette only.",
+    "tags": [
+      "creative"
+    ]
   },
   {
     "name": "Lanternwood",
     "ip": "lanternwood.gg:47649",
     "date_created": "2026-05-25T16:44:00Z",
     "version": "0.3.0",
-    "gamemodes": "survival",
     "languages": "english",
     "requires_mods": false,
-    "description": "Cozy forest village server. Lanterns everywhere, monsters nowhere."
+    "description": "Cozy forest village server. Lanterns everywhere, monsters nowhere.",
+    "tags": [
+      "survival"
+    ]
   },
   {
     "name": "Marblewatch",
     "ip": "marblewatch.it:47649",
     "date_created": "2026-05-29T10:15:00Z",
     "version": "0.3.0",
-    "gamemodes": "creative",
     "languages": "italian, english",
     "requires_mods": false,
-    "description": "Classical architecture recreations from real world landmarks."
+    "description": "Classical architecture recreations from real world landmarks.",
+    "tags": [
+      "creative"
+    ]
   },
   {
     "name": "Nordhavn",
     "ip": "nordhavn.dk:47649",
     "date_created": "2026-06-02T13:31:00Z",
     "version": "0.3.0",
-    "gamemodes": "survival, adventure",
     "languages": "danish, english",
     "requires_mods": true,
-    "description": "Viking longship expeditions across a procedurally seeded archipelago."
+    "description": "Viking longship expeditions across a procedurally seeded archipelago.",
+    "tags": [
+      "survival",
+      "adventure"
+    ]
   },
   {
     "name": "Obsidian Rift",
     "ip": "obsidianrift.net:47702",
     "date_created": "2026-06-06T20:09:00Z",
     "version": "0.3.0",
-    "gamemodes": "pvp",
     "languages": "english",
     "requires_mods": false,
-    "description": "Deathmatch server with instant respawn and rotating maps."
+    "description": "Deathmatch server with instant respawn and rotating maps.",
+    "tags": [
+      "pvp"
+    ]
   },
   {
     "name": "Pinegrove",
     "ip": "pinegrove.ca:47649",
     "date_created": "2026-06-10T09:23:00Z",
     "version": "0.2.0",
-    "gamemodes": "survival",
     "languages": "english, french",
     "requires_mods": false,
-    "description": "Family-friendly server with strict moderation and chat filters."
+    "description": "Family-friendly server with strict moderation and chat filters.",
+    "tags": [
+      "survival"
+    ]
   },
   {
     "name": "Quartzfield",
     "ip": "quartzfield.org",
     "date_created": "2026-06-14T17:48:00Z",
     "version": "0.3.0",
-    "gamemodes": "survival, creative",
     "languages": "english",
     "requires_mods": false,
-    "description": "Dual-world setup: grind in survival, prototype in creative."
+    "description": "Dual-world setup: grind in survival, prototype in creative.",
+    "tags": [
+      "survival",
+      "creative"
+    ]
   },
   {
     "name": "Rimefrost",
     "ip": "rimefrost.fi:47649",
     "date_created": "2026-06-18T11:36:00Z",
     "version": "0.3.0",
-    "gamemodes": "survival",
     "languages": "finnish, english",
     "requires_mods": true,
-    "description": "Glacier expedition server. Shelter before nightfall or freeze."
+    "description": "Glacier expedition server. Shelter before nightfall or freeze.",
+    "tags": [
+      "survival"
+    ]
   },
   {
     "name": "Saltmarsh",
     "ip": "saltmarsh.nl:47649",
     "date_created": "2026-06-22T08:12:00Z",
     "version": "0.3.0",
-    "gamemodes": "survival",
     "languages": "dutch, english",
     "requires_mods": false,
-    "description": "Below-sea-level building challenge with dykes and pumps."
+    "description": "Below-sea-level building challenge with dykes and pumps.",
+    "tags": [
+      "survival"
+    ]
   },
   {
     "name": "Tidebreak",
     "ip": "tidebreak.gg:47649",
     "date_created": "2026-06-26T19:57:00Z",
     "version": "0.3.0",
-    "gamemodes": "pvp, survival",
     "languages": "english, spanish",
     "requires_mods": false,
-    "description": "Naval combat between rival port cities. Ships are player built."
+    "description": "Naval combat between rival port cities. Ships are player built.",
+    "tags": [
+      "pvp",
+      "survival"
+    ]
   },
   {
     "name": "Umbral Depths",
     "ip": "umbral.host:47703",
     "date_created": "2026-06-30T14:03:00Z",
     "version": "0.3.0",
-    "gamemodes": "adventure",
     "languages": "english",
     "requires_mods": true,
-    "description": "Roguelike descent. Every death sends you back to the surface."
+    "description": "Roguelike descent. Every death sends you back to the surface.",
+    "tags": [
+      "adventure"
+    ]
   },
   {
     "name": "Valhalla Voxels",
     "ip": "valhallavoxels.net:47649",
     "date_created": "2026-07-03T10:39:00Z",
     "version": "0.3.0",
-    "gamemodes": "pvp",
     "languages": "english, norwegian",
     "requires_mods": false,
-    "description": "Arena combat with a glory ranking that resets each season."
+    "description": "Arena combat with a glory ranking that resets each season.",
+    "tags": [
+      "pvp"
+    ]
   },
   {
     "name": "Windrow",
     "ip": "windrow.farm:47649",
     "date_created": "2026-07-07T16:21:00Z",
     "version": "0.3.0",
-    "gamemodes": "survival",
     "languages": "english",
     "requires_mods": false,
-    "description": "Agricultural economy server. Crop prices float with supply."
+    "description": "Agricultural economy server. Crop prices float with supply.",
+    "tags": [
+      "survival"
+    ]
   },
   {
     "name": "Xenolith",
     "ip": "xenolith.dev:47649",
     "date_created": "2026-07-11T09:48:00Z",
     "version": "0.3.0",
-    "gamemodes": "creative",
     "languages": "english",
     "requires_mods": true,
-    "description": "Addon development sandbox. Open to modders, expect breakage."
+    "description": "Addon development sandbox. Open to modders, expect breakage.",
+    "tags": [
+      "creative"
+    ]
   },
   {
     "name": "Yggdrasil",
     "ip": "yggdrasil.world:47649",
     "date_created": "2026-07-15T20:52:00Z",
     "version": "0.3.0",
-    "gamemodes": "survival, adventure",
     "languages": "english, german",
     "requires_mods": true,
-    "description": "One colossal world tree. Nine realms built along its branches."
+    "description": "One colossal world tree. Nine realms built along its branches.",
+    "tags": [
+      "survival",
+      "adventure"
+    ]
   },
   {
     "name": "Zephyr Heights",
     "ip": "zephyrheights.gg:47649",
     "date_created": "2026-07-19T12:14:00Z",
     "version": "0.3.0",
-    "gamemodes": "creative, survival",
     "languages": "english",
     "requires_mods": false,
-    "description": "Glider parkour circuits threaded through floating mountains."
+    "description": "Glider parkour circuits threaded through floating mountains.",
+    "tags": [
+      "creative",
+      "survival"
+    ]
   },
   {
     "name": "Blockstead",
     "ip": "blockstead.net:47649",
     "date_created": "2026-07-23T15:36:00Z",
     "version": "0.3.0",
-    "gamemodes": "survival",
     "languages": "english",
     "requires_mods": false,
-    "description": "Homestead server with land claims and a cooperative build queue."
+    "description": "Homestead server with land claims and a cooperative build queue.",
+    "tags": [
+      "survival"
+    ]
   },
   {
     "name": "Cavernaut",
     "ip": "cavernaut.io:47649",
     "date_created": "2026-07-27T08:29:00Z",
     "version": "0.3.0",
-    "gamemodes": "survival, adventure",
     "languages": "english, portuguese",
     "requires_mods": false,
-    "description": "Newest on the list. Speleology-themed survival with mapped cave systems."
+    "description": "Newest on the list. Speleology-themed survival with mapped cave systems.",
+    "tags": [
+      "survival",
+      "adventure"
+    ]
   }
 ]
