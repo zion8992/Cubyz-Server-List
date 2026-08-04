@@ -6,8 +6,7 @@ var motds = []string{
 	"All systems nominal.",
 	"Have you tried turning it off and on again?",
 	"Uptime is a lifestyle.",
-	"It's always DNS.",
-	"Backups you haven't restored are just hopes.",
+	"I have a duck in my router, it always goes NAT NAT NAT.",
 }
 
 func randomMOTD() string {
