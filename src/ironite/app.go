@@ -99,7 +99,7 @@ func (a *App) Build(list *netgliss.List) error {
 		MOTD:  randomMOTD(),
 		List: list,
 	}
-	if err := a.renderPages(data); err != nil {
+	if err := a.renderServers(data); err != nil {
 		return fmt.Errorf("render: %w", err)
 	}
 
@@ -116,7 +116,7 @@ func (a *App) copyStatic() error {
 	return os.CopyFS(a.cfg.OutDir + "/static", os.DirFS(a.cfg.StaticDir))
 }
 
-func (a *App) renderPages(data *Page) error {
+func (a *App) renderServers(data *Page) error {
 	partials, err := filepath.Glob(filepath.Join(a.cfg.TemplateDir, "_*.html"))
 	if err != nil {
 		return err
@@ -130,14 +130,14 @@ func (a *App) renderPages(data *Page) error {
 		if strings.HasPrefix(filepath.Base(page), "_") { // partials start with '_'
 			continue
 		}
-		if err := a.renderPage(page, partials, data); err != nil {
+		if err := a.renderServer(page, partials, data); err != nil {
 			return err
 		}
 	}
 	return nil
 }
 
-func (a *App) renderPage(page string, partials []string, data *Page) error {
+func (a *App) renderServer(page string, partials []string, data *Page) error {
 	name := filepath.Base(page)
 
 	ts, err := template.New(name).Funcs(a.Funcs()).ParseFiles(append([]string{page}, partials...)...)
